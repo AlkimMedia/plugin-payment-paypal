@@ -1,0 +1,11 @@
+{
+    "version": 1.0,
+    "name": "PayPal",
+    "description": "The official PayPal plugin for plentymarkets",
+    "author": "plentymarkets GmbH",
+    "keywords": ["paypal", "official", "plentymarkets", "payment"],
+    "type": "payment",
+    "namespace": "PayPal",
+    "require": [],
+    "serviceProvider": "PayPal\\Providers\\PayPalServiceProvider"
+}

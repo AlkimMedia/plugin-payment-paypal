@@ -1,0 +1,15 @@
+[{
+    "key": "is_header_bold",
+    "label": "Bold titleheader",
+    "type": "dropdown",
+    "possibleValues": {
+        "0": "No",
+        "1": "Yes"
+    },
+    "default": "0"
+}, {
+    "key": "custom_header",
+    "label": "Custom title",
+    "type": "text",
+    "default": "Custom title"
+}]
