@@ -27,30 +27,21 @@ class PaymentController extends Controller
     return $twig->render('PayPal::content.PayPalExpressButton');
   }
 
-  public function createPayPalPayment(string $paymentEvent, array<string, mixed> $paymentData, PaymentService $paymentService):void
+  public function preparePayment(PaymentService $paymentService):void
   {
-    $paymentStatus = array();
-    $paymentStatus['name'] = 'awaiting-approval';
-    $paymentStatus['lang'] = 'de';
-
-    $paymentData['status'] = $paymentStatus;
-
-    $paymentService->createPayment($paymentData);
-
-    $this->event->fire('paymentCreated');
+    $paymentService->preparePayment();
   }
 
-  public function updatePayPalPayment(string $paymentEvent, array<string, mixed> $paymentData, PaymentService $paymentService):void
+  public function ppCheckoutCancel():void
   {
-    $paymentStatus = array();
-    $paymentStatus['name'] = 'paid';
-    $paymentStatus['lang'] = 'de';
+    header("Location: http://master.plentymarkets.com/34poepoe/zahlungsarten/");
+    exit();
+  }
 
-    $paymentData['status'] = $paymentStatus;
-
-    $paymentService->updatePayment($paymentData);
-
-    $this->event->fire('paymentUpdated', $paymentStatus);
+  public function ppCheckoutSuccess():void
+  {
+    header("Location: http://master.plentymarkets.com/34poepoe/bestellbestaetigung/");
+    exit();
   }
 
 }
