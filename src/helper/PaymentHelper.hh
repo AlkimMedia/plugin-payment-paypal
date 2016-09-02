@@ -5,17 +5,21 @@ namespace PayPal\Helper;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Payment\Method\Models\PaymentMethod;
 use Plenty\Plugin\ConfigRepository;
+use PayPal\Services\SessionStorageService;
 
 class PaymentHelper
 {
   private PaymentMethodRepositoryContract $paymentMethodRepository;
   private ConfigRepository $config;
+  private SessionStorageService $sessionService;
 
   public function __construct(PaymentMethodRepositoryContract $paymentMethodRepository,
-                              ConfigRepository $config)
+                              ConfigRepository $config,
+                              SessionStorageService $sessionService)
   {
     $this->paymentMethodRepository = $paymentMethodRepository;
     $this->config = $config;
+    $this->sessionService = $sessionService;
   }
 
   public function createMopIfNotExists():void
@@ -43,11 +47,21 @@ class PaymentHelper
 
   public function getCancelURL():string
   {
-    return 'http://master.plentymarkets.com/ppCheckoutCancel';
+    return 'http://master.plentymarkets.com/payPalCheckoutCancel';
   }
 
   public function getSuccessURL():string
   {
-    return 'http://master.plentymarkets.com/ppCheckoutSuccess';
+    return 'http://master.plentymarkets.com/payPalCheckoutSuccess';
+  }
+
+  public function setPPPayID(string $value):void
+  {
+    $this->sessionService->setSessionValue('PayPalPayId', $value);
+  }
+
+  public function getPPPayID():string
+  {
+    return (string)$this->sessionService->getSessionValue('PayPalPayId');
   }
 }
