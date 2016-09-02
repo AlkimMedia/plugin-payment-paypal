@@ -137,4 +137,32 @@ class PaymentService
       return $this->returnType;
     }
 
+    public function payPalExecutePayment():mixed
+    {
+        $ppPayId = $this->paymentHelper->getPPPayID();
+        $ppPayerId = $this->paymentHelper->getPPPayerID();
+
+        $executeParams = array();
+
+        $executeParams['sandbox'] = $this->sandbox;
+        $executeParams['paymentId'] = $ppPayId;
+        $executeParams['payerId'] = $ppPayerId;
+
+        $executeResponse = $this->libCall->call('PayPal::executePayment', $executeParams);
+
+        if(is_array($executeResponse) && $executeResponse['error'])
+        {
+            $this->returnType = 'errorCode';
+            return $executeResponse['error'].': '.$executeResponse['error_msg'];
+        }
+
+        $resultJson = json_decode($executeResponse);
+
+        // unset the session params
+        $this->paymentHelper->setPPPayID('');
+        $this->paymentHelper->setPPPayerID('');
+
+        return $resultJson;
+    }
+
 }

@@ -4,10 +4,21 @@ use PayPal\Rest\ApiContext;
 use PayPal\Api\InputFields;
 use PayPal\Api\WebProfile;
 use PayPal\Api\Presentation;
+use PayPal\Api\Payment;
 
 
 class PayPalHelper
 {
+    static $payPalStatus = array(   'created'                => 1,
+                                    'approved'               => 'approved',
+                                    'failed'                 => 'failed',
+                                    'partially_completed'    => 'partially_completed',
+                                    'completed'              => 'completed',
+                                    'in_progress'            => 'in_progress',
+                                    'pending'                => 'pending',
+                                    'refunded'               => 'refunded',
+                                    'denied'                 => 'denied');
+
     /**
      * Helper method for getting an APIContext for all calls
      * @param string $clientId Client ID
@@ -22,8 +33,8 @@ class PayPalHelper
 
         if($sandbox)
         {
-        $mode = 'sandbox';
-        $endpoint = "https://test-api.sandbox.paypal.com";
+            $mode = 'sandbox';
+            $endpoint = "https://test-api.sandbox.paypal.com";
         }
         else
         {
@@ -49,5 +60,22 @@ class PayPalHelper
         );
 
         return $apiContext;
+    }
+
+    static function mapPayment(Payment $payment)
+    {
+        $returnArray = array();
+
+        $transaction = $payment->getTransactions()[0];
+
+        $returnArray['bookingText'] = $payment->getId();
+        $returnArray['payerId'] = $payment->getPayer();
+        $returnArray['payee'] = $payment->getPayee();
+        $returnArray['amount'] = $transaction->getAmount()->getTotal();
+        $returnArray['currency'] = $transaction->getAmount()->getCurrency();
+        $returnArray['entryDate'] = $payment->getCreateTime();
+        $returnArray['status'] = $payment->getState();
+
+        return $returnArray;
     }
 }

@@ -56,6 +56,7 @@ class PaymentController extends Controller
   public function payPalCheckoutSuccess():void
   {
     $paymentId = $this->request->get('paymentId');
+    $payerId = $this->request->get('PayerID');
 
     $ppPayId = $this->payHelper->getPPPayID();
 
@@ -64,6 +65,8 @@ class PaymentController extends Controller
     {
       $this->payPalCheckoutCancel();
     }
+
+    $this->payHelper->setPPPayerID($payerId);
 
     header("Location: http://master.plentymarkets.com/34poepoe/bestellbestaetigung/");
     exit();
