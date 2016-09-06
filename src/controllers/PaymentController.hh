@@ -42,6 +42,11 @@ class PaymentController extends Controller
     return $twig->render('PayPal::content.PayPalExpressButton');
   }
 
+  public function getPayPalPayment(PaymentService $paymentService):string
+  {
+    return $paymentService->getPayPalPayment();
+  }
+
   public function preparePayment(PaymentService $paymentService):void
   {
     $paymentService->preparePayment();

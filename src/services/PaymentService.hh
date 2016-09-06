@@ -56,6 +56,11 @@ class PaymentService
         $this->paymentMethodRepository->preparePaymentMethod($this->paymentHelper->getMop());
     }
 
+    public function getPayPalPayment():string
+    {
+        return print_r($this->libCall->call('PayPal::getPayPalPayment', array('payId' => 'PAY-4RW9947250679234JK7HLVCY', 'sandbox' => true)), true);
+    }
+
     public function executePayment():void
     {
         $this->paymentMethodRepository->executePayment('plenty.paypal', 2);

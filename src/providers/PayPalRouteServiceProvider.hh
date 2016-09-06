@@ -15,6 +15,8 @@ class PayPalRouteServiceProvider extends RouteServiceProvider
 			return $result;
 		});
 
+		$router->get('getPayPalPayment', 'PayPal\Controllers\PaymentController@getPayPalPayment');
+
 		$router->get('payPalExpressButton', 'PayPal\Controllers\PaymentController@showPPExpressButton');
 
 		//paypal return urls

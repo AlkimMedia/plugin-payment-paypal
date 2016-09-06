@@ -10,6 +10,7 @@ use Plenty\Plugin\Events\Dispatcher;
 
 use PayPal\Services\PaymentService;
 use PayPal\Helper\PaymentHelper;
+use PayPal\Methods\PayPalExpressPaymentMethod;
 
 
 class PayPalServiceProvider extends ServiceProvider
@@ -22,9 +23,14 @@ class PayPalServiceProvider extends ServiceProvider
   public function boot(Dispatcher $eventDispatcher,
                        PaymentHelper $paymentHelper,
                        PaymentService $paymentService,
-                       BasketRepositoryContract $basket):void
+                       BasketRepositoryContract $basket,
+                       PaymentContainer $payContainer):void
   {
     $paymentHelper->createMopIfNotExists();
+
+    $payContainer->register('PayPal::PAYPALEXPRESS', PayPalExpressPaymentMethod::class, [\Plenty\Modules\Payment\Events\Checkout\AfterPaymentMethodSelected::class,
+                                                                                                    \Plenty\Modules\Payment\Events\Checkout\ExecutePayment::class]);
+
 
     $eventDispatcher->listen(\Plenty\Modules\Payment\Events\Checkout\AfterPaymentMethodSelected::class, ($event) ==> {
 
