@@ -42,25 +42,26 @@ class PaymentHelper
 
   public function createMopIfNotExists():void
   {
-    if(!strlen($this->getMop()))
+    if($this->getMop() == 'no_paymentmethod_found')
     {
-      $paymentMethodData = array( 'pluginKey' => 'paypal',
-                                  'paymentKey' => 'standard',
+      $paymentMethodData = array( 'pluginKey' => 'PayPal',
+                                  'paymentKey' => 'PAYPALEXPRESS',
                                   'name' => 'PayPal');
 
       $this->paymentMethodRepository->createPaymentMethod($paymentMethodData);
     }
   }
 
-  public function getMop():string
+  public function getMop():mixed
   {
-    $mop = 'plenty.paypal';
+    $paymentMethods = $this->paymentMethodRepository->allForPlugin('PayPal');
 
-    //$mops = $this->paymentMethodRepository->allForPlugin('PayPal');
+    if(count($paymentMethods))
+    {
+      return $paymentMethods->first()->id;
+    }
 
-    //$mop = $mops['standard'];
-
-    return $mop;
+    return 'no_paymentmethod_found';
   }
 
   public function getCancelURL():string
@@ -99,7 +100,7 @@ class PaymentHelper
 
     $paymentProperties = array();
 
-    $this->payment->mopId = 1;//$this->getMop();
+    $this->payment->mopId = (int)$this->getMop();
     $this->payment->currency = $payPalPayment->currency;
     $this->payment->amount = $payPalPayment->amount;
     $this->payment->entryDate = $payPalPayment->entryDate;

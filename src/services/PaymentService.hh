@@ -53,12 +53,17 @@ class PaymentService
 
     public function preparePayment():void
     {
-        $this->paymentMethodRepository->preparePaymentMethod($this->paymentHelper->getMop());
+        $this->paymentMethodRepository->preparePaymentMethod((int)$this->paymentHelper->getMop());
+    }
+
+    public function getPayPalPayment():string
+    {
+        return print_r($this->libCall->call('PayPal::getPayPalPayment', array('payId' => 'PAY-4RW9947250679234JK7HLVCY', 'sandbox' => true)), true);
     }
 
     public function executePayment():void
     {
-        $this->paymentMethodRepository->executePayment('plenty.paypal', 2);
+        $this->paymentMethodRepository->executePayment((int)$this->paymentHelper->getMop(), 2);
     }
 
     public function getPayPalContent(Basket $basket):string
@@ -98,7 +103,6 @@ class PaymentService
 
       // make the prepare call for paypal
       $result = $this->libCall->call('PayPal::preparePayment', $payPalRequestParams);
-
       if(is_array($result) && $result['error'])
       {
         $this->returnType = 'errorCode';
