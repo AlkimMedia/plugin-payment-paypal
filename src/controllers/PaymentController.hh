@@ -47,6 +47,11 @@ class PaymentController extends Controller
     $paymentService->preparePayment();
   }
 
+  public function executePayment(PaymentService $paymentService):void
+  {
+    $paymentService->executePayment();
+  }
+
   public function payPalCheckoutCancel():void
   {
     header("Location: http://master.plentymarkets.com/34poepoe/zahlungsarten/");
@@ -63,12 +68,14 @@ class PaymentController extends Controller
     // Check if the Pay ID has changed
     if($paymentId != $ppPayId)
     {
-      $this->payPalCheckoutCancel();
+      header("Location: http://master.plentymarkets.com/34poepoe/zahlungsarten?paymentId=".(string)$paymentId."&paymentIdNew=".(string)$ppPayId."&payer=".(string)$payerId);
+      exit();
     }
 
+    $this->payHelper->setPPPayID($paymentId);
     $this->payHelper->setPPPayerID($payerId);
 
-    header("Location: http://master.plentymarkets.com/34poepoe/bestellbestaetigung/");
+    header("Location: http://master.plentymarkets.com/34poepoe/bestellbestaetigung?paymentId=".(string)$paymentId."&paymentIdNew=".(string)$ppPayId."&payer=".(string)$payerId);
     exit();
   }
 

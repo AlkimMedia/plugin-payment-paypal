@@ -28,8 +28,8 @@ class PayPalHelper
     static function getApiContext($sandbox = true)
     {
         // Replace these values by entering your own ClientId and Secret by visiting https://developer.paypal.com/webapps/developer/applications/myapps
-        $clientId = 'AYSq3RDGsmBLJE-otTkBtM-jBRd1TCQwFf9RGfwddNXWz0uFU9ztymylOhRS';
-        $clientSecret = 'EGnHDxD_qRPdaLdZz8iCr8N7_MzF-YHPTkjs6NKYQvQSBngp4PTTVWkPZRbL';
+        $clientId = 'AR0llxlDLgU8PEK32N2axJBvZOyULkseGs30YnXp6xPNaj3d_Iv15T52Kb6ba6gPDlT44NbBS3n9qMty';
+        $clientSecret = 'EM0hx_v2uuKeaQ3DylABSrG7mA7sjhIuizNpiaPiva9dVAAChkqkg8oenBRfxd1fAuETw5qFu5NOe8Hn';
 
         if($sandbox)
         {
@@ -40,7 +40,7 @@ class PayPalHelper
         {
             //live environment
             $mode = 'sandbox';
-            $endpoint = "https://test-api.sandbox.paypal.com";
+            $endpoint = "https://api.sandbox.paypal.com";
         }
 
         $apiContext = new ApiContext(
@@ -69,8 +69,6 @@ class PayPalHelper
         $transaction = $payment->getTransactions()[0];
 
         $returnArray['bookingText'] = $payment->getId();
-        $returnArray['payerId'] = $payment->getPayer();
-        $returnArray['payee'] = $payment->getPayee();
         $returnArray['amount'] = $transaction->getAmount()->getTotal();
         $returnArray['currency'] = $transaction->getAmount()->getCurrency();
         $returnArray['entryDate'] = $payment->getCreateTime();

@@ -23,5 +23,9 @@ class PayPalRouteServiceProvider extends RouteServiceProvider
 
 		//trigger prepare payment
 		$router->get('preparePayPalPayment', 'PayPal\Controllers\PaymentController@preparePayment');
+
+		//trigger execute payment
+		$router->get('executePayment', 'PayPal\Controllers\PaymentController@executePayment');
+
 	}
 }

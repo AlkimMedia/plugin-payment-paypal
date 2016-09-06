@@ -56,15 +56,20 @@ class PaymentService
         $this->paymentMethodRepository->preparePaymentMethod($this->paymentHelper->getMop());
     }
 
+    public function executePayment():void
+    {
+        $this->paymentMethodRepository->executePayment('plenty.paypal', 2);
+    }
+
     public function getPayPalContent(Basket $basket):string
     {
       $payPalRequestParams = array();
       $redirectUrl = '';
       $payPalMerchantParams = array();
 
-      $webProfileId = $this->libCall->call('PayPal::createWebProfile', $payPalMerchantParams);
+//    $webProfileId = $this->libCall->call('PayPal::createWebProfile', $payPalMerchantParams);
 
-      $payPalRequestParams['webProfileId'] = $webProfileId;
+      $payPalRequestParams['webProfileId'] = 'XP-3XH9-EMJG-WX7L-789D';
 
       $payPalRequestParams['sandbox'] = $this->sandbox;
 
@@ -137,7 +142,7 @@ class PaymentService
       return $this->returnType;
     }
 
-    public function payPalExecutePayment():mixed
+    public function payPalExecutePayment():string
     {
         $ppPayId = $this->paymentHelper->getPPPayID();
         $ppPayerId = $this->paymentHelper->getPPPayerID();
@@ -145,7 +150,7 @@ class PaymentService
         $executeParams = array();
 
         $executeParams['sandbox'] = $this->sandbox;
-        $executeParams['paymentId'] = $ppPayId;
+        $executeParams['payId'] = $ppPayId;
         $executeParams['payerId'] = $ppPayerId;
 
         $executeResponse = $this->libCall->call('PayPal::executePayment', $executeParams);
@@ -156,13 +161,13 @@ class PaymentService
             return $executeResponse['error'].': '.$executeResponse['error_msg'];
         }
 
-        $resultJson = json_decode($executeResponse);
+        $result = $executeResponse;
 
         // unset the session params
         $this->paymentHelper->setPPPayID('');
         $this->paymentHelper->setPPPayerID('');
 
-        return $resultJson;
+        return (string)$result;
     }
 
 }

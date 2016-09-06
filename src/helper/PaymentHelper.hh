@@ -9,6 +9,7 @@ use Plenty\Modules\Payment\Method\Models\PaymentMethod;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Modules\Order\Models\Order;
+use Plenty\Modules\Payment\Models\PaymentOrderRelation;
 
 use PayPal\Services\SessionStorageService;
 
@@ -17,18 +18,21 @@ class PaymentHelper
   private PaymentMethodRepositoryContract $paymentMethodRepository;
   private ConfigRepository $config;
   private SessionStorageService $sessionService;
-  private PaymentOrderRelationRepositoryContract $paymentOrderRelation;
+  private PaymentOrderRelationRepositoryContract $paymentOrderRelationRepo;
+  private PaymentOrderRelation $paymentOrderRelation;
   private PaymentRepositoryContract $paymentRepo;
   private Payment $payment;
 
   public function __construct(PaymentMethodRepositoryContract $paymentMethodRepository,
                               PaymentRepositoryContract $paymentRepo,
-                              PaymentOrderRelationRepositoryContract $paymentOrderRelation,
+                              PaymentOrderRelationRepositoryContract $paymentOrderRelationRepo,
                               ConfigRepository $config,
                               SessionStorageService $sessionService,
-                              Payment $payment)
+                              Payment $payment,
+                              PaymentOrderRelation $paymentOrderRelation)
   {
     $this->paymentMethodRepository = $paymentMethodRepository;
+    $this->paymentOrderRelationRepo = $paymentOrderRelationRepo;
     $this->paymentOrderRelation = $paymentOrderRelation;
     $this->paymentRepo = $paymentRepo;
     $this->config = $config;
@@ -69,41 +73,41 @@ class PaymentHelper
     return 'http://master.plentymarkets.com/payPalCheckoutSuccess';
   }
 
-  public function setPPPayID(string $value):void
+  public function setPPPayID(mixed $value):void
   {
     $this->sessionService->setSessionValue('PayPalPayId', $value);
   }
 
-  public function getPPPayID():string
+  public function getPPPayID():mixed
   {
-    return (string)$this->sessionService->getSessionValue('PayPalPayId');
+    return $this->sessionService->getSessionValue('PayPalPayId');
   }
 
-  public function setPPPayerID(string $value):void
+  public function setPPPayerID(mixed $value):void
   {
     $this->sessionService->setSessionValue('PayPalPayerId', $value);
   }
 
-  public function getPPPayerID():string
+  public function getPPPayerID():mixed
   {
-    return (string)$this->sessionService->getSessionValue('PayPalPayerId');
+    return $this->sessionService->getSessionValue('PayPalPayerId');
   }
 
-  public function createPlentyPayment(mixed $json):Payment
+  public function createPlentyPayment(string $json):Payment
   {
-    $payPalPayment = $json;
+    $payPalPayment = json_decode($json);
 
     $paymentProperties = array();
 
-    $this->payment->mopId = $this->getMop();
+    $this->payment->mopId = 1;//$this->getMop();
     $this->payment->currency = $payPalPayment->currency;
     $this->payment->amount = $payPalPayment->amount;
     $this->payment->entryDate = $payPalPayment->entryDate;
-    $this->payment->origin = Payment::ORIGIN_PLUGIN;
-    $this->payment->status = $this->mapStatus($payPalPayment->status);
+    $this->payment->origin = 6;//$this->paymentRepo->getOriginConstants('plugin');
+    $this->payment->status = 2;//$this->mapStatus($payPalPayment->status);
+    $this->payment->transactionType = 2;
 
-
-    $this->payment->property($paymentProperties);
+//    $this->payment->property($paymentProperties);
 
     $payment = $this->paymentRepo->createPayment($this->payment->toArray());
 
@@ -112,24 +116,25 @@ class PaymentHelper
 
   public function assignPlentyPaymentToPlentyOrder(Payment $payment, Order $order):string
   {
-
+    $pay = $payment;
+    $ord = $order;
 
     return 'success';
   }
 
   public function mapStatus(string $status):int
   {
-    $statusMap = array( 'created'               => Payment::STATUS_CAPTURED,
-                        'approved'              => Payment::STATUS_APPROVED,
-                        'failed'                => Payment::STATUS_REFUSED,
-                        'partially_completed'   => Payment::STATUS_PARTIALLY_CAPTURED,
-                        'completed'             => Payment::STATUS_CAPTURED,
-                        'in_progress'           => Payment::STATUS_AWAITING_APPROVAL,
-                        'pending'               => Payment::STATUS_AWAITING_APPROVAL,
-                        'refunded'              => Payment::STATUS_REFUNDED,
-                        'denied'                => Payment::STATUS_REFUSED);
+    $statusMap = array( 'created'               => $this->paymentRepo->getStatusConstants('captured'),
+                        'approved'              => $this->paymentRepo->getStatusConstants('approved'),
+                        'failed'                => $this->paymentRepo->getStatusConstants('refused'),
+                        'partially_completed'   => $this->paymentRepo->getStatusConstants('partially_captured'),
+                        'completed'             => $this->paymentRepo->getStatusConstants('captured'),
+                        'in_progress'           => $this->paymentRepo->getStatusConstants('awaiting_approval'),
+                        'pending'               => $this->paymentRepo->getStatusConstants('awaiting_approval'),
+                        'refunded'              => $this->paymentRepo->getStatusConstants('refunded'),
+                        'denied'                => $this->paymentRepo->getStatusConstants('refused'));
 
-    return $statusMap[$status];
+    return (int)$statusMap[$status];
   }
 
 }

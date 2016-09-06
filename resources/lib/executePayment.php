@@ -9,12 +9,29 @@ require_once __DIR__.'/PayPalHelper.php';
 
 $apiContext = PayPalHelper::getApiContext(SdkRestApi::getParam('sandbox'));
 
-$paymentId = SdkRestApi::getParam('paymentId');
+$paymentId = SdkRestApi::getParam('payId');
 
-$payment = Payment::get($paymentId, $apiContext);
+try
+{
+    $payment = Payment::get($paymentId, $apiContext);
+}
+catch(PayPal\Exception\PPConnectionException $pce)
+{
+    return '<pre>';print_r(json_decode($pce->getData()));
+}
 
 $execution = new PaymentExecution();
-$execution->setPayerId(SdkRestApi::getParam('payerId'));
+
+if(is_null(SdkRestApi::getParam('payerId')))
+{
+    $payer = $payment->getPayer()->getPayerInfo()->getPayerId();
+}
+else
+{
+    $payer = SdkRestApi::getParam('payerId');
+}
+
+$execution->setPayerId($payer);
 
 try
 {
@@ -22,10 +39,10 @@ try
 
     $paidPayment = Payment::get($paymentId, $apiContext);
 }
-catch(Exception $ex)
+catch(PayPal\Exception\PPConnectionException $pce)
 {
-    return (STRING)$ex->getMessage();
+    return '<pre>';print_r(json_decode($pce->getData()));
 }
 
-return (STRING)PayPalHelper::mapPayment($paidPayment);
+return PayPalHelper::mapPayment($paidPayment);
 
