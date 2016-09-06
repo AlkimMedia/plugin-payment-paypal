@@ -56,9 +56,9 @@ class PaymentService
         $this->paymentMethodRepository->preparePaymentMethod((int)$this->paymentHelper->getMop());
     }
 
-    public function getPayPalPayment():array
+    public function getPayPalPayment():string
     {
-        return $this->libCall->call('PayPal::getPayPalPayment', array('payId' => 'PAY-4RW9947250679234JK7HLVCY', 'sandbox' => true));
+        return json_encode($this->libCall->call('PayPal::getPayPalPayment', array('payId' => 'PAY-4RW9947250679234JK7HLVCY', 'sandbox' => true)));
     }
 
     public function executePayment():void
