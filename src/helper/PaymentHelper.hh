@@ -58,7 +58,7 @@ class PaymentHelper
 
     if(count($paymentMethods))
     {
-      return $paymentMethods->first()->id;
+      return $paymentMethods[0]->id;
     }
 
     return 'no_paymentmethod_found';
