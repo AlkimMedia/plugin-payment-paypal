@@ -58,7 +58,7 @@ class PaymentService
 
     public function getPayPalPayment():string
     {
-        return print_r($this->libCall->call('PayPal::getPayPalPayment', array('payId' => 'PAY-4RW9947250679234JK7HLVCY', 'sandbox' => true)), true);
+        return strval($this->libCall->call('PayPal::getPayPalPayment', array('payId' => 'PAY-4RW9947250679234JK7HLVCY', 'sandbox' => true)));
     }
 
     public function executePayment():void
