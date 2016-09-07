@@ -59,7 +59,7 @@ class PaymentController extends Controller
 
   public function payPalCheckoutCancel():void
   {
-    header("Location: http://master.plentymarkets.com/34poepoe/zahlungsarten/");
+    header("Location: http://master.plentymarkets.com/checkout");
     exit();
   }
 
@@ -73,14 +73,14 @@ class PaymentController extends Controller
     // Check if the Pay ID has changed
     if($paymentId != $ppPayId)
     {
-      header("Location: http://master.plentymarkets.com/34poepoe/zahlungsarten?paymentId=".(string)$paymentId."&paymentIdNew=".(string)$ppPayId."&payer=".(string)$payerId);
+      header("Location: http://master.plentymarkets.com/checkout?paymentId=".(string)$paymentId."&paymentIdNew=".(string)$ppPayId."&payer=".(string)$payerId);
       exit();
     }
 
     $this->payHelper->setPPPayID($paymentId);
     $this->payHelper->setPPPayerID($payerId);
 
-    header("Location: http://master.plentymarkets.com/34poepoe/bestellbestaetigung?paymentId=".(string)$paymentId."&paymentIdNew=".(string)$ppPayId."&payer=".(string)$payerId);
+    header("Location: http://master.plentymarkets.com/confirmation?paymentId=".(string)$paymentId."&paymentIdNew=".(string)$ppPayId."&payer=".(string)$payerId);
     exit();
   }
 

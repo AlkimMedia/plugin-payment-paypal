@@ -2,38 +2,42 @@
 
 namespace PayPal\Helper;
 
+use Plenty\Plugin\Application;
+use Plenty\Plugin\ConfigRepository;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentOrderRelationRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Method\Models\PaymentMethod;
-use Plenty\Plugin\ConfigRepository;
+use Plenty\Modules\Payment\Models\PaymentProperty;
 use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Modules\Order\Models\Order;
-use Plenty\Modules\Payment\Models\PaymentOrderRelation;
 
 use PayPal\Services\SessionStorageService;
 
 class PaymentHelper
 {
+  private Application $app;
   private PaymentMethodRepositoryContract $paymentMethodRepository;
   private ConfigRepository $config;
   private SessionStorageService $sessionService;
   private PaymentOrderRelationRepositoryContract $paymentOrderRelationRepo;
-  private PaymentOrderRelation $paymentOrderRelation;
+  private PaymentProperty $paymentProperty;
   private PaymentRepositoryContract $paymentRepo;
   private Payment $payment;
 
-  public function __construct(PaymentMethodRepositoryContract $paymentMethodRepository,
+  public function __construct(Application $app,
+                              PaymentMethodRepositoryContract $paymentMethodRepository,
                               PaymentRepositoryContract $paymentRepo,
                               PaymentOrderRelationRepositoryContract $paymentOrderRelationRepo,
                               ConfigRepository $config,
                               SessionStorageService $sessionService,
                               Payment $payment,
-                              PaymentOrderRelation $paymentOrderRelation)
+                              PaymentProperty $paymentProperty)
   {
+    $this->app = $app;
     $this->paymentMethodRepository = $paymentMethodRepository;
     $this->paymentOrderRelationRepo = $paymentOrderRelationRepo;
-    $this->paymentOrderRelation = $paymentOrderRelation;
+    $this->paymentProperty = $paymentProperty;
     $this->paymentRepo = $paymentRepo;
     $this->config = $config;
     $this->sessionService = $sessionService;
@@ -58,7 +62,13 @@ class PaymentHelper
 
     if(count($paymentMethods))
     {
-      return $paymentMethods[0]->id;
+      foreach($paymentMethods as $paymentMethod)
+      {
+        if($paymentMethod->paymentKey == 'PAYPALEXPRESS')
+        {
+          return $paymentMethod->id;
+        }
+      }
     }
 
     return 'no_paymentmethod_found';
@@ -98,29 +108,38 @@ class PaymentHelper
   {
     $payPalPayment = json_decode($json);
 
-    $paymentProperties = array();
-
     $this->payment->mopId = (int)$this->getMop();
     $this->payment->currency = $payPalPayment->currency;
     $this->payment->amount = $payPalPayment->amount;
     $this->payment->entryDate = $payPalPayment->entryDate;
-    $this->payment->origin = 6;//$this->paymentRepo->getOriginConstants('plugin');
-    $this->payment->status = 2;//$this->mapStatus($payPalPayment->status);
+    $this->payment->status = $this->mapStatus($payPalPayment->status);
     $this->payment->transactionType = 2;
 
-//    $this->payment->property($paymentProperties);
+    /** @var PaymentProperty $paymentProp */
+    $paymentProp = $this->paymentProperty;
 
-    $payment = $this->paymentRepo->createPayment($this->payment->toArray());
+    $paymentProp->typeId = 3;
+    $paymentProp->value = $payPalPayment->bookingText;
+
+    $prop1 = $paymentProp->toArray();
+
+    $paymentProp->typeId = 6;
+    $paymentProp->value = $this->paymentRepo->getOriginConstants('plugin');
+
+    $prop2 = $paymentProp->toArray();
+
+    $paymentProps = array($prop1, $prop2);
+
+    $this->payment->property = $paymentProps;
+
+    $payment = $this->paymentRepo->createPayment(array($this->payment->toArray()));
 
     return $payment;
   }
 
-  public function assignPlentyPaymentToPlentyOrder(Payment $payment, Order $order):string
+  public function assignPlentyPaymentToPlentyOrder(Payment $payment, Order $order):void
   {
-    $pay = $payment;
-    $ord = $order;
-
-    return 'success';
+    $this->paymentOrderRelationRepo->createOrderRelation($payment, $order);
   }
 
   public function mapStatus(string $status):int

@@ -33,8 +33,6 @@ class PayPalServiceProvider extends ServiceProvider
         [ \Plenty\Modules\Basket\Events\Basket\AfterBasketChanged::class,
           \Plenty\Modules\Basket\Events\Basket\AfterBasketCreate::class]);
 
-
-
     $eventDispatcher->listen(\Plenty\Modules\Payment\Events\Checkout\AfterPaymentMethodSelected::class, ($event) ==> {
 
       if($event->getMop() == $paymentHelper->getMop())
@@ -59,12 +57,7 @@ class PayPalServiceProvider extends ServiceProvider
 
 //          $orderId = $event->getOrderId();
 //
-//          $response = $paymentHelper->assignPlentyPaymentToPlentyOrder($plentyPayment, $orderId);
-//
-//          if($response)
-//          {
-//            $event->setStatus('success');
-//          }
+//          $paymentHelper->assignPlentyPaymentToPlentyOrder($plentyPayment, $orderId);
 //        }
       }
     });
