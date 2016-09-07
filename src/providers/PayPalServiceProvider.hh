@@ -51,14 +51,12 @@ class PayPalServiceProvider extends ServiceProvider
         $payPalPayment = $paymentService->payPalExecutePayment();
         $event->setType($paymentService->getReturnType());
 
-//        if($paymentService->getReturnType() != 'errorCode')
-//        {
+        if($paymentService->getReturnType() != 'errorCode')
+        {
           $plentyPayment = $paymentHelper->createPlentyPayment($payPalPayment);
 
-//          $orderId = $event->getOrderId();
-//
-//          $paymentHelper->assignPlentyPaymentToPlentyOrder($plentyPayment, $orderId);
-//        }
+          $paymentHelper->assignPlentyPaymentToPlentyOrder($plentyPayment, $event->getOrderId());
+        }
       }
     });
   }

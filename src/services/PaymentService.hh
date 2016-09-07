@@ -86,11 +86,13 @@ class PaymentService
 
         $address= array();
         $country = array();
-        $address['town'] = 'hofteister';
         $country['isoCode2'] = 'DE';
+        $address['town'] = 'Hofgeismar';
         $address['postalCode'] = '34369';
-        $address['firstname'] = 'Franz';$address['lastname'] = 'stock';
-        $address['street'] = 'Krizstraße';$address['houseNumber'] = '23';
+        $address['firstname'] = 'Franz';
+        $address['lastname'] = 'Stack';
+        $address['street'] = 'Overflow';
+        $address['houseNumber'] = '13';
 
       $payPalRequestParams['shippingAddress'] = $address;
 

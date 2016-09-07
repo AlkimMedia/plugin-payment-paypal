@@ -7,6 +7,7 @@ use Plenty\Plugin\ConfigRepository;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentOrderRelationRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
+use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Payment\Method\Models\PaymentMethod;
 use Plenty\Modules\Payment\Models\PaymentProperty;
 use Plenty\Modules\Payment\Models\Payment;
@@ -24,6 +25,7 @@ class PaymentHelper
   private PaymentProperty $paymentProperty;
   private PaymentRepositoryContract $paymentRepo;
   private Payment $payment;
+  private OrderRepositoryContract $orderRepo;
 
   public function __construct(Application $app,
                               PaymentMethodRepositoryContract $paymentMethodRepository,
@@ -32,15 +34,17 @@ class PaymentHelper
                               ConfigRepository $config,
                               SessionStorageService $sessionService,
                               Payment $payment,
-                              PaymentProperty $paymentProperty)
+                              PaymentProperty $paymentProperty,
+                              OrderRepositoryContract $orderRepo)
   {
     $this->app = $app;
-    $this->paymentMethodRepository = $paymentMethodRepository;
-    $this->paymentOrderRelationRepo = $paymentOrderRelationRepo;
-    $this->paymentProperty = $paymentProperty;
-    $this->paymentRepo = $paymentRepo;
     $this->config = $config;
     $this->sessionService = $sessionService;
+    $this->paymentMethodRepository = $paymentMethodRepository;
+    $this->paymentOrderRelationRepo = $paymentOrderRelationRepo;
+    $this->paymentRepo = $paymentRepo;
+    $this->paymentProperty = $paymentProperty;
+    $this->orderRepo = $orderRepo;
     $this->payment = $payment;
   }
 
@@ -135,9 +139,14 @@ class PaymentHelper
     return $payment;
   }
 
-  public function assignPlentyPaymentToPlentyOrder(Payment $payment, Order $order):void
+  public function assignPlentyPaymentToPlentyOrder(Payment $payment, int $orderId):void
   {
-    $this->paymentOrderRelationRepo->createOrderRelation($payment, $order);
+    $order = $this->orderRepo->findOrderById($orderId);
+
+    if(!is_null($order) && $order instanceof Order)
+    {
+      $this->paymentOrderRelationRepo->createOrderRelation($payment, $order);
+    }
   }
 
   public function mapStatus(string $status):int
