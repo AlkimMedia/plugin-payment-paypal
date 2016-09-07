@@ -58,7 +58,13 @@ class PaymentHelper
 
     if(count($paymentMethods))
     {
-      return $paymentMethods[0]->id;
+      foreach($paymentMethods as $paymentMethod)
+      {
+        if($paymentMethod->paymentKey == 'PAYPALEXPRESS')
+        {
+          return $paymentMethod->id;
+        }
+      }
     }
 
     return 'no_paymentmethod_found';

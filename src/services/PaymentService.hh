@@ -103,6 +103,7 @@ class PaymentService
 
       // make the prepare call for paypal
       $result = $this->libCall->call('PayPal::preparePayment', $payPalRequestParams);
+
       if(is_array($result) && $result['error'])
       {
         $this->returnType = 'errorCode';
