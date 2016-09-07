@@ -166,11 +166,11 @@ class PaymentService
             return $executeResponse['error'].': '.$executeResponse['error_msg'];
         }
 
-        $result = $executeResponse;
+        $result = json_encode($executeResponse);
 
         // unset the session params
-        $this->paymentHelper->setPPPayID('');
-        $this->paymentHelper->setPPPayerID('');
+        $this->paymentHelper->setPPPayID(null);
+        $this->paymentHelper->setPPPayerID(null);
 
         return (string)$result;
     }
