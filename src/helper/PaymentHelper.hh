@@ -109,26 +109,24 @@ class PaymentHelper
     $payPalPayment = json_decode($json);
 
     $this->payment->mopId = (int)$this->getMop();
-    $this->payment->currency = $payPalPayment['currency'];
-    $this->payment->amount = $payPalPayment['amount'];
-    $this->payment->entryDate = $payPalPayment['entryDate'];
-    $this->payment->status = $this->mapStatus($payPalPayment['status']);
+    $this->payment->currency = $payPalPayment->currency;
+    $this->payment->amount = $payPalPayment->amount;
+    $this->payment->entryDate = $payPalPayment->entryDate;
+    $this->payment->status = $this->mapStatus($payPalPayment->status);
     $this->payment->transactionType = 2;
 
     /** @var PaymentProperty $paymentProp */
-    $paymentProp = $this->paymentProperty;
+    $paymentProp1 = $this->paymentProperty;
 
-    $paymentProp->typeId = 3;
-    $paymentProp->value = $payPalPayment['bookingText'];
+    $paymentProp2 = clone $paymentProp1;
 
-    $prop1 = $paymentProp;
+    $paymentProp1->typeId = 3;
+    $paymentProp1->value = 'PayPalPayID: '.(string)$payPalPayment->bookingText;
 
-    $paymentProp->typeId = 23;
-    $paymentProp->value = (string)$this->paymentRepo->getOriginConstants('plugin');
+    $paymentProp2->typeId = 23;
+    $paymentProp2->value = (string)$this->paymentRepo->getOriginConstants('plugin');
 
-    $prop2 = $paymentProp;
-
-    $paymentProps = array($prop1, $prop2);
+    $paymentProps = array($paymentProp1, $paymentProp2);
 
     $this->payment->property = $paymentProps;
 
