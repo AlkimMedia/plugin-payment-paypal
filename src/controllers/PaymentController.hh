@@ -12,6 +12,10 @@ use Plenty\Plugin\Http\Request;
 use PayPal\Services\PaymentService;
 use PayPal\Helper\PaymentHelper;
 
+/**
+ * Class PaymentController
+ * @package PayPal\Controllers
+ */
 class PaymentController extends Controller
 {
   protected Application $app;
@@ -22,6 +26,15 @@ class PaymentController extends Controller
   private OrderRepositoryContract $orderRepo;
   private PaymentHelper $payHelper;
 
+  /**
+   * PaymentController constructor.
+   * @param Application $app
+   * @param Twig $twig
+   * @param Dispatcher $event
+   * @param OrderRepositoryContract $orderRep
+   * @param PaymentHelper $payHelper
+   * @param Request $request
+   */
   public function __construct(Application $app,
                               Twig $twig,
                               Dispatcher $event,
@@ -37,49 +50,60 @@ class PaymentController extends Controller
     $this->request = $request;
   }
 
+  /**
+   * @param Twig $twig
+   * @return string
+   */
   public function showPPExpressButton(Twig $twig):string
   {
     return $twig->render('PayPal::content.PayPalExpressButton');
   }
 
-  public function getPayPalPayment(PaymentService $paymentService):string
-  {
-    return $paymentService->getPayPalPayment();
-  }
-
-  public function preparePayment(PaymentService $paymentService):void
-  {
-    $paymentService->preparePayment();
-  }
-
-  public function executePayment(PaymentService $paymentService):void
-  {
-    $paymentService->executePayment();
-  }
-
+  /**
+   * this is where paypal will redirect to if issues occured
+   */
   public function payPalCheckoutCancel():void
   {
+    /*
+     * redirect to the cancel page
+     */
     header("Location: http://master.plentymarkets.com/checkout");
     exit();
   }
 
+  /**
+   * this is where paypal will redirect to if everything went fine
+   */
   public function payPalCheckoutSuccess():void
   {
+    /*
+     * get the paypal payment data from the request
+     */
     $paymentId = $this->request->get('paymentId');
     $payerId = $this->request->get('PayerID');
 
+    /*
+     * get the paypal payId from the session
+     */
     $ppPayId = $this->payHelper->getPPPayID();
 
-    // Check if the Pay ID has changed
+    /*
+     * check if the payId from the session is equal to the given payId by paypal
+     */
     if($paymentId != $ppPayId)
     {
-      header("Location: http://master.plentymarkets.com/checkout?paymentId=".(string)$paymentId."&paymentIdNew=".(string)$ppPayId."&payer=".(string)$payerId);
-      exit();
+      $this->payPalCheckoutCancel();
     }
 
+    /*
+     * set the paypal data in the session
+     */
     $this->payHelper->setPPPayID($paymentId);
     $this->payHelper->setPPPayerID($payerId);
 
+    /*
+     * redirect to the confirmation page
+     */
     header("Location: http://master.plentymarkets.com/confirmation?paymentId=".(string)$paymentId."&paymentIdNew=".(string)$ppPayId."&payer=".(string)$payerId);
     exit();
   }

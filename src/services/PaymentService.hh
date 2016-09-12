@@ -13,6 +13,10 @@ use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 
 use PayPal\Helper\PaymentHelper;
 
+/**
+ * Class PaymentService
+ * @package PayPal\Services
+ */
 class PaymentService
 {
     private PaymentMethodRepositoryContract $paymentMethodRepository;
@@ -26,6 +30,15 @@ class PaymentService
 
     private string $returnType = '';
 
+    /**
+     * PaymentService constructor.
+     * @param PaymentMethodRepositoryContract $paymentMethodRepository
+     * @param PaymentRepositoryContract $paymentRepository
+     * @param ConfigRepository $config
+     * @param PaymentHelper $paymentHelper
+     * @param LibraryCallContract $libCall
+     * @param AddressRepositoryContract $addressRepo
+     */
     public function __construct(PaymentMethodRepositoryContract $paymentMethodRepository,
                                 PaymentRepositoryContract $paymentRepository,
                                 ConfigRepository $config,
@@ -39,6 +52,9 @@ class PaymentService
         $this->libCall = $libCall;
         $this->addressRepo = $addressRepo;
 
+        /*
+         * read from plugin config
+         */
         if($config->get('PayPal.environment') == 1)
         {
           $this->sandbox = true;
@@ -51,25 +67,14 @@ class PaymentService
         }
     }
 
-    public function preparePayment():void
-    {
-        $this->paymentMethodRepository->preparePaymentMethod((int)$this->paymentHelper->getMop());
-    }
-
-    public function getPayPalPayment():string
-    {
-        return json_encode($this->libCall->call('PayPal::getPayPalPayment', array('payId' => 'PAY-4RW9947250679234JK7HLVCY', 'sandbox' => true)));
-    }
-
-    public function executePayment():void
-    {
-        $this->paymentMethodRepository->executePayment((int)$this->paymentHelper->getMop(), 2);
-    }
-
-    public function getPayPalContent(Basket $basket):string
+    /**
+     * @param Basket $basket
+     * @return string
+     */
+    public function getPaymentContent(Basket $basket):string
     {
       $payPalRequestParams = array();
-      $redirectUrl = '';
+      $paymentContent = '';
       $payPalMerchantParams = array();
 
 //    $webProfileId = $this->libCall->call('PayPal::createWebProfile', $payPalMerchantParams);
@@ -89,8 +94,10 @@ class PaymentService
         $address['town'] = 'hofteister';
         $country['isoCode2'] = 'DE';
         $address['postalCode'] = '34369';
-        $address['firstname'] = 'Franz';$address['lastname'] = 'stock';
-        $address['street'] = 'Krizstraße';$address['houseNumber'] = '23';
+        $address['firstname'] = 'Franz';
+        $address['lastname'] = 'stock';
+        $address['street'] = 'Krizstraße';
+        $address['houseNumber'] = '23';
 
       $payPalRequestParams['shippingAddress'] = $address;
 
@@ -101,9 +108,14 @@ class PaymentService
 
       $payPalRequestParams['urls'] = $urls;
 
-      // make the prepare call for paypal
+      /*
+       * prepare the paypal payment
+       */
       $result = $this->libCall->call('PayPal::preparePayment', $payPalRequestParams);
 
+      /*
+       * check for errors
+       */
       if(is_array($result) && $result['error'])
       {
         $this->returnType = 'errorCode';
@@ -112,8 +124,11 @@ class PaymentService
 
       $resultJson = json_decode($result);
 
-      //save this in the session
+      /*
+       * store the paypal payid in the session
+       */
       $ppPayId = $resultJson->id;
+
       if(strlen($ppPayId))
       {
           $this->paymentHelper->setPPPayID($ppPayId);
@@ -127,28 +142,40 @@ class PaymentService
         {
           if($value->method == 'REDIRECT')
           {
-            $redirectUrl = $value->href;
+            $paymentContent = $value->href;
             $this->returnType = 'redirectUrl';
           }
         }
       }
 
-      if(!strlen($redirectUrl))
+      /*
+       * check if content isset, else return error code
+       */
+      if(!strlen($paymentContent))
       {
         $this->returnType = 'errorCode';
         return 'An unknown error occured, please try again.';
       }
 
-      return $redirectUrl;
+      return $paymentContent;
     }
 
+    /**
+     * @return string
+     */
     public function getReturnType():string
     {
       return $this->returnType;
     }
 
-    public function payPalExecutePayment():string
+    /**
+     * @return string
+     */
+    public function executePayment():string
     {
+        /*
+         * load mandatory paypal data from session
+         */
         $ppPayId = $this->paymentHelper->getPPPayID();
         $ppPayerId = $this->paymentHelper->getPPPayerID();
 
@@ -158,8 +185,14 @@ class PaymentService
         $executeParams['payId'] = $ppPayId;
         $executeParams['payerId'] = $ppPayerId;
 
+        /*
+         * execute the paypal payment
+         */
         $executeResponse = $this->libCall->call('PayPal::executePayment', $executeParams);
 
+        /*
+         * check for errors
+         */
         if(is_array($executeResponse) && $executeResponse['error'])
         {
             $this->returnType = 'errorCode';
@@ -168,7 +201,9 @@ class PaymentService
 
         $result = json_encode($executeResponse);
 
-        // unset the session params
+        /*
+         * clear the session params
+         */
         $this->paymentHelper->setPPPayID(null);
         $this->paymentHelper->setPPPayerID(null);
 
