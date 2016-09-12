@@ -94,7 +94,7 @@ class PaymentHelper
      */
     $paymentMethods = $this->paymentMethodRepository->allForPlugin('PayPal');
 
-    if(count($paymentMethods))
+    if( !is_null($paymentMethods) )
     {
       foreach($paymentMethods as $paymentMethod)
       {
