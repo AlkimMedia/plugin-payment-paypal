@@ -22,6 +22,7 @@ class PaymentHelper
   private PaymentOrderRelation $paymentOrderRelation;
   private PaymentRepositoryContract $paymentRepo;
   private Payment $payment;
+  private array<string, int> $statusMap;
 
   public function __construct(PaymentMethodRepositoryContract $paymentMethodRepository,
                               PaymentRepositoryContract $paymentRepo,
@@ -38,6 +39,7 @@ class PaymentHelper
     $this->config = $config;
     $this->sessionService = $sessionService;
     $this->payment = $payment;
+    $this->statusMap = array();
   }
 
   public function createMopIfNotExists():void
@@ -131,17 +133,25 @@ class PaymentHelper
 
   public function mapStatus(string $status):int
   {
-    $statusMap = array( 'created'               => $this->paymentRepo->getStatusConstants('captured'),
-                        'approved'              => $this->paymentRepo->getStatusConstants('approved'),
-                        'failed'                => $this->paymentRepo->getStatusConstants('refused'),
-                        'partially_completed'   => $this->paymentRepo->getStatusConstants('partially_captured'),
-                        'completed'             => $this->paymentRepo->getStatusConstants('captured'),
-                        'in_progress'           => $this->paymentRepo->getStatusConstants('awaiting_approval'),
-                        'pending'               => $this->paymentRepo->getStatusConstants('awaiting_approval'),
-                        'refunded'              => $this->paymentRepo->getStatusConstants('refunded'),
-                        'denied'                => $this->paymentRepo->getStatusConstants('refused'));
+    if(!is_array($this->statusMap) || count($this->statusMap) <= 0)
+    {
+      $this->statusMap = array();
+      $statusConstants = $this->paymentRepo->getStatusConstants();
 
-    return (int)$statusMap[$status];
+      if(!is_null($statusConstants) && is_array($statusConstants))
+      {
+        $this->statusMap['created'] = $statusConstants['captured'];
+        $this->statusMap['approved'] = $statusConstants['approved'];
+        $this->statusMap['failed'] = $statusConstants['refused'];
+        $this->statusMap['partially_completed'] = $statusConstants['partially_captured'];
+        $this->statusMap['completed'] = $statusConstants['captured'];
+        $this->statusMap['in_progress'] = $statusConstants['awaiting_approval'];
+        $this->statusMap['pending'] = $statusConstants['awaiting_approval'];
+        $this->statusMap['refunded'] = $statusConstants['refunded'];
+        $this->statusMap['denied'] = $statusConstants['refused'];
+      }
+    }
+
+    return (int)$this->statusMap[$status];
   }
-
 }
