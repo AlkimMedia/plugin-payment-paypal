@@ -2,48 +2,78 @@
 
 namespace PayPal\Helper;
 
+use Plenty\Plugin\Application;
+use Plenty\Plugin\ConfigRepository;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentOrderRelationRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
+use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Payment\Method\Models\PaymentMethod;
-use Plenty\Plugin\ConfigRepository;
+use Plenty\Modules\Payment\Models\PaymentProperty;
 use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Modules\Order\Models\Order;
-use Plenty\Modules\Payment\Models\PaymentOrderRelation;
 
 use PayPal\Services\SessionStorageService;
 
+/**
+ * Class PaymentHelper
+ * @package PayPal\Helper
+ */
 class PaymentHelper
 {
+  private Application $app;
   private PaymentMethodRepositoryContract $paymentMethodRepository;
   private ConfigRepository $config;
   private SessionStorageService $sessionService;
   private PaymentOrderRelationRepositoryContract $paymentOrderRelationRepo;
-  private PaymentOrderRelation $paymentOrderRelation;
+  private PaymentProperty $paymentProperty;
   private PaymentRepositoryContract $paymentRepo;
   private Payment $payment;
+  private OrderRepositoryContract $orderRepo;
   private array<string, int> $statusMap;
 
-  public function __construct(PaymentMethodRepositoryContract $paymentMethodRepository,
+  /**
+   * PaymentHelper constructor.
+   * @param Application $app
+   * @param PaymentMethodRepositoryContract $paymentMethodRepository
+   * @param PaymentRepositoryContract $paymentRepo
+   * @param PaymentOrderRelationRepositoryContract $paymentOrderRelationRepo
+   * @param ConfigRepository $config
+   * @param SessionStorageService $sessionService
+   * @param Payment $payment
+   * @param PaymentProperty $paymentProperty
+   * @param OrderRepositoryContract $orderRepo
+   */
+  public function __construct(Application $app,
+                              PaymentMethodRepositoryContract $paymentMethodRepository,
                               PaymentRepositoryContract $paymentRepo,
                               PaymentOrderRelationRepositoryContract $paymentOrderRelationRepo,
                               ConfigRepository $config,
                               SessionStorageService $sessionService,
                               Payment $payment,
-                              PaymentOrderRelation $paymentOrderRelation)
+                              PaymentProperty $paymentProperty,
+                              OrderRepositoryContract $orderRepo)
   {
-    $this->paymentMethodRepository = $paymentMethodRepository;
-    $this->paymentOrderRelationRepo = $paymentOrderRelationRepo;
-    $this->paymentOrderRelation = $paymentOrderRelation;
-    $this->paymentRepo = $paymentRepo;
+    $this->app = $app;
     $this->config = $config;
     $this->sessionService = $sessionService;
+    $this->paymentMethodRepository = $paymentMethodRepository;
+    $this->paymentOrderRelationRepo = $paymentOrderRelationRepo;
+    $this->paymentRepo = $paymentRepo;
+    $this->paymentProperty = $paymentProperty;
+    $this->orderRepo = $orderRepo;
     $this->payment = $payment;
     $this->statusMap = array();
   }
 
+  /**
+   * create the payment method id
+   */
   public function createMopIfNotExists():void
   {
+    /*
+     * check if the payment method is already created
+     */
     if($this->getMop() == 'no_paymentmethod_found')
     {
       $paymentMethodData = array( 'pluginKey' => 'PayPal',
@@ -54,8 +84,14 @@ class PaymentHelper
     }
   }
 
+  /**
+   * @return mixed
+   */
   public function getMop():mixed
   {
+    /*
+     * get all payment methods for the given plugin
+     */
     $paymentMethods = $this->paymentMethodRepository->allForPlugin('PayPal');
 
     if(count($paymentMethods))
@@ -72,65 +108,140 @@ class PaymentHelper
     return 'no_paymentmethod_found';
   }
 
+  /**
+   * @return string
+   */
   public function getCancelURL():string
   {
     return 'http://master.plentymarkets.com/payPalCheckoutCancel';
   }
 
+  /**
+   * @return string
+   */
   public function getSuccessURL():string
   {
     return 'http://master.plentymarkets.com/payPalCheckoutSuccess';
   }
 
+  /**
+   * @param mixed $value
+   */
   public function setPPPayID(mixed $value):void
   {
     $this->sessionService->setSessionValue('PayPalPayId', $value);
   }
 
+  /**
+   * @return mixed
+   */
   public function getPPPayID():mixed
   {
     return $this->sessionService->getSessionValue('PayPalPayId');
   }
 
+  /**
+   * @param mixed $value
+   */
   public function setPPPayerID(mixed $value):void
   {
     $this->sessionService->setSessionValue('PayPalPayerId', $value);
   }
 
+  /**
+   * @return mixed
+   */
   public function getPPPayerID():mixed
   {
     return $this->sessionService->getSessionValue('PayPalPayerId');
   }
 
+  /**
+   * @param string $json
+   * @return Payment
+   */
   public function createPlentyPayment(string $json):Payment
   {
     $payPalPayment = json_decode($json);
 
-    $paymentProperties = array();
+    /** @var Payment $payment */
+    $payment = clone $this->payment;
 
-    $this->payment->mopId = (int)$this->getMop();
-    $this->payment->currency = $payPalPayment->currency;
-    $this->payment->amount = $payPalPayment->amount;
-    $this->payment->entryDate = $payPalPayment->entryDate;
-    $this->payment->origin = 6;//$this->paymentRepo->getOriginConstants('plugin');
-    $this->payment->status = 2;//$this->mapStatus($payPalPayment->status);
-    $this->payment->transactionType = 2;
+    /*
+     * set the payment data
+     */
+    $payment->mopId           = (int)$this->getMop();
+    $payment->transactionType = 2;
+    $payment->status          = $this->mapStatus($payPalPayment->status);
+    $payment->currency        = $payPalPayment->currency;
+    $payment->amount          = $payPalPayment->amount;
+    $payment->entryDate       = $payPalPayment->entryDate;
 
-//    $this->payment->property($paymentProperties);
+    /** @var PaymentProperty $paymentProp1 */
+    $paymentProp1 = clone $this->paymentProperty;
 
-    $payment = $this->paymentRepo->createPayment($this->payment->toArray());
+    /** @var PaymentProperty $paymentProp2 */
+    $paymentProp2 = clone $this->paymentProperty;
+
+    /*
+     * set the payment properties
+     */
+    $paymentProp1->typeId = 3;
+    $paymentProp1->value = 'PayPalPayID: '.(string)$payPalPayment->bookingText;
+
+    /*
+     * set the payment properties
+     */
+    $paymentProp2->typeId = 23;
+    $originConstants = $this->paymentRepo->getOriginConstants();
+    if(!is_null($originConstants) && is_array($originConstants))
+    {
+      $paymentProp2->value = (string)$originConstants['plugin'];
+    }
+
+    /** @var PaymentProperty[] $paymentProps */
+    $paymentProps = array($paymentProp1,
+                          $paymentProp2);
+
+    /*
+     * append the properties to the payment
+     */
+    $payment->property = $paymentProps;
+
+    $payment = $this->paymentRepo->createPayment($payment);
 
     return $payment;
   }
 
-  public function assignPlentyPaymentToPlentyOrder(Payment $payment, Order $order):string
+  /**
+   * @param Payment $payment
+   * @param int $orderId
+   */
+  public function assignPlentyPaymentToPlentyOrder(Payment $payment, int $orderId):void
   {
-    $pay = $payment;
-    $ord = $order;
+    /*
+     * get the order by the given orderId
+     */
+    $order = $this->orderRepo->findOrderById($orderId);
 
-    return 'success';
+    /*
+     * check if the order truly exists
+     */
+    if(!is_null($order) && $order instanceof Order)
+    {
+      /*
+       * assign the given payment to the given order
+       */
+      $this->paymentOrderRelationRepo->createOrderRelation($payment, $order);
+    }
   }
 
+  /**
+   * @param string $status
+   * @return int
+   *
+   * this function maps the paypal payment status to the plenty payment status
+   */
   public function mapStatus(string $status):int
   {
     if(!is_array($this->statusMap) || count($this->statusMap) <= 0)

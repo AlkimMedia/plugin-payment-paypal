@@ -9,16 +9,6 @@ use PayPal\Api\Payment;
 
 class PayPalHelper
 {
-    static $payPalStatus = array(   'created'                => 1,
-                                    'approved'               => 'approved',
-                                    'failed'                 => 'failed',
-                                    'partially_completed'    => 'partially_completed',
-                                    'completed'              => 'completed',
-                                    'in_progress'            => 'in_progress',
-                                    'pending'                => 'pending',
-                                    'refunded'               => 'refunded',
-                                    'denied'                 => 'denied');
-
     /**
      * Helper method for getting an APIContext for all calls
      * @param string $clientId Client ID
