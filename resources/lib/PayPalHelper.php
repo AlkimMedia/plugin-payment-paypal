@@ -13,14 +13,11 @@ class PayPalHelper
      * Helper method for getting an APIContext for all calls
      * @param string $clientId Client ID
      * @param string $clientSecret Client Secret
+     * @param bool $sandbox
      * @return PayPal\Rest\ApiContext
      */
-    static function getApiContext($sandbox = true)
+    static function getApiContext($clientId, $clientSecret, $sandbox = true)
     {
-        // Replace these values by entering your own ClientId and Secret by visiting https://developer.paypal.com/webapps/developer/applications/myapps
-        $clientId = 'AR0llxlDLgU8PEK32N2axJBvZOyULkseGs30YnXp6xPNaj3d_Iv15T52Kb6ba6gPDlT44NbBS3n9qMty';
-        $clientSecret = 'EM0hx_v2uuKeaQ3DylABSrG7mA7sjhIuizNpiaPiva9dVAAChkqkg8oenBRfxd1fAuETw5qFu5NOe8Hn';
-
         if($sandbox)
         {
             $mode = 'sandbox';

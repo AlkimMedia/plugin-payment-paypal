@@ -1,39 +1,75 @@
 [{
-    "key": "name",
-    "label": "Name",
-    "type": "text",
-    "default": "PayPal Express"
-}, {
-    "key": "logo",
-    "label": "Logo",
-    "type": "dropdown",
-    "possibleValues": {
-        "0": "Default-Logo",
-        "1": "Without-Logo"
-    },
-    "default": "0"
-}, {
+    "tab": "Grundeinstellungen",
     "key": "environment",
-    "label": "Environment",
+    "label": "Modus",
     "type": "dropdown",
     "possibleValues": {
         "0": "Live",
         "1": "Sandbox"
     },
     "default": "1"
-}, {
-    "key": "account",
-    "label": "Account",
+},{
+    "tab": "Grundeinstellungen",
+    "key": "name",
+    "label": "Anzeigename der Zahlungsart",
     "type": "text",
-    "default": "seller@plentymarkets.com"
-}, {
-    "key": "url",
-    "label": "Own Logo URL",
+    "default": "PayPal"
+},  {
+    "tab": "Grundeinstellungen",
+    "key": "clientId",
+    "label": "Client-ID",
     "type": "text",
-    "default": "https://www.example.com"
-}, {
-    "key": "landingpage",
-    "label": "Landing-Page",
+    "default": ""
+},  {
+    "tab": "Grundeinstellungen",
+    "key": "clientSecret",
+    "label": "Client-Secret",
     "type": "text",
-    "default": "http://master.plentymarkets.com/34poepoe/bestellbestaetigung/"
+    "default": ""
+}, {
+    "tab": "Grundeinstellungen",
+    "key": "fee",
+    "label": "Aufpreis (EUR)",
+    "type": "text",
+    "default": "0"
+},  {
+    "tab": "Grundeinstellungen",
+    "key": "successUrl",
+    "label": "URL der Danke-Seite (success-url)",
+    "type": "text",
+    "default": ""
+}, {
+    "tab": "Grundeinstellungen",
+    "key": "cancelUrl",
+    "label": "URL der Checkout-Seite (cancel-url)",
+    "type": "text",
+    "default": ""
+},  {
+    "tab": "Grundeinstellungen",
+    "key": "description",
+    "label": "Beschreibung",
+    "type": "text",
+    "default": ""
+}, {
+    "tab": "Händlereinstellungen",
+    "key": "editableShipping",
+    "label": "Lieferanschrit bei PayPal änderbar",
+    "type": "dropdown",
+    "possibleValues": {
+        "0": "Nein",
+        "1": "Ja"
+    },
+    "default": "0"
+}, {
+    "tab": "Händlereinstellungen",
+    "key": "shopName",
+    "label": "Shopname bei PayPal",
+    "type": "text",
+    "default": ""
+}, {
+    "tab": "Händlereinstellungen",
+    "key": "shopLogo",
+    "label": "URL zum Shop-Logo bei PayPal",
+    "type": "text",
+    "default": ""
 }]

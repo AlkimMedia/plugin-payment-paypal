@@ -7,22 +7,33 @@ use PayPal\Api\Presentation;
 
 require_once __DIR__.'/PayPalHelper.php';
 
+$apiContext = PayPalHelper::getApiContext(  SdkRestApi::getParam('clientId', true),
+                                            SdkRestApi::getParam('clientSecret', true),
+                                            SdkRestApi::getParam('sandbox', true));
+
 $inputFields = new InputFields();
-$inputFields->setNoShipping(0)
+$inputFields
+    ->setNoShipping(SdkRestApi::getParam('editableShipping', 0))
     ->setAddressOverride(1);
 
 $presentation = new Presentation();
-$presentation   //->setLogoImage('')
-->setBrandName('PayPalSHOOOOP');
+$presentation
+    ->setBrandName(SdkRestApi::getParam('shopName', 'Bitte Shopnamen angeben!'));
+
+if(SdkRestApi::getParam('shopLogo', false))
+{
+    $presentation->setLogoImage(SdkRestApi::getParam('shopLogo', false));
+}
 
 $webProfile = new WebProfile();
-$webProfile ->setName('PayPalSHOOOOP'.uniqid())
+$webProfile
+    ->setName('PayPalSHOOOOP'.uniqid())
     ->setInputFields($inputFields)
     ->setPresentation($presentation);
 
 try
 {
-    $webProfResponse = $webProfile->create(PayPalHelper::getApiContext(true));
+    $webProfResponse = $webProfile->create($apiContext);
 }
 catch(Exception $ex)
 {

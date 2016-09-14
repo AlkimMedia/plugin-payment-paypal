@@ -12,7 +12,9 @@ use PayPal\Api\ShippingAddress;
 require_once __DIR__.'/PayPalHelper.php';
 
 /** @var \Paypal\Rest\ApiContext $apiContext */
-$apiContext = PayPalHelper::getApiContext(SdkRestApi::getParam('sandbox', true));
+$apiContext = PayPalHelper::getApiContext(  SdkRestApi::getParam('clientId', true),
+                                            SdkRestApi::getParam('clientSecret', true),
+                                            SdkRestApi::getParam('sandbox', true));
 
 $payer = new Payer();
 $payer->setPaymentMethod('paypal');

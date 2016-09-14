@@ -12,6 +12,7 @@ use Plenty\Modules\Payment\Models\Payment;
 use PayPal\Services\PaymentService;
 use PayPal\Helper\PaymentHelper;
 use PayPal\Methods\PayPalExpressPaymentMethod;
+use PayPal\Methods\PayPalPaymentMethod;
 
 /**
  * Class PayPalServiceProvider
@@ -48,9 +49,16 @@ class PayPalServiceProvider extends ServiceProvider
     /*
      * register the payment method in the payment method container
      */
-    $payContainer->register('PayPal::PAYPALEXPRESS', PayPalExpressPaymentMethod::class,
+    $payContainer->register('plentyPayPal::PAYPALEXPRESS', PayPalExpressPaymentMethod::class,
         [ \Plenty\Modules\Basket\Events\Basket\AfterBasketChanged::class,
           \Plenty\Modules\Basket\Events\Basket\AfterBasketCreate::class]);
+
+   /*
+    * register the payment method in the payment method container
+    */
+    $payContainer->register('plentyPayPal::PAYPAL', PayPalPaymentMethod::class,
+        [ \Plenty\Modules\Basket\Events\Basket\AfterBasketChanged::class,
+            \Plenty\Modules\Basket\Events\Basket\AfterBasketCreate::class]);
 
 
 
@@ -59,7 +67,7 @@ class PayPalServiceProvider extends ServiceProvider
      */
     $eventDispatcher->listen(\Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent::class, ($event) ==> {
 
-      if($event->getMop() == $paymentHelper->getMop())
+      if($event->getMop() == $paymentHelper->getPayPalMopId())
       {
         $basket = $basket->load();
 
@@ -75,7 +83,7 @@ class PayPalServiceProvider extends ServiceProvider
      */
     $eventDispatcher->listen(\Plenty\Modules\Payment\Events\Checkout\ExecutePayment::class, ($event) ==> {
 
-      if($event->getMop() == $paymentHelper->getMop())
+      if($event->getMop() == $paymentHelper->getPayPalMopId())
       {
         /*
          * execute the payment

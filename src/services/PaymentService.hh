@@ -24,9 +24,9 @@ class PaymentService
     private PaymentHelper $paymentHelper;
     private LibraryCallContract $libCall;
     private AddressRepositoryContract $addressRepo;
+    private ConfigRepository $config;
 
-    private bool $sandbox = false;
-    private string $payPalAccount = '';
+    private bool $sandbox = true;
 
     private string $returnType = '';
 
@@ -51,6 +51,7 @@ class PaymentService
         $this->paymentHelper = $paymentHelper;
         $this->libCall = $libCall;
         $this->addressRepo = $addressRepo;
+        $this->config = $config;
 
         /*
          * read from plugin config
@@ -58,12 +59,6 @@ class PaymentService
         if($config->get('PayPal.environment') == 1)
         {
           $this->sandbox = true;
-        }
-
-        $account = $config->get('PayPal.account');
-        if(strlen($account))
-        {
-          $this->payPalAccount = $account;
         }
     }
 
@@ -73,11 +68,16 @@ class PaymentService
      */
     public function getPaymentContent(Basket $basket):string
     {
-      $payPalRequestParams = array();
+      $payPalRequestParams = array( 'clientSecret' => $this->config->get('PayPal.clientSecret'),
+                                    'clientId' => $this->config->get('PayPal.clientId'));
       $paymentContent = '';
-      $payPalMerchantParams = array();
 
-//    $webProfileId = $this->libCall->call('PayPal::createWebProfile', $payPalMerchantParams);
+//      $payPalMerchantParams = array('clientSecret' => $this->config->get('PayPal.clientSecret'),
+//                                    'clientId' => $this->config->get('PayPal.clientId'));
+
+//      $payPalMerchantParams['shopName'] = $config->get('PayPal.shopName');
+//      $payPalMerchantParams['shopLogo'] = $config->get('PayPal.shopLogo');
+//      $webProfileId = $this->libCall->call('PayPal::createWebProfile', $payPalMerchantParams);
 
       $payPalRequestParams['webProfileId'] = 'XP-3XH9-EMJG-WX7L-789D';
 
@@ -103,8 +103,8 @@ class PaymentService
 
       $payPalRequestParams['country'] = $country;
 
-      $urls = array('returnUrl' => $this->paymentHelper->getSuccessURL(),
-                    'cancelUrl' => $this->paymentHelper->getCancelURL());
+      $urls = array('returnUrl' => $this->paymentHelper->getRestSuccessURL(),
+                    'cancelUrl' => $this->paymentHelper->getRestCancelURL());
 
       $payPalRequestParams['urls'] = $urls;
 
@@ -179,7 +179,8 @@ class PaymentService
         $ppPayId = $this->paymentHelper->getPPPayID();
         $ppPayerId = $this->paymentHelper->getPPPayerID();
 
-        $executeParams = array();
+        $executeParams = array( 'clientSecret' => $this->config->get('PayPal.clientSecret'),
+                                'clientId' => $this->config->get('PayPal.clientId'));
 
         $executeParams['sandbox'] = $this->sandbox;
         $executeParams['payId'] = $ppPayId;

@@ -3,13 +3,11 @@
 namespace PayPal\Controllers;
 
 use Plenty\Plugin\Application;
+use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Templates\Twig;
-use Plenty\Plugin\Events\Dispatcher;
-use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Plugin\Http\Request;
 
-use PayPal\Services\PaymentService;
 use PayPal\Helper\PaymentHelper;
 
 /**
@@ -20,43 +18,29 @@ class PaymentController extends Controller
 {
   protected Application $app;
   private Twig $twig;
-  private Dispatcher $event;
   private Request $request;
-
-  private OrderRepositoryContract $orderRepo;
+  private ConfigRepository $config;
   private PaymentHelper $payHelper;
 
   /**
    * PaymentController constructor.
    * @param Application $app
    * @param Twig $twig
-   * @param Dispatcher $event
-   * @param OrderRepositoryContract $orderRep
-   * @param PaymentHelper $payHelper
+   * @param ConfigRepository $config
    * @param Request $request
+   * @param PaymentHelper $payHelper
    */
   public function __construct(Application $app,
                               Twig $twig,
-                              Dispatcher $event,
-                              OrderRepositoryContract $orderRep,
-                              PaymentHelper $payHelper,
-                              Request $request)
+                              Request $request,
+                              ConfigRepository $config,
+                              PaymentHelper $payHelper)
   {
     $this->app = $app;
     $this->twig = $twig;
-    $this->event = $event;
-    $this->orderRepo = $orderRep;
-    $this->payHelper = $payHelper;
     $this->request = $request;
-  }
-
-  /**
-   * @param Twig $twig
-   * @return string
-   */
-  public function showPPExpressButton(Twig $twig):string
-  {
-    return $twig->render('PayPal::content.PayPalExpressButton');
+    $this->config = $config;
+    $this->payHelper = $payHelper;
   }
 
   /**
@@ -67,7 +51,7 @@ class PaymentController extends Controller
     /*
      * redirect to the cancel page
      */
-    header("Location: http://master.plentymarkets.com/checkout");
+    header("Location: ".$this->config->get('PayPal.cancelUrl'));
     exit();
   }
 
@@ -104,7 +88,7 @@ class PaymentController extends Controller
     /*
      * redirect to the confirmation page
      */
-    header("Location: http://master.plentymarkets.com/confirmation?paymentId=".(string)$paymentId."&paymentIdNew=".(string)$ppPayId."&payer=".(string)$payerId);
+    header("Location: ".$this->config->get('PayPal.successUrl'));
     exit();
   }
 

@@ -12,6 +12,7 @@ use Plenty\Modules\Payment\Method\Models\PaymentMethod;
 use Plenty\Modules\Payment\Models\PaymentProperty;
 use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Modules\Order\Models\Order;
+use Plenty\Modules\Helper\Services\WebstoreHelper;
 
 use PayPal\Services\SessionStorageService;
 
@@ -22,6 +23,7 @@ use PayPal\Services\SessionStorageService;
 class PaymentHelper
 {
   private Application $app;
+  private WebstoreHelper $webstoreHelper;
   private PaymentMethodRepositoryContract $paymentMethodRepository;
   private ConfigRepository $config;
   private SessionStorageService $sessionService;
@@ -35,6 +37,7 @@ class PaymentHelper
   /**
    * PaymentHelper constructor.
    * @param Application $app
+   * @param WebstoreHelper $webstoreHelper
    * @param PaymentMethodRepositoryContract $paymentMethodRepository
    * @param PaymentRepositoryContract $paymentRepo
    * @param PaymentOrderRelationRepositoryContract $paymentOrderRelationRepo
@@ -52,9 +55,11 @@ class PaymentHelper
                               SessionStorageService $sessionService,
                               Payment $payment,
                               PaymentProperty $paymentProperty,
-                              OrderRepositoryContract $orderRepo)
+                              OrderRepositoryContract $orderRepo,
+                              WebstoreHelper $webstoreHelper)
   {
     $this->app = $app;
+    $this->webstoreHelper = $webstoreHelper;
     $this->config = $config;
     $this->sessionService = $sessionService;
     $this->paymentMethodRepository = $paymentMethodRepository;
@@ -74,11 +79,23 @@ class PaymentHelper
     /*
      * check if the payment method is already created
      */
-    if($this->getMop() == 'no_paymentmethod_found')
+    if($this->getPayPalMopId() == 'no_paymentmethod_found')
     {
-      $paymentMethodData = array( 'pluginKey' => 'PayPal',
-                                  'paymentKey' => 'PAYPALEXPRESS',
+      $paymentMethodData = array( 'pluginKey' => 'plentyPayPal',
+                                  'paymentKey' => 'PAYPAL',
                                   'name' => 'PayPal');
+
+      $this->paymentMethodRepository->createPaymentMethod($paymentMethodData);
+    }
+
+    /*
+     * check if the payment method is already created
+     */
+    if($this->getPayPalExpressMopId() == 'no_paymentmethod_found')
+    {
+      $paymentMethodData = array( 'pluginKey' => 'plentyPayPal',
+                                  'paymentKey' => 'PAYPALEXPRESS',
+                                  'name' => 'PayPalExpress');
 
       $this->paymentMethodRepository->createPaymentMethod($paymentMethodData);
     }
@@ -87,7 +104,31 @@ class PaymentHelper
   /**
    * @return mixed
    */
-  public function getMop():mixed
+  public function getPayPalMopId():mixed
+  {
+    /*
+     * get all payment methods for the given plugin
+     */
+    $paymentMethods = $this->paymentMethodRepository->allForPlugin('PayPal');
+
+    if( !is_null($paymentMethods) )
+    {
+      foreach($paymentMethods as $paymentMethod)
+      {
+        if($paymentMethod->paymentKey == 'PAYPAL')
+        {
+          return $paymentMethod->id;
+        }
+      }
+    }
+
+    return 'no_paymentmethod_found';
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getPayPalExpressMopId():mixed
   {
     /*
      * get all payment methods for the given plugin
@@ -111,17 +152,31 @@ class PaymentHelper
   /**
    * @return string
    */
-  public function getCancelURL():string
+  public function getRestCancelURL():string
   {
-    return 'http://master.plentymarkets.com/payPalCheckoutCancel';
+    $domain = $this->webstoreHelper->getCurrentWebstoreConfiguration()->domainSsl;
+
+    if(is_null($domain))
+    {
+      $domain = 'error';
+    }
+
+    return $domain.'/plentyPayPal/payPalCheckoutCancel';
   }
 
   /**
    * @return string
    */
-  public function getSuccessURL():string
+  public function getRestSuccessURL():string
   {
-    return 'http://master.plentymarkets.com/payPalCheckoutSuccess';
+    $domain = $this->webstoreHelper->getCurrentWebstoreConfiguration()->domainSsl;
+
+    if(is_null($domain))
+    {
+      $domain = 'error';
+    }
+
+    return $domain.'/plentyPayPal/payPalCheckoutSuccess';
   }
 
   /**
@@ -170,7 +225,7 @@ class PaymentHelper
     /*
      * set the payment data
      */
-    $payment->mopId           = (int)$this->getMop();
+    $payment->mopId           = (int)$this->getPayPalMopId();
     $payment->transactionType = 2;
     $payment->status          = $this->mapStatus($payPalPayment->status);
     $payment->currency        = $payPalPayment->currency;
@@ -194,6 +249,7 @@ class PaymentHelper
      */
     $paymentProp2->typeId = 23;
     $originConstants = $this->paymentRepo->getOriginConstants();
+
     if(!is_null($originConstants) && is_array($originConstants))
     {
       $paymentProp2->value = (string)$originConstants['plugin'];
