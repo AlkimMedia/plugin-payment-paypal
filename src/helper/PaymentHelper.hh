@@ -109,7 +109,7 @@ class PaymentHelper
     /*
      * get all payment methods for the given plugin
      */
-    $paymentMethods = $this->paymentMethodRepository->allForPlugin('PayPal');
+    $paymentMethods = $this->paymentMethodRepository->allForPlugin('plentyPayPal');
 
     if( !is_null($paymentMethods) )
     {
@@ -133,7 +133,7 @@ class PaymentHelper
     /*
      * get all payment methods for the given plugin
      */
-    $paymentMethods = $this->paymentMethodRepository->allForPlugin('PayPal');
+    $paymentMethods = $this->paymentMethodRepository->allForPlugin('plentyPayPal');
 
     if( !is_null($paymentMethods) )
     {
@@ -154,12 +154,14 @@ class PaymentHelper
    */
   public function getRestCancelURL():string
   {
-    $domain = $this->webstoreHelper->getCurrentWebstoreConfiguration()->domainSsl;
+    $webstoreConfig = $this->webstoreHelper->getCurrentWebstoreConfiguration();
 
-    if(is_null($domain))
+    if(is_null($webstoreConfig))
     {
-      $domain = 'error';
+      return 'error';
     }
+
+    $domain = $webstoreConfig->domainSsl;
 
     return $domain.'/plentyPayPal/payPalCheckoutCancel';
   }
@@ -169,12 +171,14 @@ class PaymentHelper
    */
   public function getRestSuccessURL():string
   {
-    $domain = $this->webstoreHelper->getCurrentWebstoreConfiguration()->domainSsl;
+    $webstoreConfig = $this->webstoreHelper->getCurrentWebstoreConfiguration();
 
-    if(is_null($domain))
+    if(is_null($webstoreConfig))
     {
-      $domain = 'error';
+      return 'error';
     }
+
+    $domain = $webstoreConfig->domainSsl;
 
     return $domain.'/plentyPayPal/payPalCheckoutSuccess';
   }
