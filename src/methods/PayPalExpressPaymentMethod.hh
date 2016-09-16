@@ -32,6 +32,6 @@ class PayPalExpressPaymentMethod extends PaymentMethodService
      */
     public function isActive():bool
     {
-        return true;
+        return false;
     }
 }
