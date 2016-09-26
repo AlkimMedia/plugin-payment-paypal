@@ -35,30 +35,32 @@ class PayPalPaymentMethod extends PaymentMethodService
      * @param ContactRepositoryContract $contactRepo
      * @param ConfigRepository $configRepo
      */
-    public function __construct(BasketRepositoryContract $basketRepo,
-                                ContactRepositoryContract $contactRepo,
-                                ConfigRepository $configRepo)
+    public function __construct(BasketRepositoryContract    $basketRepo,
+                                ContactRepositoryContract   $contactRepo,
+                                ConfigRepository            $configRepo)
     {
-        $this->basketRepo = $basketRepo;
-        $this->contactRepo = $contactRepo;
-        $this->configRepo = $configRepo;
+        $this->basketRepo     = $basketRepo;
+        $this->contactRepo    = $contactRepo;
+        $this->configRepo     = $configRepo;
     }
 
     /**
+     * Is Plugin Active
+     *
      * @return bool
      */
-    public function isActive():bool
+    public function isActive()
     {
         return true;
     }
 
     /**
+     * Get Plugin Name
+     *
      * @return string
      */
-    public function getName():string
+    public function getName()
     {
-        $name = '';
-
         $name = $this->configRepo->get('PayPal.name');
 
         if(!strlen($name))
@@ -70,9 +72,11 @@ class PayPalPaymentMethod extends PaymentMethodService
     }
 
     /**
+     * Get PayPal Fee
+     *
      * @return float
      */
-    public function getFee():float
+    public function getFee()
     {
         $fee = $this->configRepo->get('PayPal.fee');
 
@@ -89,9 +93,11 @@ class PayPalPaymentMethod extends PaymentMethodService
     }
 
     /**
+     * Get Icon Path
+     *
      * @return string
      */
-    public function getIcon():string
+    public function getIcon()
     {
         $icon = 'http://i.imgur.com/Qnhkp.png';
 
@@ -99,12 +105,12 @@ class PayPalPaymentMethod extends PaymentMethodService
     }
 
     /**
+     * Get description
+     *
      * @return string
      */
-    public function getDescription():string
+    public function getDescription()
     {
-        $desc = '';
-
         $desc = $this->configRepo->get('PayPal.description');
 
         return $desc;
