@@ -1,4 +1,4 @@
-<?hh // strict
+<?php // strict
 
 namespace PayPal\Providers;
 
@@ -14,7 +14,7 @@ class PayPalRouteServiceProvider extends RouteServiceProvider
 	/**
 	 * @param Router $router
 	 */
-	public function map(Router $router):void
+	public function map(Router $router)
 	{
 		//paypal return urls
 		$router->get('plentyPayPal/payPalCheckoutSuccess', 'PayPal\Controllers\PaymentController@payPalCheckoutSuccess');
