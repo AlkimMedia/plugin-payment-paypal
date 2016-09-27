@@ -134,9 +134,7 @@ class PaymentService
             {
                   foreach($links as $key => $value)
                   {
-                        /*
-                         * Get redirect URLs for the content
-                         */
+                        // Get redirect URLs for the content
                         if($value->method == 'REDIRECT')
                         {
                               $paymentContent = $value->href;

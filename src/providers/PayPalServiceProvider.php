@@ -26,7 +26,7 @@ use \Plenty\Modules\Basket\Events\Basket\AfterBasketCreate;
 class PayPalServiceProvider extends ServiceProvider
 {
       /**
-       * Register the route service provider
+       * Registers the route service provider
        */
       public function register()
       {
@@ -34,7 +34,7 @@ class PayPalServiceProvider extends ServiceProvider
       }
 
       /**
-       * Boot PayPal Service
+       * Boots additional PayPal services
        *
        * @param Dispatcher $eventDispatcher
        * @param PaymentHelper $paymentHelper
@@ -45,26 +45,18 @@ class PayPalServiceProvider extends ServiceProvider
       public function boot(   Dispatcher $eventDispatcher     , PaymentHelper $paymentHelper     , PaymentService $paymentService,
                               BasketRepositoryContract $basket, PaymentMethodContainer $payContainer)
       {
-            /*
-             * Create a Method of Payment id
-             */
+            // Creates the ID of the payment method if it doesn't exist yet
             $paymentHelper->createMopIfNotExists();
 
-            /*
-             * Register the Payment Method in the Payment Method Container
-             */
+            // Registers the payment method for PayPal Express in the payment method container
             $payContainer->register('plentyPayPal::PAYPALEXPRESS', PayPalExpressPaymentMethod::class,
                                     [ AfterBasketChanged::class, AfterBasketCreate::class  ]);
 
-            /*
-             * Register the Payment Method in the Payment Method Container
-             */
+            // Registers the payment method for PayPal in the payment method container
             $payContainer->register('plentyPayPal::PAYPAL', PayPalPaymentMethod::class,
                                     [ AfterBasketChanged::class, AfterBasketCreate::class  ]);
 
-            /*
-             * Listen for the get Payment Method Content Event
-             */
+            // Listens for the event that gets the payment method content
             $eventDispatcher->listen(GetPaymentMethodContent::class,
                                function(GetPaymentMethodContent $event) use( $paymentHelper,  $basket,  $paymentService)
                                {
@@ -78,35 +70,25 @@ class PayPalServiceProvider extends ServiceProvider
                                });
 
 
-            /*
-             * Listen for the Execute Payment Event
-             */
+            // Listens for the event that executes the payment
             $eventDispatcher->listen(ExecutePayment::class,
                               function(ExecutePayment $event) use ( $paymentHelper, $paymentService)
                               {
 
                                     if($event->getMop() == $paymentHelper->getPayPalMopId())
                                     {
-                                          /*
-                                           * Execute the Payment
-                                           */
+                                          // Executes the payment
                                           $payPalPayment = $paymentService->executePayment();
 
-                                          /*
-                                           * Check if the PayPal Payment has been executed successfully
-                                           */
+                                          // Checks whether the PayPal payment has been executed successfully
                                           if($paymentService->getReturnType() != 'errorCode')
                                           {
-                                                /*
-                                                 * Create the Plenty Payment with the PayPal payment data
-                                                 */
+                                                // Creates a payment in plentymarkets with the PayPal payment data
                                                 $plentyPayment = $paymentHelper->createPlentyPaymentFromJson($payPalPayment);
 
                                                 if($plentyPayment instanceof Payment)
                                                 {
-                                                      /*
-                                                       * Assign the Plenty Payment to the given order
-                                                       */
+                                                      // Assigns the payment to an order in plentymarkets
                                                       $paymentHelper->assignPlentyPaymentToPlentyOrder($plentyPayment, $event->getOrderId());
                                                 }
                                           }

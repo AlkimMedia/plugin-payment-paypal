@@ -8,7 +8,7 @@
         "1": "Sandbox"
     },
     "default": "1"
-},{
+},  {
     "tab": "Grundeinstellungen",
     "key": "name",
     "label": "Anzeigename der Zahlungsart",
@@ -26,7 +26,7 @@
     "label": "Client-Secret",
     "type": "text",
     "default": ""
-}, {
+},  {
     "tab": "Grundeinstellungen",
     "key": "fee",
     "label": "Aufpreis (EUR)",
@@ -35,13 +35,13 @@
 },  {
     "tab": "Grundeinstellungen",
     "key": "successUrl",
-    "label": "URL der Danke-Seite (success-url)",
+    "label": "URL der Danke-Seite (Confirmation URL)",
     "type": "text",
     "default": ""
-}, {
+},  {
     "tab": "Grundeinstellungen",
     "key": "cancelUrl",
-    "label": "URL der Checkout-Seite (cancel-url)",
+    "label": "URL der Checkout-Seite (Cancellation URL)",
     "type": "text",
     "default": ""
 },  {
@@ -50,23 +50,23 @@
     "label": "Beschreibung",
     "type": "text",
     "default": ""
-}, {
+},  {
     "tab": "Händlereinstellungen",
     "key": "editableShipping",
-    "label": "Lieferanschrit bei PayPal änderbar",
+    "label": "Lieferanschrift bei PayPal änderbar",
     "type": "dropdown",
     "possibleValues": {
         "0": "Nein",
         "1": "Ja"
     },
     "default": "0"
-}, {
+},  {
     "tab": "Händlereinstellungen",
     "key": "shopName",
-    "label": "Shopname bei PayPal",
+    "label": "Shop-Name bei PayPal",
     "type": "text",
     "default": ""
-}, {
+},  {
     "tab": "Händlereinstellungen",
     "key": "shopLogo",
     "label": "URL zum Shop-Logo bei PayPal",

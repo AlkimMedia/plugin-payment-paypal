@@ -110,14 +110,12 @@ class PaymentHelper
       }
 
       /**
-       * Create the payment method id if it doesn't exists
+       * Creates the ID of the payment method if it doesn't exist yet
        */
       public function createMopIfNotExists()
       {
 
-            /*
-             * Check if the payment method is already created
-             */
+            // Checks whether the payment method for PayPal has been created
             if($this->getPayPalMopId() == 'no_paymentmethod_found')
             {
                   $paymentMethodData = array( 'pluginKey' => 'plentyPayPal',
@@ -127,9 +125,7 @@ class PaymentHelper
                   $this->paymentMethodRepository->createPaymentMethod($paymentMethodData);
             }
 
-            /*
-             * Check if the payment method is already created
-             */
+            // Checks whether the payment method for PayPal Express has been created
             if($this->getPayPalExpressMopId() == 'no_paymentmethod_found')
             {
                   $paymentMethodData = array( 'pluginKey'   => 'plentyPayPal',
@@ -141,15 +137,13 @@ class PaymentHelper
       }
 
       /**
-       * Get PayPal Method of Payment ID
+       * Gets the ID of the payment method for PayPal
        *
        * @return mixed
        */
       public function getPayPalMopId()
       {
-            /*
-             * Get all payment methods for the given plugin
-             */
+            // Lists all payment methods for the given plugin
             $paymentMethods = $this->paymentMethodRepository->allForPlugin('plentyPayPal');
 
             if( !is_null($paymentMethods) )
@@ -167,15 +161,13 @@ class PaymentHelper
       }
 
       /**
-       * Get PayPal Express Method of Payment ID
+       * Gets the ID of the payment method for PayPal Express
        *
        * @return mixed
        */
       public function getPayPalExpressMopId()
       {
-            /*
-            * get all payment methods for the given plugin
-            */
+            // Lists all payment methods for the given plugin
             $paymentMethods = $this->paymentMethodRepository->allForPlugin('plentyPayPal');
 
             if( !is_null($paymentMethods) )
@@ -193,7 +185,7 @@ class PaymentHelper
       }
 
       /**
-       * Get Rest cancel URL
+       * Gets the REST cancellation URL
        *
        * @return string
        */
@@ -212,7 +204,7 @@ class PaymentHelper
       }
 
       /**
-       * Get Rest success URL
+       * Gets the REST confirmation URL
        *
        * @return string
        */
@@ -231,7 +223,7 @@ class PaymentHelper
       }
 
       /**
-       * Set PayPal Pay ID
+       * Sets the PayPal Pay ID
        *
        * @param mixed $value
        */
@@ -241,7 +233,7 @@ class PaymentHelper
       }
 
       /**
-       * Get PayPal Pay ID
+       * Gets the PayPal Pay ID
        *
        * @return mixed
        */
@@ -251,7 +243,7 @@ class PaymentHelper
       }
 
       /**
-       * Set PayPal Payer ID
+       * Sets the PayPal Payer ID
        *
        * @param mixed $value
        */
@@ -261,7 +253,7 @@ class PaymentHelper
       }
 
       /**
-       * Get PayPal Payer ID
+       * Gets the PayPal Payer ID
        *
        * @return mixed
        */
@@ -271,7 +263,7 @@ class PaymentHelper
       }
 
       /**
-       * Creates a Plenty Payment from Json data
+       * Creates a payment in plentymarkets from the JSON data
        *
        * @param string $json
        * @return Payment
@@ -283,9 +275,7 @@ class PaymentHelper
             /** @var Payment $payment */
             $payment = clone $this->payment;
 
-            /*
-             * Set the payment data
-             */
+            // Sets the payment data
             $payment->mopId           = (int)$this->getPayPalMopId();
             $payment->transactionType = 2;
             $payment->status          = $this->mapStatus($payPalPayment->status);
@@ -299,15 +289,11 @@ class PaymentHelper
             /** @var PaymentProperty $paymentProp2 */
             $paymentProp2 = clone $this->paymentProperty;
 
-            /*
-             * Set the payment properties
-             */
+            // Sets the payment properties
             $paymentProp1->typeId   = PaymentProperty::TYPE_BOOKING_TEXT;
             $paymentProp1->value    = 'PayPalPayID: '.(string)$payPalPayment->bookingText;
 
-            /*
-             * Set the payment properties
-             */
+            // Sets the payment properties
             $paymentProp2->typeId   = PaymentProperty::TYPE_ORIGIN;
             $originConstants        = $this->paymentRepo->getOriginConstants();
 
@@ -320,9 +306,7 @@ class PaymentHelper
             $paymentProps = array(  $paymentProp1,
                                     $paymentProp2     );
 
-            /*
-             * Append the properties to the payment
-             */
+            // Adds the payment properties to the payment
             $payment->property = $paymentProps;
 
             $payment = $this->paymentRepo->createPayment($payment);
@@ -331,32 +315,26 @@ class PaymentHelper
       }
 
       /**
-       * Assign Payment to Order
+       * Assigns the payment to an order in plentymarkets
        *
        * @param Payment $payment
        * @param int $orderId
        */
       public function assignPlentyPaymentToPlentyOrder(Payment $payment, int $orderId)
       {
-            /*
-             * Get the order by the given orderId
-             */
+            // Gets the order by the given order ID
             $order = $this->orderRepo->findOrderById($orderId);
 
-            /*
-             * Check if the order truly exists
-             */
+            // Checks whether the order truly exists in plentymarkets
             if(!is_null($order) && $order instanceof Order)
             {
-                  /*
-                   * Assign the given payment to the given order
-                   */
+                  // Assigns the given payment to the given order
                   $this->paymentOrderRelationRepo->createOrderRelation($payment, $order);
             }
       }
 
       /**
-       * Map PayPal Payment Status to Plenty Payment Status
+       * Maps the PayPal payment status to the plentymarkets payment status
        *
        * @param string $status
        * @return int
