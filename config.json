@@ -35,7 +35,7 @@
 },  {
     "tab": "Grundeinstellungen",
     "key": "successUrl",
-    "label": "URL der Danke-Seite (Confirmation URL)",
+    "label": "URL der Danke-Seite (Success URL)",
     "type": "text",
     "default": ""
 },  {

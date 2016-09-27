@@ -25,7 +25,7 @@ class SessionStorageService
     }
 
     /**
-     * Set session value
+     * Set the session value
      *
      * @param string $name
      * @param mixed $value
@@ -36,7 +36,7 @@ class SessionStorageService
     }
 
     /**
-     * Get session value
+     * Get the session value
      *
      * @param string $name
      * @return mixed

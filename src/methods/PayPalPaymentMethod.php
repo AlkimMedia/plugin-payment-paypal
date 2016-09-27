@@ -45,7 +45,7 @@ class PayPalPaymentMethod extends PaymentMethodService
     }
 
     /**
-     * Checks whether the plugin is active
+     * Check whether the plugin is active
      *
      * @return bool
      */
@@ -55,7 +55,7 @@ class PayPalPaymentMethod extends PaymentMethodService
     }
 
     /**
-     * Gets the name of the plugin
+     * Get the name of the plugin
      *
      * @return string
      */
@@ -72,7 +72,7 @@ class PayPalPaymentMethod extends PaymentMethodService
     }
 
     /**
-     * Gets additional costs for PayPal. Additional costs can be entered in the config.json.
+     * Get additional costs for PayPal. Additional costs can be entered in the config.json.
      *
      * @return float
      */
@@ -93,7 +93,7 @@ class PayPalPaymentMethod extends PaymentMethodService
     }
 
     /**
-     * Gets the path of the icon
+     * Get the path of the icon
      *
      * @return string
      */
@@ -105,7 +105,7 @@ class PayPalPaymentMethod extends PaymentMethodService
     }
 
     /**
-     * Gets the description of the payment method. The description can be entered in the config.json.
+     * Get the description of the payment method. The description can be entered in the config.json.
      *
      * @return string
      */

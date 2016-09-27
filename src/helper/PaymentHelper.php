@@ -110,12 +110,12 @@ class PaymentHelper
       }
 
       /**
-       * Creates the ID of the payment method if it doesn't exist yet
+       * Create the ID of the payment method if it doesn't exist yet
        */
       public function createMopIfNotExists()
       {
 
-            // Checks whether the payment method for PayPal has been created
+            // Check whether the ID of the PayPal payment method has been created
             if($this->getPayPalMopId() == 'no_paymentmethod_found')
             {
                   $paymentMethodData = array( 'pluginKey' => 'plentyPayPal',
@@ -125,7 +125,7 @@ class PaymentHelper
                   $this->paymentMethodRepository->createPaymentMethod($paymentMethodData);
             }
 
-            // Checks whether the payment method for PayPal Express has been created
+            // Check whether the ID of the PayPal Express payment method has been created
             if($this->getPayPalExpressMopId() == 'no_paymentmethod_found')
             {
                   $paymentMethodData = array( 'pluginKey'   => 'plentyPayPal',
@@ -137,13 +137,13 @@ class PaymentHelper
       }
 
       /**
-       * Gets the ID of the payment method for PayPal
+       * Get the ID of the PayPal payment method
        *
        * @return mixed
        */
       public function getPayPalMopId()
       {
-            // Lists all payment methods for the given plugin
+            // List all payment methods for the given plugin
             $paymentMethods = $this->paymentMethodRepository->allForPlugin('plentyPayPal');
 
             if( !is_null($paymentMethods) )
@@ -161,13 +161,13 @@ class PaymentHelper
       }
 
       /**
-       * Gets the ID of the payment method for PayPal Express
+       * Get the ID of the PayPal Express payment method
        *
        * @return mixed
        */
       public function getPayPalExpressMopId()
       {
-            // Lists all payment methods for the given plugin
+            // List all payment methods for the given plugin
             $paymentMethods = $this->paymentMethodRepository->allForPlugin('plentyPayPal');
 
             if( !is_null($paymentMethods) )
@@ -185,7 +185,7 @@ class PaymentHelper
       }
 
       /**
-       * Gets the REST cancellation URL
+       * Get the REST cancellation URL
        *
        * @return string
        */
@@ -204,7 +204,7 @@ class PaymentHelper
       }
 
       /**
-       * Gets the REST confirmation URL
+       * Get the REST success URL
        *
        * @return string
        */
@@ -223,7 +223,7 @@ class PaymentHelper
       }
 
       /**
-       * Sets the PayPal Pay ID
+       * Set the PayPal Pay ID
        *
        * @param mixed $value
        */
@@ -233,7 +233,7 @@ class PaymentHelper
       }
 
       /**
-       * Gets the PayPal Pay ID
+       * Get the PayPal Pay ID
        *
        * @return mixed
        */
@@ -243,7 +243,7 @@ class PaymentHelper
       }
 
       /**
-       * Sets the PayPal Payer ID
+       * Set the PayPal Payer ID
        *
        * @param mixed $value
        */
@@ -253,7 +253,7 @@ class PaymentHelper
       }
 
       /**
-       * Gets the PayPal Payer ID
+       * Get the PayPal Payer ID
        *
        * @return mixed
        */
@@ -263,7 +263,7 @@ class PaymentHelper
       }
 
       /**
-       * Creates a payment in plentymarkets from the JSON data
+       * Create a payment in plentymarkets from the JSON data
        *
        * @param string $json
        * @return Payment
@@ -275,7 +275,7 @@ class PaymentHelper
             /** @var Payment $payment */
             $payment = clone $this->payment;
 
-            // Sets the payment data
+            // Set the payment data
             $payment->mopId           = (int)$this->getPayPalMopId();
             $payment->transactionType = 2;
             $payment->status          = $this->mapStatus($payPalPayment->status);
@@ -289,11 +289,11 @@ class PaymentHelper
             /** @var PaymentProperty $paymentProp2 */
             $paymentProp2 = clone $this->paymentProperty;
 
-            // Sets the payment properties
+            // Set the payment properties
             $paymentProp1->typeId   = PaymentProperty::TYPE_BOOKING_TEXT;
             $paymentProp1->value    = 'PayPalPayID: '.(string)$payPalPayment->bookingText;
 
-            // Sets the payment properties
+            // Set the payment properties
             $paymentProp2->typeId   = PaymentProperty::TYPE_ORIGIN;
             $originConstants        = $this->paymentRepo->getOriginConstants();
 
@@ -306,7 +306,7 @@ class PaymentHelper
             $paymentProps = array(  $paymentProp1,
                                     $paymentProp2     );
 
-            // Adds the payment properties to the payment
+            // Add the payment properties to the payment
             $payment->property = $paymentProps;
 
             $payment = $this->paymentRepo->createPayment($payment);
@@ -315,26 +315,26 @@ class PaymentHelper
       }
 
       /**
-       * Assigns the payment to an order in plentymarkets
+       * Assign the payment to an order in plentymarkets
        *
        * @param Payment $payment
        * @param int $orderId
        */
       public function assignPlentyPaymentToPlentyOrder(Payment $payment, int $orderId)
       {
-            // Gets the order by the given order ID
+            // Get the order by the given order ID
             $order = $this->orderRepo->findOrderById($orderId);
 
-            // Checks whether the order truly exists in plentymarkets
+            // Check whether the order truly exists in plentymarkets
             if(!is_null($order) && $order instanceof Order)
             {
-                  // Assigns the given payment to the given order
+                  // Assign the given payment to the given order
                   $this->paymentOrderRelationRepo->createOrderRelation($payment, $order);
             }
       }
 
       /**
-       * Maps the PayPal payment status to the plentymarkets payment status
+       * Map the PayPal payment status to the plentymarkets payment status
        *
        * @param string $status
        * @return int
