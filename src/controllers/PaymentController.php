@@ -16,99 +16,96 @@ use PayPal\Helper\PaymentHelper;
  */
 class PaymentController extends Controller
 {
-  /**
-   * @var Application
-   */
-  protected $app;
+      /**
+      * @var Application
+      */
+      protected $app;
 
-  /**
-   * @var Twig
-   */
-  private $twig;
+      /**
+      * @var Twig
+      */
+      private $twig;
 
-  /**
-   * @var Request
-   */
-  private $request;
+      /**
+      * @var Request
+      */
+      private $request;
 
-  /**
-   * @var ConfigRepository
-   */
-  private $config;
+      /**
+      * @var ConfigRepository
+      */
+      private $config;
 
-  /**
-   * @var PaymentHelper
-   */
-  private $payHelper;
+      /**
+      * @var PaymentHelper
+      */
+      private $payHelper;
 
-  /**
-   * PaymentController constructor.
-   *
-   * @param Application $app
-   * @param Twig $twig
-   * @param ConfigRepository $config
-   * @param Request $request
-   * @param PaymentHelper $payHelper
-   */
-  public function __construct(Application $app,
-                              Twig $twig,
-                              Request $request,
-                              ConfigRepository $config,
-                              PaymentHelper $payHelper)
-  {
-    $this->app = $app;
-    $this->twig = $twig;
-    $this->request = $request;
-    $this->config = $config;
-    $this->payHelper = $payHelper;
-  }
+      /**
+      * PaymentController constructor.
+      *
+      * @param Application $app
+      * @param Twig $twig
+      * @param ConfigRepository $config
+      * @param Request $request
+      * @param PaymentHelper $payHelper
+      */
+      public function __construct(  Application $app, Twig $twig, Request $request,
+                                    ConfigRepository $config, PaymentHelper $payHelper)
+      {
+            $this->app          = $app;
+            $this->twig         = $twig;
+            $this->request      = $request;
+            $this->config       = $config;
+            $this->payHelper    = $payHelper;
+      }
 
-  /**
-   * this is where paypal will redirect to if issues occured
-   */
-  public function payPalCheckoutCancel()
-  {
-    /*
-     * redirect to the cancel page
-     */
-    header("Location: ".$this->config->get('PayPal.cancelUrl'));
-    exit();
-  }
+      /**
+      * This is where PayPal will redirect to if issues occured
+      */
+      public function payPalCheckoutCancel()
+      {
+            /*
+            * Redirect to the cancel page
+            */
+            header("Location: ".$this->config->get('PayPal.cancelUrl'));
+            exit();
+      }
 
-  /**
-   * this is where paypal will redirect to if everything went fine
-   */
-  public function payPalCheckoutSuccess()
-  {
-    /*
-     * get the paypal payment data from the request
-     */
-    $paymentId = $this->request->get('paymentId');
-    $payerId = $this->request->get('PayerID');
+      /**
+      * This is where paypal will redirect to if everything went fine
+      */
+      public function payPalCheckoutSuccess()
+      {
+            /*
+            * Get the PayPal payment data from the request
+            */
+            $paymentId    = $this->request->get('paymentId');
+            $payerId      = $this->request->get('PayerID');
 
-    /*
-     * get the paypal payId from the session
-     */
-    $ppPayId = $this->payHelper->getPPPayID();
+            /*
+            * Get the PayPal Pay ID from the session
+            */
+            $ppPayId = $this->payHelper->getPayPalPayID();
 
-    /*
-     * check if the payId from the session is equal to the given payId by paypal
-     */
-    if($paymentId != $ppPayId)
-    {
-      $this->payPalCheckoutCancel();
-    }
+            /*
+            * Check if the Pay ID from the session is equal to the given Pay ID by PayPal
+            */
+            if($paymentId != $ppPayId)
+            {
+                  $this->payPalCheckoutCancel();
+            }
 
-    /*
-     * set the paypal data in the session
-     */
-    $this->payHelper->setPPPayID($paymentId);
-    $this->payHelper->setPPPayerID($payerId);
+            /*
+            * Set the PayPal data in the session
+            */
+            $this->payHelper->setPayPalPayID($paymentId);
+            $this->payHelper->setPayPalPayerID($payerId);
 
-    /*
-     * redirect to the confirmation page
-     */
-    header("Location: ".$this->config->get('PayPal.successUrl'));
-    exit();
-  }
+            /*
+            * Redirect to the confirmation page
+            */
+            header("Location: ".$this->config->get('PayPal.successUrl'));
+            exit();
+      }
 }
