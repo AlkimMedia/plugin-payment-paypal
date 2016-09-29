@@ -26,8 +26,6 @@ class ContactService
     }
 
     /**
-     * Return Contact by ID
-     *
      * @param int $contactId
      * @return Contact
      */
@@ -37,8 +35,6 @@ class ContactService
     }
 
     /**
-     * Create contact
-     *
      * @param array $contact
      * @return Contact
      */

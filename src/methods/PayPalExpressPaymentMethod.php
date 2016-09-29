@@ -24,7 +24,6 @@ class PayPalExpressPaymentMethod extends PaymentMethodService
 
     /**
      * PayPalExpressPaymentMethod constructor.
-     *
      * @param BasketRepositoryContract $basketRepo
      * @param ContactRepositoryContract $contactRepo
      */
@@ -36,8 +35,6 @@ class PayPalExpressPaymentMethod extends PaymentMethodService
     }
 
     /**
-     * Is PayPalExpress active
-     *
      * @return bool
      */
     public function isActive():bool
