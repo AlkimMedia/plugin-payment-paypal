@@ -1,4 +1,4 @@
-<?php // strict
+<?hh // strict
 
 namespace PayPal\Methods;
 
@@ -13,24 +13,13 @@ use Plenty\Plugin\ConfigRepository;
  */
 class PayPalPaymentMethod extends PaymentMethodService
 {
-    /**
-     * @var BasketRepositoryContract
-     */
-    private $basketRepo;
 
-    /**
-     * @var ContactRepositoryContract
-     */
-    private $contactRepo;
-
-    /**
-     * @var ConfigRepository
-     */
-    private $configRepo;
+    private BasketRepositoryContract $basketRepo;
+    private ContactRepositoryContract $contactRepo;
+    private ConfigRepository $configRepo;
 
     /**
      * PayPalExpressPaymentMethod constructor.
-     *
      * @param BasketRepositoryContract $basketRepo
      * @param ContactRepositoryContract $contactRepo
      * @param ConfigRepository $configRepo

@@ -1,4 +1,4 @@
-<?php //strict
+<?hh //strict
 
 namespace PayPal\Services;
 
@@ -19,49 +19,19 @@ use PayPal\Helper\PaymentHelper;
  */
 class PaymentService
 {
-    /**
-     * @var PaymentMethodRepositoryContract
-     */
-    private $paymentMethodRepository;
+    private PaymentMethodRepositoryContract $paymentMethodRepository;
+    private PaymentRepositoryContract $paymentRepository;
+    private PaymentHelper $paymentHelper;
+    private LibraryCallContract $libCall;
+    private AddressRepositoryContract $addressRepo;
+    private ConfigRepository $config;
 
-    /**
-     * @var PaymentRepositoryContract
-     */
-    private $paymentRepository;
+    private bool $sandbox = true;
 
-    /**
-     * @var PaymentHelper
-     */
-    private $paymentHelper;
-
-    /**
-     * @var LibraryCallContract
-     */
-    private $libCall;
-
-    /**
-     * @var AddressRepositoryContract
-     */
-    private $addressRepo;
-
-    /**
-     * @var ConfigRepository
-     */
-    private $config;
-
-    /**
-     * @var bool
-     */
-    private $sandbox = true;
-
-    /**
-     * @var string
-     */
-    private $returnType = '';
+    private string $returnType = '';
 
     /**
      * PaymentService constructor.
-     *
      * @param PaymentMethodRepositoryContract $paymentMethodRepository
      * @param PaymentRepositoryContract $paymentRepository
      * @param ConfigRepository $config

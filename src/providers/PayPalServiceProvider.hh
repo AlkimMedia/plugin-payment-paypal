@@ -1,4 +1,4 @@
-<?php // strict
+<?hh // strict
 
 namespace PayPal\Providers;
 
@@ -23,7 +23,7 @@ class PayPalServiceProvider extends ServiceProvider
   /**
    * register the route service provider
    */
-  public function register()
+  public function register():void
   {
     $this->getApplication()->register(PayPalRouteServiceProvider::class);
   }
@@ -39,7 +39,7 @@ class PayPalServiceProvider extends ServiceProvider
                        PaymentHelper $paymentHelper,
                        PaymentService $paymentService,
                        BasketRepositoryContract $basket,
-                       PaymentMethodContainer $payContainer)
+                       PaymentMethodContainer $payContainer):void
   {
     /*
      * create a method of payment id
@@ -65,7 +65,7 @@ class PayPalServiceProvider extends ServiceProvider
     /*
      * listen for the get payment method content event
      */
-    $eventDispatcher->listen(\Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent::class, function($event, $paymentHelper, $basket, $paymentService) {
+    $eventDispatcher->listen(\Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent::class, ($event) ==> {
 
       if($event->getMop() == $paymentHelper->getPayPalMopId())
       {
@@ -81,7 +81,7 @@ class PayPalServiceProvider extends ServiceProvider
     /*
      * listen for the execute payment event
      */
-    $eventDispatcher->listen(\Plenty\Modules\Payment\Events\Checkout\ExecutePayment::class, function($event, $paymentHelper, $paymentService) {
+    $eventDispatcher->listen(\Plenty\Modules\Payment\Events\Checkout\ExecutePayment::class, ($event) ==> {
 
       if($event->getMop() == $paymentHelper->getPayPalMopId())
       {

@@ -1,4 +1,4 @@
-<?php //strict
+<?hh //strict
 
 namespace PayPal\Controllers;
 
@@ -16,34 +16,14 @@ use PayPal\Helper\PaymentHelper;
  */
 class PaymentController extends Controller
 {
-  /**
-   * @var Application
-   */
-  protected $app;
-
-  /**
-   * @var Twig
-   */
-  private $twig;
-
-  /**
-   * @var Request
-   */
-  private $request;
-
-  /**
-   * @var ConfigRepository
-   */
-  private $config;
-
-  /**
-   * @var PaymentHelper
-   */
-  private $payHelper;
+  protected Application $app;
+  private Twig $twig;
+  private Request $request;
+  private ConfigRepository $config;
+  private PaymentHelper $payHelper;
 
   /**
    * PaymentController constructor.
-   *
    * @param Application $app
    * @param Twig $twig
    * @param ConfigRepository $config
@@ -66,7 +46,7 @@ class PaymentController extends Controller
   /**
    * this is where paypal will redirect to if issues occured
    */
-  public function payPalCheckoutCancel()
+  public function payPalCheckoutCancel():void
   {
     /*
      * redirect to the cancel page
@@ -78,7 +58,7 @@ class PaymentController extends Controller
   /**
    * this is where paypal will redirect to if everything went fine
    */
-  public function payPalCheckoutSuccess()
+  public function payPalCheckoutSuccess():void
   {
     /*
      * get the paypal payment data from the request
@@ -111,4 +91,5 @@ class PaymentController extends Controller
     header("Location: ".$this->config->get('PayPal.successUrl'));
     exit();
   }
+
 }

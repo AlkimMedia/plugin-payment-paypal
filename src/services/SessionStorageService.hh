@@ -1,4 +1,4 @@
-<?php //strict
+<?hh //strict
 
 namespace PayPal\Services;
 
@@ -10,10 +10,7 @@ use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFact
  */
 class SessionStorageService
 {
-    /**
-     * @var FrontendSessionStorageFactoryContract
-     */
-    private $sessionStorage;
+    private FrontendSessionStorageFactoryContract $sessionStorage;
 
     /**
      * SessionStorageService constructor.
@@ -28,7 +25,7 @@ class SessionStorageService
      * @param string $name
      * @param mixed $value
      */
-    public function setSessionValue(string $name, mixed $value)
+    public function setSessionValue(string $name, mixed $value):void
     {
         $this->sessionStorage->getPlugin()->setValue($name, $value);
     }
