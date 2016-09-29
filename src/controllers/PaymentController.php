@@ -61,38 +61,50 @@ class PaymentController extends Controller
       }
 
       /**
-      * PayPal redirects to this page if the payment could not be executed or other problems occurred
+      * This is where PayPal will redirect to if issues occured
       */
       public function payPalCheckoutCancel()
       {
-            // Redirects to the cancellation page. The URL can be entered in the config.json.
+            /*
+            * Redirect to the cancel page
+            */
             header("Location: ".$this->config->get('PayPal.cancelUrl'));
             exit();
       }
 
       /**
-      * PayPal redirects to this page if the payment was executed correctly
+      * This is where paypal will redirect to if everything went fine
       */
       public function payPalCheckoutSuccess()
       {
-            // Get the PayPal payment data from the request
+            /*
+            * Get the PayPal payment data from the request
+            */
             $paymentId    = $this->request->get('paymentId');
             $payerId      = $this->request->get('PayerID');
 
-            // Get the PayPal Pay ID from the session
+            /*
+            * Get the PayPal Pay ID from the session
+            */
             $ppPayId = $this->payHelper->getPayPalPayID();
 
-            // Check whether the Pay ID from the session is equal to the given Pay ID by PayPal
+            /*
+            * Check if the Pay ID from the session is equal to the given Pay ID by PayPal
+            */
             if($paymentId != $ppPayId)
             {
                   $this->payPalCheckoutCancel();
             }
 
-            // Set the PayPal data in the session
+            /*
+            * Set the PayPal data in the session
+            */
             $this->payHelper->setPayPalPayID($paymentId);
             $this->payHelper->setPayPalPayerID($payerId);
 
-            // Redirect to the success page. The URL can be entered in the config.json.
+            /*
+            * Redirect to the confirmation page
+            */
             header("Location: ".$this->config->get('PayPal.successUrl'));
             exit();
       }

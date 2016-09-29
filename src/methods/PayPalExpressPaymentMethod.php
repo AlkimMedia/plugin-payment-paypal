@@ -36,7 +36,7 @@ class PayPalExpressPaymentMethod extends PaymentMethodService
     }
 
     /**
-     * Check whether PayPal Express is active
+     * Is PayPalExpress active
      *
      * @return bool
      */
