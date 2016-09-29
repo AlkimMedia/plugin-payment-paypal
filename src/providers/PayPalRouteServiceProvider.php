@@ -16,9 +16,7 @@ class PayPalRouteServiceProvider extends RouteServiceProvider
 	 */
 	public function map(Router $router)
 	{
-		/*
-		 * PayPal return URLs
-		 */
+		// Get the PayPal success and cancellation URLs
 		$router->get('plentyPayPal/payPalCheckoutSuccess', 'PayPal\Controllers\PaymentController@payPalCheckoutSuccess');
 		$router->get('plentyPayPal/payPalCheckoutCancel' , 'PayPal\Controllers\PaymentController@payPalCheckoutCancel' );
 	}

@@ -80,9 +80,7 @@ class PaymentService
             $this->addressRepo                = $addressRepo;
             $this->config                     = $config;
 
-            /*
-             * Read from plugin config
-             */
+            // Get the PayPal environment. The environment can be set in the config.json.
             if($config->get('PayPal.environment') == 1)
             {
                   $this->sandbox = true;
@@ -90,7 +88,7 @@ class PaymentService
       }
 
       /**
-       * Get PayPal payment content
+       * Get the PayPal payment content
        *
        * @param Basket $basket
        * @return string
@@ -100,14 +98,10 @@ class PaymentService
 
             $payPalRequestParams = $this->getPaypalParams($basket);
 
-            /*
-             * Prepare the PayPal payment
-             */
+            // Prepare the PayPal payment
             $result = $this->libCall->call('PayPal::preparePayment', $payPalRequestParams);
 
-            /*
-             * Check for errors
-             */
+            // Check for errors
             if(is_array($result) && $result['error'])
             {
               $this->returnType = 'errorCode';
@@ -116,27 +110,21 @@ class PaymentService
 
             $resultJson = json_decode($result);
 
-            /*
-             * Store the PayPal pay ID in the session
-             */
+            // Store the PayPal Pay ID in the session
             $ppPayId = $resultJson->id;
             if(strlen($ppPayId))
             {
                 $this->paymentHelper->setPayPalPayID($ppPayId);
             }
 
-            /*
-             * Get PayPal container content
-             */
+            // Get the content of the PayPal container
             $paymentContent = '';
             $links = $resultJson->links;
             if(is_array($links))
             {
                   foreach($links as $key => $value)
                   {
-                        /*
-                         * Get redirect URLs for the content
-                         */
+                        // Get the redirect URLs for the content
                         if($value->method == 'REDIRECT')
                         {
                               $paymentContent = $value->href;
@@ -145,9 +133,7 @@ class PaymentService
                   }
             }
 
-            /*
-             * Check if content is set, other wise return error code
-             */
+            // Check whether the content is set. Else, return an error code.
             if(!strlen($paymentContent))
             {
               $this->returnType = 'errorCode';
@@ -158,7 +144,7 @@ class PaymentService
       }
 
       /**
-       * Return Type of Payment PayPal container content
+       * Get the type of payment from the content of the PayPal container
        *
        * @return string
        */
@@ -168,35 +154,27 @@ class PaymentService
       }
 
       /**
-       * Execute PayPal payment
+       * Execute the PayPal payment
        *
        * @return string
        */
       public function executePayment()
       {
-            /*
-            * Load mandatory PayPal data from session
-            */
+            // Load the mandatory PayPal data from session
             $ppPayId    = $this->paymentHelper->getPayPalPayID();
             $ppPayerId  = $this->paymentHelper->getPayPalPayerID();
 
-            /*
-             * Set PayPal payment execute parameters
-             */
+            // Set the execute parameters for the PayPal payment
             $executeParams = array( 'clientSecret'    => $this->config->get('PayPal.clientSecret'),
                                     'clientId'        => $this->config->get('PayPal.clientId'    ));
             $executeParams['sandbox']   = $this->sandbox;
             $executeParams['payId']     = $ppPayId;
             $executeParams['payerId']   = $ppPayerId;
 
-            /*
-             * Execute the PayPal payment
-             */
+            // Execute the PayPal payment
             $executeResponse = $this->libCall->call('PayPal::executePayment', $executeParams);
 
-            /*
-             * Check for errors
-             */
+            // Check for errors
             if(is_array($executeResponse) && $executeResponse['error'])
             {
                   $this->returnType = 'errorCode';
@@ -205,9 +183,7 @@ class PaymentService
 
             $result = json_encode($executeResponse);
 
-            /*
-             * Clear the session params
-             */
+            // Clear the session parameters
             $this->paymentHelper->setPayPalPayID(null);
             $this->paymentHelper->setPayPalPayerID(null);
 
@@ -215,7 +191,7 @@ class PaymentService
       }
 
       /**
-       * Fill and return Paypal parameters
+       * Fill and return the Paypal parameters
        *
        * @param Basket $basket
        * @return array
@@ -225,18 +201,14 @@ class PaymentService
           $payPalRequestParams = array( 'clientSecret'    => $this->config->get('PayPal.clientSecret'),
                                         'clientId'        => $this->config->get('PayPal.clientId'));
 
-          /*
-           * Set PayPal basic parameter
-           */
+          // Set the PayPal basic parameters
           $payPalRequestParams['webProfileId']      = 'XP-3XH9-EMJG-WX7L-789D';
           $payPalRequestParams['sandbox']           = $this->sandbox;
           $payPalRequestParams['basket']            = $basket;
           $payPalRequestParams['basketItems']       = $basket->basketItems;
 
 
-          /*
-           * Fill Address and Country for PayPal parameters
-           */
+          // Fill the address and the country for PayPal parameters
           $address = array();
           $country = array();
           $address['town']            = 'hofteister';
@@ -250,9 +222,7 @@ class PaymentService
           $payPalRequestParams['shippingAddress']     = $address;
           $payPalRequestParams['country']             = $country;
 
-          /*
-           * Get URLs for PayPal parameters
-           */
+          // Get the URLs for PayPal parameters
           $urls = array('returnUrl' => $this->paymentHelper->getRestSuccessURL(),
                         'cancelUrl' => $this->paymentHelper->getRestCancelURL());
 
