@@ -1,4 +1,4 @@
-<?hh //strict
+<?php //strict
 
 namespace PayPal\Helper;
 
@@ -22,20 +22,64 @@ use PayPal\Services\SessionStorageService;
  */
 class PaymentHelper
 {
-  private Application $app;
-  private WebstoreHelper $webstoreHelper;
-  private PaymentMethodRepositoryContract $paymentMethodRepository;
-  private ConfigRepository $config;
-  private SessionStorageService $sessionService;
-  private PaymentOrderRelationRepositoryContract $paymentOrderRelationRepo;
-  private PaymentProperty $paymentProperty;
-  private PaymentRepositoryContract $paymentRepo;
-  private Payment $payment;
-  private OrderRepositoryContract $orderRepo;
-  private array<string, int> $statusMap;
+  /**
+   * @var Application
+   */
+  private $app;
+
+  /**
+   * @var WebstoreHelper
+   */
+  private $webstoreHelper;
+
+  /**
+   * @var PaymentMethodRepositoryContract
+   */
+  private $paymentMethodRepository;
+
+  /**
+   * @var ConfigRepository
+   */
+  private $config;
+
+  /**
+   * @var SessionStorageService
+   */
+  private $sessionService;
+
+  /**
+   * @var PaymentOrderRelationRepositoryContract
+   */
+  private $paymentOrderRelationRepo;
+
+  /**
+   * @var PaymentProperty
+   */
+  private $paymentProperty;
+
+  /**
+   * @var PaymentRepositoryContract
+   */
+  private $paymentRepo;
+
+  /**
+   * @var Payment
+   */
+  private $payment;
+
+  /**
+   * @var OrderRepositoryContract
+   */
+  private $orderRepo;
+
+  /**
+   * @var array
+   */
+  private $statusMap = array();
 
   /**
    * PaymentHelper constructor.
+   *
    * @param Application $app
    * @param WebstoreHelper $webstoreHelper
    * @param PaymentMethodRepositoryContract $paymentMethodRepository
@@ -74,7 +118,7 @@ class PaymentHelper
   /**
    * create the payment method id
    */
-  public function createMopIfNotExists():void
+  public function createMopIfNotExists()
   {
     /*
      * check if the payment method is already created
@@ -186,7 +230,7 @@ class PaymentHelper
   /**
    * @param mixed $value
    */
-  public function setPPPayID(mixed $value):void
+  public function setPPPayID(mixed $value)
   {
     $this->sessionService->setSessionValue('PayPalPayId', $value);
   }
@@ -202,7 +246,7 @@ class PaymentHelper
   /**
    * @param mixed $value
    */
-  public function setPPPayerID(mixed $value):void
+  public function setPPPayerID(mixed $value)
   {
     $this->sessionService->setSessionValue('PayPalPayerId', $value);
   }
@@ -277,7 +321,7 @@ class PaymentHelper
    * @param Payment $payment
    * @param int $orderId
    */
-  public function assignPlentyPaymentToPlentyOrder(Payment $payment, int $orderId):void
+  public function assignPlentyPaymentToPlentyOrder(Payment $payment, int $orderId)
   {
     /*
      * get the order by the given orderId
@@ -306,7 +350,6 @@ class PaymentHelper
   {
     if(!is_array($this->statusMap) || count($this->statusMap) <= 0)
     {
-      $this->statusMap = array();
       $statusConstants = $this->paymentRepo->getStatusConstants();
 
       if(!is_null($statusConstants) && is_array($statusConstants))

@@ -1,4 +1,4 @@
-<?hh //strict
+<?php //strict
 
 namespace PayPal\Services;
 
@@ -11,7 +11,10 @@ use Plenty\Modules\Account\Contact\Models\Contact;
  */
 class ContactService
 {
-    private ContactRepositoryContract $contactRepository;
+    /**
+     * @var ContactRepositoryContract
+     */
+    private $contactRepository;
 
     /**
      * ContactService constructor.
@@ -32,10 +35,10 @@ class ContactService
     }
 
     /**
-     * @param array<string, mixed> $contact
+     * @param array $contact
      * @return Contact
      */
-    public function createContact(array<string, mixed> $contact):Contact
+    public function createContact(array $contact):Contact
     {
         return $this->contactRepository->createContact($contact);
     }
