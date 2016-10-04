@@ -2,6 +2,7 @@
 
 namespace PayPal\Helper;
 
+use Plenty\Modules\Payment\Contracts\PaymentPropertyRepositoryContract;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
@@ -53,19 +54,14 @@ class PaymentHelper
       private $paymentOrderRelationRepo;
 
       /**
-       * @var PaymentProperty
+       * @var PaymentPropertyRepositoryContract
        */
-      private $paymentProperty;
+      private $paymentPropertyRepositoryContract;
 
       /**
        * @var PaymentRepositoryContract
        */
-      private $paymentRepo;
-
-      /**
-       * @var Payment
-       */
-      private $payment;
+      private $paymentRepository;
 
       /**
        * @var OrderRepositoryContract
@@ -81,32 +77,35 @@ class PaymentHelper
        * PaymentHelper constructor.
        *
        * @param Application $app
-       * @param WebstoreHelper $webstoreHelper
        * @param PaymentMethodRepositoryContract $paymentMethodRepository
        * @param PaymentRepositoryContract $paymentRepo
+       * @param PaymentPropertyRepositoryContract $paymentPropertyRepositoryContract
        * @param PaymentOrderRelationRepositoryContract $paymentOrderRelationRepo
        * @param ConfigRepository $config
        * @param SessionStorageService $sessionService
-       * @param Payment $payment
-       * @param PaymentProperty $paymentProperty
        * @param OrderRepositoryContract $orderRepo
+       * @param WebstoreHelper $webstoreHelper
        */
-      public function __construct(Application $app, PaymentMethodRepositoryContract $paymentMethodRepository, PaymentRepositoryContract $paymentRepo,
-                                  PaymentOrderRelationRepositoryContract $paymentOrderRelationRepo,   ConfigRepository $config,
-                                  SessionStorageService $sessionService,      Payment $payment,       PaymentProperty $paymentProperty,
-                                  OrderRepositoryContract $orderRepo,         WebstoreHelper $webstoreHelper)
+      public function __construct(Application $app,
+                                  PaymentMethodRepositoryContract $paymentMethodRepository,
+                                  PaymentRepositoryContract $paymentRepo,
+                                  PaymentPropertyRepositoryContract $paymentPropertyRepositoryContract,
+                                  PaymentOrderRelationRepositoryContract $paymentOrderRelationRepo,
+                                  ConfigRepository $config,
+                                  SessionStorageService $sessionService,
+                                  OrderRepositoryContract $orderRepo,
+                                  WebstoreHelper $webstoreHelper)
       {
-            $this->app                          = $app;
-            $this->webstoreHelper               = $webstoreHelper;
-            $this->config                       = $config;
-            $this->sessionService               = $sessionService;
-            $this->paymentMethodRepository      = $paymentMethodRepository;
-            $this->paymentOrderRelationRepo     = $paymentOrderRelationRepo;
-            $this->paymentRepo                  = $paymentRepo;
-            $this->paymentProperty              = $paymentProperty;
-            $this->orderRepo                    = $orderRepo;
-            $this->payment                      = $payment;
-            $this->statusMap                    = array();
+            $this->app                                      = $app;
+            $this->webstoreHelper                           = $webstoreHelper;
+            $this->config                                   = $config;
+            $this->sessionService                           = $sessionService;
+            $this->paymentMethodRepository                  = $paymentMethodRepository;
+            $this->paymentOrderRelationRepo                 = $paymentOrderRelationRepo;
+            $this->paymentRepository                        = $paymentRepo;
+            $this->paymentPropertyRepositoryContract        = $paymentPropertyRepositoryContract;
+            $this->orderRepo                                = $orderRepo;
+            $this->statusMap                                = array();
       }
 
       /**
@@ -272,46 +271,48 @@ class PaymentHelper
       {
             $payPalPayment = json_decode($json);
 
-            /** @var Payment $payment */
-            $payment = clone $this->payment;
+            $paymentData = array();
 
             // Set the payment data
-            $payment->mopId           = (int)$this->getPayPalMopId();
-            $payment->transactionType = 2;
-            $payment->status          = $this->mapStatus($payPalPayment->status);
-            $payment->currency        = $payPalPayment->currency;
-            $payment->amount          = $payPalPayment->amount;
-            $payment->entryDate       = $payPalPayment->entryDate;
+            $paymentData['mopId']           = (int)$this->getPayPalMopId();
+            $paymentData['transactionType'] = 2;
+            $paymentData['status']          = $this->mapStatus($payPalPayment->status);
+            $paymentData['currency']        = $payPalPayment->currency;
+            $paymentData['amount']          = $payPalPayment->amount;
+            $paymentData['entryDate']       = $payPalPayment->entryDate;
 
-            /** @var PaymentProperty $paymentProp1 */
-            $paymentProp1 = clone $this->paymentProperty;
+            $payment = $this->paymentRepository->createPayment($paymentData);
 
-            /** @var PaymentProperty $paymentProp2 */
-            $paymentProp2 = clone $this->paymentProperty;
+            /**
+             * Add payment property with type booking text
+             */
+            $this->addPaymentProperty($payment->id, array('typeId'=>PaymentProperty::TYPE_BOOKING_TEXT, 'value'=>'PayPalPayID: '.(string)$payPalPayment->bookingText));
 
-            // Set the payment properties
-            $paymentProp1->typeId   = PaymentProperty::TYPE_BOOKING_TEXT;
-            $paymentProp1->value    = 'PayPalPayID: '.(string)$payPalPayment->bookingText;
-
-            // Set the payment properties
-            $paymentProp2->typeId   = PaymentProperty::TYPE_ORIGIN;
-            $originConstants        = $this->paymentRepo->getOriginConstants();
-
+            /**
+             * Add payment property with type origin
+             */
+            $originConstants        = $this->paymentRepository->getOriginConstants();
+            $paymentPropertyValue      = '';
             if(!is_null($originConstants) && is_array($originConstants))
             {
-                  $paymentProp2->value = (string)$originConstants['plugin'];
+                  $paymentPropertyValue = (string)$originConstants['plugin'];
             }
-
-            /** @var PaymentProperty[] $paymentProps */
-            $paymentProps = array(  $paymentProp1,
-                                    $paymentProp2     );
-
-            // Add the payment properties to the payment
-            $payment->property = $paymentProps;
-
-            $payment = $this->paymentRepo->createPayment($payment);
+            $this->addPaymentProperty($payment->id, array('typeId'=>PaymentProperty::TYPE_ORIGIN, 'value'=>$paymentPropertyValue));
 
             return $payment;
+      }
+
+      /**
+       * @param int $paymentId
+       * @param array $data
+       */
+      private function addPaymentProperty(int $paymentId, array $data)
+      {
+            $paymentPropertyData['paymentId'] = $paymentId;
+            $paymentPropertyData['typeId'] = $data['typeId'];
+            $paymentPropertyData['value'] = $data['value'];
+
+            $this->paymentPropertyRepositoryContract->createProperty($paymentPropertyData);
       }
 
       /**
@@ -344,7 +345,7 @@ class PaymentHelper
       {
             if(!is_array($this->statusMap) || count($this->statusMap) <= 0)
             {
-                  $statusConstants = $this->paymentRepo->getStatusConstants();
+                  $statusConstants = $this->paymentRepository->getStatusConstants();
 
                   if(!is_null($statusConstants) && is_array($statusConstants))
                   {

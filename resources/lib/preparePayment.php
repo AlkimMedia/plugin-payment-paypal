@@ -16,6 +16,8 @@ $apiContext = PayPalHelper::getApiContext(  SdkRestApi::getParam('clientId', tru
                                             SdkRestApi::getParam('clientSecret', true),
                                             SdkRestApi::getParam('sandbox', true));
 
+
+
 $payer = new Payer();
 $payer->setPaymentMethod('paypal');
 

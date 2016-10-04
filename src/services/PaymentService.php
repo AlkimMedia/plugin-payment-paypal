@@ -95,7 +95,6 @@ class PaymentService
        */
       public function getPaymentContent(Basket $basket):string
       {
-
             $payPalRequestParams = $this->getPaypalParams($basket);
 
             // Prepare the PayPal payment
@@ -104,13 +103,17 @@ class PaymentService
             // Check for errors
             if(is_array($result) && $result['error'])
             {
-              $this->returnType = 'errorCode';
-              return $result['error_msg'];
+                $this->returnType = 'errorCode';
+                return $result['error_msg'];
             }
 
-            $resultJson = json_decode($result);
+            $resultJson = $result;
+            if(is_string($result))
+            {
+                $resultJson = json_decode((string)$result);
+            }
 
-            // Store the PayPal Pay ID in the session
+          // Store the PayPal Pay ID in the session
             $ppPayId = $resultJson->id;
             if(strlen($ppPayId))
             {
