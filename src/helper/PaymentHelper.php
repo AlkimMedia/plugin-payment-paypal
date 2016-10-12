@@ -286,7 +286,7 @@ class PaymentHelper
             /**
              * Add payment property with type booking text
              */
-            $this->addPaymentProperty($payment->id, array('typeId'=>PaymentProperty::TYPE_BOOKING_TEXT, 'value'=>'PayPalPayID: '.(string)$payPalPayment->bookingText));
+            $this->addPaymentProperty($payment->id, array('typeId'=>3, 'value'=>'PayPalPayID: '.(string)$payPalPayment->bookingText));
 
             /**
              * Add payment property with type origin
@@ -297,7 +297,7 @@ class PaymentHelper
             {
                   $paymentPropertyValue = (string)$originConstants['plugin'];
             }
-            $this->addPaymentProperty($payment->id, array('typeId'=>PaymentProperty::TYPE_ORIGIN, 'value'=>$paymentPropertyValue));
+            $this->addPaymentProperty($payment->id, array('typeId'=>23, 'value'=>$paymentPropertyValue));
 
             return $payment;
       }

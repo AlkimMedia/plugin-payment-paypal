@@ -17,6 +17,7 @@ use PayPal\Methods\PayPalExpressPaymentMethod;
 use PayPal\Methods\PayPalPaymentMethod;
 
 use \Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
+use Plenty\Modules\Basket\Events\BasketItem\AfterBasketItemAdd;
 use \Plenty\Modules\Basket\Events\Basket\AfterBasketCreate;
 
 /**
@@ -50,11 +51,11 @@ class PayPalServiceProvider extends ServiceProvider
 
             // Register the PayPal Express payment method in the payment method container
             $payContainer->register('plentyPayPal::PAYPALEXPRESS', PayPalExpressPaymentMethod::class,
-                                    [ AfterBasketChanged::class, AfterBasketCreate::class  ]);
+                                    [ AfterBasketChanged::class, AfterBasketItemAdd::class, AfterBasketCreate::class  ]);
 
             // Register the PayPal payment method in the payment method container
             $payContainer->register('plentyPayPal::PAYPAL', PayPalPaymentMethod::class,
-                                    [ AfterBasketChanged::class, AfterBasketCreate::class  ]);
+                                    [ AfterBasketChanged::class, AfterBasketItemAdd::class, AfterBasketCreate::class  ]);
 
             // Listen for the event that gets the payment method content
             $eventDispatcher->listen(GetPaymentMethodContent::class,
