@@ -234,7 +234,7 @@ class PaymentHelper
     $payment->status          = $this->mapStatus($payPalPayment->status);
     $payment->currency        = $payPalPayment->currency;
     $payment->amount          = $payPalPayment->amount;
-    $payment->entryDate       = $payPalPayment->entryDate;
+    $payment->receivedAt      = $payPalPayment->entryDate;
 
     /** @var PaymentProperty $paymentProp1 */
     $paymentProp1 = clone $this->paymentProperty;
