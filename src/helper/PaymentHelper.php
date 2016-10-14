@@ -279,7 +279,7 @@ class PaymentHelper
             $paymentData['status']          = $this->mapStatus($payPalPayment->status);
             $paymentData['currency']        = $payPalPayment->currency;
             $paymentData['amount']          = $payPalPayment->amount;
-            $paymentData['entryDate']       = $payPalPayment->entryDate;
+            $paymentData['receivedAt']       = $payPalPayment->entryDate;
 
             $payment = $this->paymentRepository->createPayment($paymentData);
 
