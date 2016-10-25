@@ -10,5 +10,8 @@
     "serviceProvider": "PayPal\\Providers\\PayPalServiceProvider",
     "dependencies":{
       "paypal/rest-api-sdk-php":"*"
-    }
+    },
+    "runOnBuild": [
+        "PayPal\\Migrations\\CreatePaymentMethod"
+    ]
 }

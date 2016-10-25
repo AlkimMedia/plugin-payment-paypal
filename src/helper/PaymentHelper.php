@@ -109,33 +109,6 @@ class PaymentHelper
       }
 
       /**
-       * Create the ID of the payment method if it doesn't exist yet
-       */
-      public function createMopIfNotExists()
-      {
-
-            // Check whether the ID of the PayPal payment method has been created
-            if($this->getPayPalMopId() == 'no_paymentmethod_found')
-            {
-                  $paymentMethodData = array( 'pluginKey' => 'plentyPayPal',
-                                              'paymentKey' => 'PAYPAL',
-                                              'name' => 'PayPal');
-
-                  $this->paymentMethodRepository->createPaymentMethod($paymentMethodData);
-            }
-
-            // Check whether the ID of the PayPal Express payment method has been created
-            if($this->getPayPalExpressMopId() == 'no_paymentmethod_found')
-            {
-                  $paymentMethodData = array( 'pluginKey'   => 'plentyPayPal',
-                                              'paymentKey'  => 'PAYPALEXPRESS',
-                                              'name'        => 'PayPalExpress');
-
-                  $this->paymentMethodRepository->createPaymentMethod($paymentMethodData);
-            }
-      }
-
-      /**
        * Get the ID of the PayPal payment method
        *
        * @return mixed

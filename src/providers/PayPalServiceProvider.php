@@ -31,7 +31,7 @@ class PayPalServiceProvider extends ServiceProvider
        */
       public function register()
       {
-      $this->getApplication()->register(PayPalRouteServiceProvider::class);
+          $this->getApplication()->register(PayPalRouteServiceProvider::class);
       }
 
       /**
@@ -46,9 +46,6 @@ class PayPalServiceProvider extends ServiceProvider
       public function boot(   Dispatcher $eventDispatcher     , PaymentHelper $paymentHelper     , PaymentService $paymentService,
                               BasketRepositoryContract $basket, PaymentMethodContainer $payContainer)
       {
-            // Create the ID of the payment method if it doesn't exist yet
-            $paymentHelper->createMopIfNotExists();
-
             // Register the PayPal Express payment method in the payment method container
             $payContainer->register('plentyPayPal::PAYPALEXPRESS', PayPalExpressPaymentMethod::class,
                                     [ AfterBasketChanged::class, AfterBasketItemAdd::class, AfterBasketCreate::class  ]);
