@@ -11,88 +11,95 @@ use PayPal\Api\ShippingAddress;
 
 require_once __DIR__.'/PayPalHelper.php';
 
-/** @var \Paypal\Rest\ApiContext $apiContext */
-$apiContext = PayPalHelper::getApiContext(  SdkRestApi::getParam('clientId', true),
-                                            SdkRestApi::getParam('clientSecret', true),
-                                            SdkRestApi::getParam('sandbox', true));
+    /** @var \Paypal\Rest\ApiContext $apiContext */
+    $apiContext = PayPalHelper::getApiContext(  SdkRestApi::getParam('clientId', true),
+                                                SdkRestApi::getParam('clientSecret', true),
+                                                SdkRestApi::getParam('sandbox', true));
 
 
 
-$payer = new Payer();
-$payer->setPaymentMethod('paypal');
+    $payer = new Payer();
+    $payer->setPaymentMethod('paypal');
 
-$basket = SdkRestApi::getParam('basket');
+    $basket         = SdkRestApi::getParam('basket');
+    $basketItems    = SdkRestApi::getParam('basketItems');
 
-$basketItems = SdkRestApi::getParam('basketItems');
+    $itemList = new ItemList();
 
-$itemList = new ItemList();
+    foreach($basketItems as $basketItem)
+    {
+      $item = new Item();
+      $item ->setName('grüner tisch')
+            ->setCurrency($basket['currency'])
+            ->setQuantity($basketItem['quantity'])
+            ->setSku($basketItem['variationId'])
+            ->setPrice($basketItem['price']);
 
-foreach($basketItems as $basketItem)
-{
-  $item = new Item();
-  $item ->setName('grüner tisch')
-        ->setCurrency($basket['currency'])
-        ->setQuantity($basketItem['quantity'])
-        ->setSku($basketItem['variationId'])
-        ->setPrice($basketItem['price']);
+      $itemList->addItem($item);
+    }
 
-  $itemList->addItem($item);
-}
+    $address = SdkRestApi::getParam('shippingAddress');
+    $country = SdkRestApi::getParam('country');
 
-$address = SdkRestApi::getParam('shippingAddress');
-$country = SdkRestApi::getParam('country');
+    if(strlen($address['town']) && strlen($address['postalCode']) && strlen($address['firstname']) && strlen($address['lastname'])
+                                && strlen($address['street'])     && strlen($address['houseNumber']) )
+    {
+        $shippingAddress = new ShippingAddress();
+        $shippingAddress->setCity($address['town'])
+            ->setCountryCode($country['isoCode2'])
+            ->setPostalCode($address['postalCode'])
+            ->setRecipientName($address['firstname'] . ' ' . $address['lastname'])
+            ->setLine1($address['street'] . ' ' . $address['houseNumber'])
+            ->setPreferredAddress(true);
 
-$shippingAddress = new ShippingAddress();
-$shippingAddress->setCity($address['town'])
-                ->setCountryCode($country['isoCode2'])
-                ->setPostalCode($address['postalCode'])
-                ->setRecipientName($address['firstname'].' '.$address['lastname'])
-                ->setLine1($address['street'].' '.$address['houseNumber'])
-                ->setPreferredAddress(true);
+        $itemList->setShippingAddress($shippingAddress);
+    }
+    else
+    {
 
-$itemList->setShippingAddress($shippingAddress);
+    }
 
-$details = new Details();
-$details->setShipping($basket['shippingAmount'])
-        ->setSubtotal($basket['itemSum']);
+    $details = new Details();
+    $details->setShipping($basket['shippingAmount'])
+            ->setSubtotal($basket['itemSum']);
 
-$amount = new Amount();
-$amount ->setCurrency($basket['currency'])
-        ->setTotal($basket['basketAmount'])
-        ->setDetails($details);
+    $amount = new Amount();
+    $amount ->setCurrency($basket['currency'])
+            ->setTotal($basket['basketAmount'])
+            ->setDetails($details);
 
-$transaction = new Transaction();
-$transaction->setAmount($amount)
-            ->setItemList($itemList)
-            ->setDescription('payment description')
-            ->setInvoiceNumber(uniqid());
+    $transaction = new Transaction();
+    $transaction->setAmount($amount)
+                ->setItemList($itemList)
+                ->setDescription('payment description')
+                ->setInvoiceNumber(uniqid());
 
-$urls = SdkRestApi::getParam('urls');
+    $urls = SdkRestApi::getParam('urls');
 
-$redirectUrls = new RedirectUrls();
-$redirectUrls ->setReturnUrl($urls['returnUrl'])
-              ->setCancelUrl($urls['cancelUrl']);
+    $redirectUrls = new RedirectUrls();
+    $redirectUrls ->setReturnUrl($urls['returnUrl'])
+                  ->setCancelUrl($urls['cancelUrl']);
 
-$payment = new Payment();
-$payment->setIntent('sale')
-        ->setPayer($payer)
-        ->setRedirectUrls($redirectUrls)
-        ->setTransactions(array($transaction));
+    $payment = new Payment();
+    $payment->setIntent('sale')
+            ->setPayer($payer)
+            ->setRedirectUrls($redirectUrls)
+            ->setTransactions(array($transaction));
 
-$webProfileId = SdkRestApi::getParam('webProfileId');
+    $webProfileId = SdkRestApi::getParam('webProfileId');
 
-if(!is_null($webProfileId))
-{
-    $payment->setExperienceProfileId($webProfileId);
-}
+    if(!is_null($webProfileId))
+    {
+        $payment->setExperienceProfileId($webProfileId);
+    }
 
-try
-{
-    $payment->create($apiContext);
-}
-catch(Exception $ex)
-{
-    return (STRING)$ex->getMessage();
-}
+    try
+    {
+        $payment->create($apiContext);
+    }
+    catch(Exception $ex)
+    {
+        return (STRING)$ex->getMessage();
+    }
 
-return (STRING)$payment;
+    return (STRING)$payment;

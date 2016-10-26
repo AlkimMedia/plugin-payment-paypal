@@ -236,9 +236,21 @@ class PaymentService
 
       public function executePayPalExpressPayment(Basket $basket)
       {
-          $payPalRequestParams = $this->getPaypalParams($basket);
+//          $payPalRequestParams = $this->getPaypalParams($basket);
+
+          $paymentContent = $this->getPaymentContent($basket);
+          $preparePaymentResult = $this->getReturnType();
+
+          if($preparePaymentResult == 'errorCode')
+          {
+              return 'http://master.plentymarkets.com/basket';
+          }
+          elseif($preparePaymentResult == 'redirectUrl')
+          {
+              return $paymentContent;
+          }
 
           // Prepare the PayPal payment
-          $result = $this->libCall->call('PayPal::executePayPalExpressCheckout', $payPalRequestParams);
+//          $result = $this->libCall->call('PayPal::executePayPalExpressCheckout', $payPalRequestParams);
       }
 }
