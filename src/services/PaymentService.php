@@ -234,4 +234,11 @@ class PaymentService
           return $payPalRequestParams;
       }
 
+      public function executePayPalExpressPayment(Basket $basket)
+      {
+          $payPalRequestParams = $this->getPaypalParams($basket);
+
+          // Prepare the PayPal payment
+          $result = $this->libCall->call('PayPal::executePayPalExpressCheckout', $payPalRequestParams);
+      }
 }
