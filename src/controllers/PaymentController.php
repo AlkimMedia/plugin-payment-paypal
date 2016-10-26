@@ -96,4 +96,10 @@ class PaymentController extends Controller
             header("Location: ".$this->config->get('PayPal.successUrl'));
             exit();
       }
+
+      public function payPalExpressCheckout()
+      {
+          header("Location: http://www.plentymarkets.com");
+          exit();
+      }
 }

@@ -57,8 +57,8 @@ class CreatePaymentMethod
         if($this->paymentHelper->getPayPalExpressMopId() == 'no_paymentmethod_found')
         {
             $paymentMethodData = array( 'pluginKey'   => 'plentyPayPal',
-                'paymentKey'  => 'PAYPALEXPRESS',
-                'name'        => 'PayPalExpress');
+                                        'paymentKey'  => 'PAYPALEXPRESS',
+                                        'name'        => 'PayPalExpress');
 
             $this->paymentMethodRepositoryContract->createPaymentMethod($paymentMethodData);
         }
