@@ -2,6 +2,8 @@
 
 namespace PayPal\Providers;
 
+use Plenty\Modules\EventAction\Services\Entries\ActionEntry;
+use Plenty\Modules\EventAction\Services\EventActionService;
 use Plenty\Plugin\Events\Dispatcher;
 use Plenty\Plugin\ServiceProvider;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
@@ -33,18 +35,19 @@ class PayPalServiceProvider extends ServiceProvider
       {
           $this->getApplication()->register(PayPalRouteServiceProvider::class);
       }
-
-      /**
-       * Boot additional PayPal services
-       *
-       * @param Dispatcher $eventDispatcher
-       * @param PaymentHelper $paymentHelper
-       * @param PaymentService $paymentService
-       * @param BasketRepositoryContract $basket
-       * @param PaymentMethodContainer $payContainer
-       */
+	
+	/**
+	 * Boot additional PayPal services
+	 *
+	 * @param Dispatcher               $eventDispatcher
+	 * @param PaymentHelper            $paymentHelper
+	 * @param PaymentService           $paymentService
+	 * @param BasketRepositoryContract $basket
+	 * @param PaymentMethodContainer   $payContainer
+	 * @param EventActionService       $eventActionService
+	 */
       public function boot(   Dispatcher $eventDispatcher     , PaymentHelper $paymentHelper     , PaymentService $paymentService,
-                              BasketRepositoryContract $basket, PaymentMethodContainer $payContainer)
+                              BasketRepositoryContract $basket, PaymentMethodContainer $payContainer, EventActionService $eventActionService)
       {
             // Register the PayPal Express payment method in the payment method container
             $payContainer->register('plentyPayPal::PAYPALEXPRESS', PayPalExpressPaymentMethod::class,
@@ -92,6 +95,8 @@ class PayPalServiceProvider extends ServiceProvider
                                           }
                                     }
                               });
+		  
+		  $eventActionService->registerAction('plentyPaypal', ActionEntry::ACTION_GROUP_ORDER, ['de'=>'Aktion des PlentyPayPal plugins'], "FirstEventActionClass@run");
       }
 
 }
