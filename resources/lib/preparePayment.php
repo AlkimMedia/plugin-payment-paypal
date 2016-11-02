@@ -16,7 +16,7 @@ require_once __DIR__.'/PayPalHelper.php';
                                                 SdkRestApi::getParam('clientSecret', true),
                                                 SdkRestApi::getParam('sandbox', true));
 
-
+    $mode = SdkRestApi::getParam('mode', false);
 
     $payer = new Payer();
     $payer->setPaymentMethod('paypal');
@@ -41,8 +41,7 @@ require_once __DIR__.'/PayPalHelper.php';
     $address = SdkRestApi::getParam('shippingAddress');
     $country = SdkRestApi::getParam('country');
 
-    if(strlen($address['town']) && strlen($address['postalCode']) && strlen($address['firstname']) && strlen($address['lastname'])
-                                && strlen($address['street'])     && strlen($address['houseNumber']) )
+    if($mode != 'paypalexpress')
     {
         $shippingAddress = new ShippingAddress();
         $shippingAddress->setCity($address['town'])
@@ -53,10 +52,6 @@ require_once __DIR__.'/PayPalHelper.php';
             ->setPreferredAddress(true);
 
         $itemList->setShippingAddress($shippingAddress);
-    }
-    else
-    {
-
     }
 
     $details = new Details();

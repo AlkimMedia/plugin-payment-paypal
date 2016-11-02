@@ -101,14 +101,14 @@ class PayPalServiceProvider extends ServiceProvider
                                                       // Assign the payment to an order in plentymarkets
                                                       $paymentHelper->assignPlentyPaymentToPlentyOrder($plentyPayment, $event->getOrderId());
 
-                                                      $event->setType(ExecutePayment::RETURN_TYPE_SUCCESS);
-                                                      $event->setValue('The Payment has been executed successfully!');
+//                                                      $event->setType(ExecutePayment::RETURN_TYPE_SUCCESS);
+//                                                      $event->setValue('The Payment has been executed successfully!');
                                                 }
                                           }
                                           else
                                           {
-                                              $event->setType(ExecutePayment::RETURN_TYPE_ERROR);
-                                              $event->setValue('The PayPal-Payment could not be executed!');
+//                                              $event->setType(ExecutePayment::RETURN_TYPE_ERROR);
+//                                              $event->setValue('The PayPal-Payment could not be executed!');
                                           }
                                     }
                               });

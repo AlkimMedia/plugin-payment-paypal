@@ -93,9 +93,11 @@ class PaymentService
        * @param Basket $basket
        * @return string
        */
-      public function getPaymentContent(Basket $basket):string
+      public function getPaymentContent(Basket $basket, $mode = 'paypal'):string
       {
             $payPalRequestParams = $this->getPaypalParams($basket);
+
+            $payPalRequestParams['mode'] = $mode;
 
             // Prepare the PayPal payment
             $result = $this->libCall->call('PayPal::preparePayment', $payPalRequestParams);
@@ -199,7 +201,7 @@ class PaymentService
        * @param Basket $basket
        * @return array
        */
-      private function getPaypalParams(Basket $basket)
+      public function getPaypalParams(Basket $basket = null)
       {
           $payPalRequestParams = array( 'clientSecret'    => $this->config->get('PayPal.clientSecret'),
                                         'clientId'        => $this->config->get('PayPal.clientId'));
@@ -207,38 +209,40 @@ class PaymentService
           // Set the PayPal basic parameters
           $payPalRequestParams['webProfileId']      = $this->config->get('PayPal.webProfileID');
           $payPalRequestParams['sandbox']           = $this->sandbox;
-          $payPalRequestParams['basket']            = $basket;
-          $payPalRequestParams['basketItems']       = $basket->basketItems;
 
+          if(!is_null($basket))
+          {
+              $payPalRequestParams['basket']            = $basket;
+              $payPalRequestParams['basketItems']       = $basket->basketItems;
 
-          // Fill the address and the country for PayPal parameters
-          $address = array();
-          $country = array();
-          $address['town']            = 'hofteister';
-          $country['isoCode2']        = 'DE';
-          $address['postalCode']      = '34369';
-          $address['firstname']       = 'Franz';
-          $address['lastname']        = 'stock';
-          $address['street']          = 'Krizstraße';
-          $address['houseNumber']     = '23';
+              // Fill the address and the country for PayPal parameters
+              $address = array();
+              $country = array();
+              $address['town']            = 'hofteister';
+              $country['isoCode2']        = 'DE';
+              $address['postalCode']      = '34369';
+              $address['firstname']       = 'Franz';
+              $address['lastname']        = 'stock';
+              $address['street']          = 'Krizstraße';
+              $address['houseNumber']     = '23';
 
-          $payPalRequestParams['shippingAddress']     = $address;
-          $payPalRequestParams['country']             = $country;
+              $payPalRequestParams['shippingAddress']     = $address;
+              $payPalRequestParams['country']             = $country;
 
-          // Get the URLs for PayPal parameters
-          $urls = array('returnUrl' => $this->paymentHelper->getRestSuccessURL(),
-                        'cancelUrl' => $this->paymentHelper->getRestCancelURL());
+              // Get the URLs for PayPal parameters
+              $urls = array('returnUrl' => $this->paymentHelper->getRestSuccessURL(),
+                  'cancelUrl' => $this->paymentHelper->getRestCancelURL());
 
-          $payPalRequestParams['urls'] = $urls;
+              $payPalRequestParams['urls'] = $urls;
+          }
 
           return $payPalRequestParams;
       }
 
-      public function executePayPalExpressPayment(Basket $basket)
+      public function preparePayPalExpressPayment(Basket $basket)
       {
-//          $payPalRequestParams = $this->getPaypalParams($basket);
+          $paymentContent = $this->getPaymentContent($basket, 'paypalexpress');
 
-          $paymentContent = $this->getPaymentContent($basket);
           $preparePaymentResult = $this->getReturnType();
 
           if($preparePaymentResult == 'errorCode')
@@ -249,8 +253,5 @@ class PaymentService
           {
               return $paymentContent;
           }
-
-          // Prepare the PayPal payment
-//          $result = $this->libCall->call('PayPal::executePayPalExpressCheckout', $payPalRequestParams);
       }
 }
