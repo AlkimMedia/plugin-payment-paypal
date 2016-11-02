@@ -205,7 +205,7 @@ class PaymentService
                                         'clientId'        => $this->config->get('PayPal.clientId'));
 
           // Set the PayPal basic parameters
-          $payPalRequestParams['webProfileId']      = 'XP-3XH9-EMJG-WX7L-789D';
+          $payPalRequestParams['webProfileId']      = $this->config->get('PayPal.webProfileID');
           $payPalRequestParams['sandbox']           = $this->sandbox;
           $payPalRequestParams['basket']            = $basket;
           $payPalRequestParams['basketItems']       = $basket->basketItems;

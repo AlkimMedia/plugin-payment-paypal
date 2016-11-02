@@ -17,6 +17,7 @@ use PayPal\Services\PaymentService;
 use PayPal\Helper\PaymentHelper;
 use PayPal\Methods\PayPalExpressPaymentMethod;
 use PayPal\Methods\PayPalPaymentMethod;
+use PayPal\Events\RefundEventAction;
 
 use \Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
 use Plenty\Modules\Basket\Events\BasketItem\AfterBasketItemAdd;
@@ -34,6 +35,8 @@ class PayPalServiceProvider extends ServiceProvider
       public function register()
       {
           $this->getApplication()->register(PayPalRouteServiceProvider::class);
+
+          $this->getApplication()->bind(RefundEventAction::class);
       }
 	
 	/**
@@ -57,6 +60,13 @@ class PayPalServiceProvider extends ServiceProvider
             $payContainer->register('plentyPayPal::PAYPAL', PayPalPaymentMethod::class,
                                     [ AfterBasketChanged::class, AfterBasketItemAdd::class, AfterBasketCreate::class  ]);
 
+            // Register PayPal Refund Event Action
+            $eventActionService->registerAction('plentyPayPal',
+                                                ActionEntry::ACTION_GROUP_ORDER,
+                                                [   'de' => 'Rückzahlung der PayPal-Zahlung',
+                                                    'en' => 'Refund the PayPal-Payment'],
+                                                '\PayPal\Events\RefundEventAction@run');
+
             // Listen for the event that gets the payment method content
             $eventDispatcher->listen(GetPaymentMethodContent::class,
                                function(GetPaymentMethodContent $event) use( $paymentHelper,  $basket,  $paymentService)
@@ -75,7 +85,6 @@ class PayPalServiceProvider extends ServiceProvider
             $eventDispatcher->listen(ExecutePayment::class,
                               function(ExecutePayment $event) use ( $paymentHelper, $paymentService)
                               {
-
                                     if($event->getMop() == $paymentHelper->getPayPalMopId())
                                     {
                                           // Execute the payment
@@ -91,12 +100,18 @@ class PayPalServiceProvider extends ServiceProvider
                                                 {
                                                       // Assign the payment to an order in plentymarkets
                                                       $paymentHelper->assignPlentyPaymentToPlentyOrder($plentyPayment, $event->getOrderId());
+
+                                                      $event->setType(ExecutePayment::RETURN_TYPE_SUCCESS);
+                                                      $event->setValue('The Payment has been executed successfully!');
                                                 }
+                                          }
+                                          else
+                                          {
+                                              $event->setType(ExecutePayment::RETURN_TYPE_ERROR);
+                                              $event->setValue('The PayPal-Payment could not be executed!');
                                           }
                                     }
                               });
-		  
-		  $eventActionService->registerAction('plentyPaypal', ActionEntry::ACTION_GROUP_ORDER, ['de'=>'Aktion des PlentyPayPal plugins'], "FirstEventActionClass@run");
       }
 
 }
