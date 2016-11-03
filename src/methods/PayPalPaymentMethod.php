@@ -99,7 +99,7 @@ class PayPalPaymentMethod extends PaymentMethodService
      */
     public function getIcon()
     {
-        $icon = 'http://i.imgur.com/Qnhkp.png';
+        $icon = 'layout/plugins/production/paypal/images/logos/de-pp-logo.png';
 
         return $icon;
     }

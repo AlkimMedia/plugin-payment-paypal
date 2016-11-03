@@ -17,7 +17,7 @@ use PayPal\Services\PaymentService;
 use PayPal\Helper\PaymentHelper;
 use PayPal\Methods\PayPalExpressPaymentMethod;
 use PayPal\Methods\PayPalPaymentMethod;
-use PayPal\Events\RefundEventAction;
+use PayPal\Events\RefundEventProcedure;
 
 use \Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
 use Plenty\Modules\Basket\Events\BasketItem\AfterBasketItemAdd;
@@ -36,7 +36,7 @@ class PayPalServiceProvider extends ServiceProvider
       {
           $this->getApplication()->register(PayPalRouteServiceProvider::class);
 
-          $this->getApplication()->bind(RefundEventAction::class);
+          $this->getApplication()->bind(RefundEventProcedure::class);
       }
 	
 	/**
@@ -50,7 +50,7 @@ class PayPalServiceProvider extends ServiceProvider
 	 * @param EventActionService       $eventActionService
 	 */
       public function boot(   Dispatcher $eventDispatcher     , PaymentHelper $paymentHelper     , PaymentService $paymentService,
-                              BasketRepositoryContract $basket, PaymentMethodContainer $payContainer, EventActionService $eventActionService)
+                              BasketRepositoryContract $basket, PaymentMethodContainer $payContainer, EventActionService $eventProcedureService)
       {
             // Register the PayPal Express payment method in the payment method container
             $payContainer->register('plentyPayPal::PAYPALEXPRESS', PayPalExpressPaymentMethod::class,
@@ -60,12 +60,12 @@ class PayPalServiceProvider extends ServiceProvider
             $payContainer->register('plentyPayPal::PAYPAL', PayPalPaymentMethod::class,
                                     [ AfterBasketChanged::class, AfterBasketItemAdd::class, AfterBasketCreate::class  ]);
 
-            // Register PayPal Refund Event Action
-            $eventActionService->registerAction('plentyPayPal',
+            // Register PayPal Refund Event Procedure
+            $eventProcedureService->registerAction('plentyPayPal',
                                                 ActionEntry::ACTION_GROUP_ORDER,
                                                 [   'de' => 'Rückzahlung der PayPal-Zahlung',
                                                     'en' => 'Refund the PayPal-Payment'],
-                                                '\PayPal\Events\RefundEventAction@run');
+                                                '\PayPal\Events\RefundEventProcedure@run');
 
             // Listen for the event that gets the payment method content
             $eventDispatcher->listen(GetPaymentMethodContent::class,

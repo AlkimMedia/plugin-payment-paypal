@@ -11,10 +11,10 @@ use PayPal\Services\PaymentService;
 use PayPal\Helper\PaymentHelper;
 
 /**
- * Class RefundEventAction
+ * Class RefundEventProcedure
  * @package PayPal\Events
  */
-class RefundEventAction
+class RefundEventProcedure
 {
     /**
      * @param EventActionTriggered  $eventTriggered
