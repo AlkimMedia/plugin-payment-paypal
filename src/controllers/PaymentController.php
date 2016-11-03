@@ -121,7 +121,11 @@ class PaymentController extends Controller
     public function payPalExpressCheckout()
     {
         $basket = $this->basketContract->load();
-        header("Location: " . $this->paymentService->executePayPalExpressPayment($basket));
+
+        // get the paypal-express redirect URL
+        $redirectURL = $this->paymentService->preparePayPalExpressPayment($basket);
+
+        header("Location: " . $redirectURL);
         exit();
     }
 }

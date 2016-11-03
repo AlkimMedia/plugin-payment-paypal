@@ -62,6 +62,12 @@
     "default": "0"
 },  {
     "tab": "Händlereinstellungen",
+    "key": "webProfileID",
+    "label": "PayPal WebProfileID",
+    "type": "text",
+    "default": ""
+},  {
+    "tab": "Händlereinstellungen",
     "key": "shopName",
     "label": "Shop-Name bei PayPal",
     "type": "text",
