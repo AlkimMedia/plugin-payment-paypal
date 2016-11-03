@@ -97,17 +97,16 @@ class PaymentController extends Controller
         $payerId      = $this->request->get('PayerID');
 
         // Get the PayPal Pay ID from the session
-        $ppPayId = $this->payHelper->getPayPalPayID();
+        $paypalPaymentData = $this->payHelper->getPayPalPaymentData();
+
+        $ppPayId    = $paypalPaymentData['PayPalPayId'];
+        $ppPayerId  = $paypalPaymentData['PayPalPayerId'];
 
         // Check whether the Pay ID from the session is equal to the given Pay ID by PayPal
         if($paymentId != $ppPayId)
         {
               $this->payPalCheckoutCancel();
         }
-
-        // Set the PayPal data in the session
-        $this->payHelper->setPayPalPayID($paymentId);
-        $this->payHelper->setPayPalPayerID($payerId);
 
         // Redirect to the success page. The URL can be entered in the config.json.
         header("Location: ".$this->config->get('PayPal.successUrl'));

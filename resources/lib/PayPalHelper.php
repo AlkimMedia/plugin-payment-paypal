@@ -21,13 +21,13 @@ class PayPalHelper
         if($sandbox)
         {
             $mode = 'sandbox';
-            $endpoint = "https://test-api.sandbox.paypal.com";
+            $endpoint = "https://api.sandbox.paypal.com";
         }
         else
         {
             //live environment
             $mode = 'sandbox';
-            $endpoint = "https://api.sandbox.paypal.com";
+            $endpoint = "https://test-api.sandbox.paypal.com";
         }
 
         $apiContext = new ApiContext(

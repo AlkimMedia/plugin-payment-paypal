@@ -195,43 +195,23 @@ class PaymentHelper
       }
 
       /**
-       * Set the PayPal Pay ID
+       * Set the PayPal-PaymentData
        *
-       * @param mixed $value
+       * @param array $value
        */
-      public function setPayPalPayID($value)
+      public function setPayPalPaymentData($value)
       {
-            $this->sessionService->setSessionValue('PayPalPayId', $value);
+            $this->sessionService->setSessionValue('PayPalPaymentData', $value);
       }
 
       /**
-       * Get the PayPal Pay ID
+       * Get the PayPal-PaymentData
        *
-       * @return mixed
+       * @return array
        */
-      public function getPayPalPayID()
+      public function getPayPalPaymentData()
       {
-            return $this->sessionService->getSessionValue('PayPalPayId');
-      }
-
-      /**
-       * Set the PayPal Payer ID
-       *
-       * @param mixed $value
-       */
-      public function setPayPalPayerID($value)
-      {
-            $this->sessionService->setSessionValue('PayPalPayerId', $value);
-      }
-
-      /**
-       * Get the PayPal Payer ID
-       *
-       * @return mixed
-       */
-      public function getPayPalPayerID()
-      {
-            return $this->sessionService->getSessionValue('PayPalPayerId');
+            return $this->sessionService->getSessionValue('PayPalPaymentData');
       }
 
       /**

@@ -28,9 +28,9 @@ class SessionStorageService
      * Set the session value
      *
      * @param string $name
-     * @param mixed $value
+     * @param array $value
      */
-    public function setSessionValue(string $name, mixed $value)
+    public function setSessionValue(string $name, array $value)
     {
         $this->sessionStorage->getPlugin()->setValue($name, $value);
     }
@@ -39,7 +39,7 @@ class SessionStorageService
      * Get the session value
      *
      * @param string $name
-     * @return mixed
+     * @return array
      */
     public function getSessionValue(string $name):mixed
     {

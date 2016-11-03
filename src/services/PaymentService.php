@@ -115,11 +115,17 @@ class PaymentService
                 $resultJson = json_decode((string)$result);
             }
 
-          // Store the PayPal Pay ID in the session
+            // Store the PayPal Pay ID in the session
             $ppPayId = $resultJson->id;
+            $ppPayerId = 'test';
             if(strlen($ppPayId))
             {
-                $this->paymentHelper->setPayPalPayID($ppPayId);
+                $ppPaymentData = array();
+
+                $ppPaymentData['PayPalPayId'] = $ppPayId;
+                $ppPaymentData['PayPalPayerId'] = $ppPayerId;
+
+                $this->paymentHelper->setPayPalPaymentData($ppPaymentData);
             }
 
             // Get the content of the PayPal container
@@ -166,12 +172,15 @@ class PaymentService
       public function executePayment()
       {
             // Load the mandatory PayPal data from session
-            $ppPayId    = $this->paymentHelper->getPayPalPayID();
-            $ppPayerId  = $this->paymentHelper->getPayPalPayerID();
+            $ppPaymentData = $this->paymentHelper->getPayPalPaymentData();
+
+            $ppPayId    = $ppPaymentData['PayPalPayId'];
+            $ppPayerId  = $ppPaymentData['PayPalPayerId'];
 
             // Set the execute parameters for the PayPal payment
             $executeParams = array( 'clientSecret'    => $this->config->get('PayPal.clientSecret'),
                                     'clientId'        => $this->config->get('PayPal.clientId'    ));
+
             $executeParams['sandbox']   = $this->sandbox;
             $executeParams['payId']     = $ppPayId;
             $executeParams['payerId']   = $ppPayerId;
@@ -189,8 +198,7 @@ class PaymentService
             $result = json_encode($executeResponse);
 
             // Clear the session parameters
-            $this->paymentHelper->setPayPalPayID(null);
-            $this->paymentHelper->setPayPalPayerID(null);
+            $this->paymentHelper->setPayPalPaymentData(null);
 
             return (string)$result;
       }
@@ -229,12 +237,13 @@ class PaymentService
               $payPalRequestParams['shippingAddress']     = $address;
               $payPalRequestParams['country']             = $country;
 
-              // Get the URLs for PayPal parameters
-              $urls = array('returnUrl' => $this->paymentHelper->getRestSuccessURL(),
-                  'cancelUrl' => $this->paymentHelper->getRestCancelURL());
-
-              $payPalRequestParams['urls'] = $urls;
           }
+
+          // Get the URLs for PayPal parameters
+          $urls = array('returnUrl' => $this->paymentHelper->getRestSuccessURL(),
+                        'cancelUrl' => $this->paymentHelper->getRestCancelURL());
+
+          $payPalRequestParams['urls'] = $urls;
 
           return $payPalRequestParams;
       }
