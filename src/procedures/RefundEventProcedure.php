@@ -1,9 +1,9 @@
 <?php
-namespace PayPal\Events;
+namespace PayPal\Procedures;
 
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Payment\Models\Payment;
-use Plenty\Modules\EventAction\Events\EventActionTriggered;
+use Plenty\Modules\EventProcedures\Events\EventProceduresTriggered;
 use Plenty\Modules\Plugin\Libs\Contracts\LibraryCallContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 
@@ -12,21 +12,25 @@ use PayPal\Helper\PaymentHelper;
 
 /**
  * Class RefundEventProcedure
- * @package PayPal\Events
+ * @package PayPal\Procedures
  */
 class RefundEventProcedure
 {
     /**
-     * @param EventActionTriggered  $eventTriggered
+     * @param EventProceduresTriggered $eventProceduresTriggered
+     * @param LibraryCallContract $libCall
+     * @param PaymentService $paymentService
+     * @param PaymentHelper $paymentHelper
+     * @param PaymentRepositoryContract $paymentContract
      */
-    public function run(EventActionTriggered $eventTriggered,
+    public function run(EventProceduresTriggered $eventProceduresTriggered,
                         LibraryCallContract $libCall,
                         PaymentService $paymentService,
                         PaymentHelper $paymentHelper,
                         PaymentRepositoryContract $paymentContract)
     {
         /** @var Order $order */
-        $order = $eventTriggered->getOrder();
+        $order = $eventProceduresTriggered->getOrder();
 
         $payPalRequestParams = $paymentService->getPaypalParams();
 
