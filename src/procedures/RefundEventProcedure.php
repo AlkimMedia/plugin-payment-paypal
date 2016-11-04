@@ -18,21 +18,15 @@ class RefundEventProcedure
 {
     /**
      * @param EventProceduresTriggered $eventProceduresTriggered
-     * @param LibraryCallContract $libCall
      * @param PaymentService $paymentService
-     * @param PaymentHelper $paymentHelper
      * @param PaymentRepositoryContract $paymentContract
      */
     public function run(EventProceduresTriggered $eventProceduresTriggered,
-                        LibraryCallContract $libCall,
                         PaymentService $paymentService,
-                        PaymentHelper $paymentHelper,
                         PaymentRepositoryContract $paymentContract)
     {
         /** @var Order $order */
         $order = $eventProceduresTriggered->getOrder();
-
-        $payPalRequestParams = $paymentService->getPaypalParams();
 
         /** @var Payment $payment */
         $payment = $paymentContract->getPaymentsByOrderId($order->id);
@@ -40,8 +34,6 @@ class RefundEventProcedure
         $paymentData = array(   'currency' => $payment->currency,
                                 'total'    => $payment->amount);
 
-        $payPalRequestParams['payment'] = $paymentData;
-
-        $result = $libCall->call('PayPal::refundPayment', $payPalRequestParams);
+        $result = $paymentService->refundPayment($paymentData);
     }
 }

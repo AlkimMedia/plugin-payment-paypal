@@ -42,4 +42,3 @@ catch(Exception $ex)
 
 
 return (STRING)$webProfResponse->getId();
-

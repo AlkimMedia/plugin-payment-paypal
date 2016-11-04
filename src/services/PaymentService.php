@@ -50,11 +50,6 @@ class PaymentService
       private $config;
 
       /**
-      * @var bool
-      */
-      private $sandbox = true;
-
-      /**
       * @var string
       */
       private $returnType = '';
@@ -81,10 +76,7 @@ class PaymentService
             $this->config                     = $config;
 
             // Get the PayPal environment. The environment can be set in the config.json.
-            if($config->get('PayPal.environment') == 1)
-            {
-                  $this->sandbox = true;
-            }
+
       }
 
       /**
@@ -178,10 +170,8 @@ class PaymentService
             $ppPayerId  = $ppPaymentData['PayPalPayerId'];
 
             // Set the execute parameters for the PayPal payment
-            $executeParams = array( 'clientSecret'    => $this->config->get('PayPal.clientSecret'),
-                                    'clientId'        => $this->config->get('PayPal.clientId'    ));
+            $executeParams = $this->getApiContextParams();
 
-            $executeParams['sandbox']   = $this->sandbox;
             $executeParams['payId']     = $ppPayId;
             $executeParams['payerId']   = $ppPayerId;
 
@@ -203,20 +193,61 @@ class PaymentService
             return (string)$result;
       }
 
+      public function preparePayPalExpressPayment(Basket $basket)
+      {
+          $paymentContent = $this->getPaymentContent($basket, 'paypalexpress');
+
+          $preparePaymentResult = $this->getReturnType();
+
+
+          if($preparePaymentResult == 'errorCode')
+          {
+              return 'http://master.plentymarkets.com/basket';
+          }
+          elseif($preparePaymentResult == 'redirectUrl')
+          {
+              return $paymentContent;
+          }
+      }
+
+     /**
+      * @param array $paymentData
+      * @return array
+      */
+      public function refundPayment($paymentData = array())
+      {
+          $requestParams = $this->getApiContextParams();
+          $requestParams['payment'] = $paymentData;
+
+          return $this->libCall->call('PayPal::refundPayment', $requestParams);
+      }
+
+      /**
+       * List all available webhooks
+       *
+       * @return array
+       */
+      public function listAvailableWebhooks()
+      {
+          $requestParams = $this->getApiContextParams();
+
+          $response = $this->libCall->call('PayPal::listAvailableWebhooks', $requestParams);
+
+          return $response;
+      }
+
       /**
        * Fill and return the Paypal parameters
        *
        * @param Basket $basket
        * @return array
        */
-      public function getPaypalParams(Basket $basket = null)
+      private function getPaypalParams(Basket $basket = null)
       {
-          $payPalRequestParams = array( 'clientSecret'    => $this->config->get('PayPal.clientSecret'),
-                                        'clientId'        => $this->config->get('PayPal.clientId'));
+          $payPalRequestParams = $this->getApiContextParams();
 
           // Set the PayPal basic parameters
           $payPalRequestParams['webProfileId']      = $this->config->get('PayPal.webProfileID');
-          $payPalRequestParams['sandbox']           = $this->sandbox;
 
           if(!is_null($basket))
           {
@@ -248,19 +279,18 @@ class PaymentService
           return $payPalRequestParams;
       }
 
-      public function preparePayPalExpressPayment(Basket $basket)
+      private function getApiContextParams()
       {
-          $paymentContent = $this->getPaymentContent($basket, 'paypalexpress');
+          $apiContextParams = array();
+          $apiContextParams['clientSecret'] = $this->config->get('PayPal.clientSecret');
+          $apiContextParams['clientId'] = $this->config->get('PayPal.clientId');
 
-          $preparePaymentResult = $this->getReturnType();
+          $apiContextParams['sandbox'] = false;
+          if($this->config->get('PayPal.environment') == 1)
+          {
+              $apiContextParams['sandbox'] = true;
+          }
 
-          if($preparePaymentResult == 'errorCode')
-          {
-              return 'http://master.plentymarkets.com/basket';
-          }
-          elseif($preparePaymentResult == 'redirectUrl')
-          {
-              return $paymentContent;
-          }
+          return $apiContextParams;
       }
 }
