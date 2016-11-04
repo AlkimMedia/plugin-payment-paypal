@@ -103,7 +103,7 @@ class PaymentController extends Controller
     /**
     * PayPal redirects to this page if the payment was executed correctly
     */
-    public function payPalCheckoutSuccess()
+    public function checkoutSuccess()
     {
         // Get the PayPal payment data from the request
         $paymentId    = $this->request->get('paymentId');
@@ -129,7 +129,7 @@ class PaymentController extends Controller
      * Redirect to PayPal Express Checkout
      *
      */
-    public function payPalExpressCheckout()
+    public function expressCheckout()
     {
         $basket = $this->basketContract->load();
 

@@ -172,7 +172,7 @@ class PaymentHelper
 
             $domain = $webstoreConfig->domainSsl;
 
-            return $domain.'/plentyPayPal/payPalCheckoutCancel';
+            return $domain.'/payPal/checkoutCancel';
       }
 
       /**
@@ -191,7 +191,7 @@ class PaymentHelper
 
             $domain = $webstoreConfig->domainSsl;
 
-            return $domain.'/plentyPayPal/payPalCheckoutSuccess';
+            return $domain.'/payPal/checkoutSuccess';
       }
 
       /**
