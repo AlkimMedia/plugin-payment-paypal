@@ -195,26 +195,6 @@ class PaymentHelper
       }
 
       /**
-       * Set the PayPal-PaymentData
-       *
-       * @param array $value
-       */
-      public function setPayPalPaymentData($value)
-      {
-            $this->sessionService->setSessionValue('PayPalPaymentData', $value);
-      }
-
-      /**
-       * Get the PayPal-PaymentData
-       *
-       * @return array
-       */
-      public function getPayPalPaymentData()
-      {
-            return $this->sessionService->getSessionValue('PayPalPaymentData');
-      }
-
-      /**
        * Create a payment in plentymarkets from the JSON data
        *
        * @param string $json
