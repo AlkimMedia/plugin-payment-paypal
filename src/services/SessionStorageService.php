@@ -10,6 +10,11 @@ use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFact
  */
 class SessionStorageService
 {
+    const DELIVERY_ADDRESS_ID   = "deliveryAddressId";
+    const BILLING_ADDRESS_ID    = "billingAddressId";
+    const PAYPAL_PAY_ID         = "payPalPayId";
+    const PAYPAL_PAYER_ID       = "payPalPayerId";
+
     /**
      * @var FrontendSessionStorageFactoryContract
      */
@@ -28,9 +33,9 @@ class SessionStorageService
      * Set the session value
      *
      * @param string $name
-     * @param array $value
+     * @param $value
      */
-    public function setSessionValue(string $name, array $value)
+    public function setSessionValue(string $name, $value)
     {
         $this->sessionStorage->getPlugin()->setValue($name, $value);
     }
@@ -39,9 +44,9 @@ class SessionStorageService
      * Get the session value
      *
      * @param string $name
-     * @return array
+     * @return mixed
      */
-    public function getSessionValue(string $name):mixed
+    public function getSessionValue(string $name)
     {
         return $this->sessionStorage->getPlugin()->getValue($name);
     }

@@ -2,15 +2,16 @@
 
 namespace PayPal\Controllers;
 
+use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Templates\Twig;
 use Plenty\Plugin\Http\Request;
 
+use PayPal\Services\SessionStorageService;
 use Paypal\Services\PaymentService;
 use PayPal\Helper\PaymentHelper;
-use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 
 /**
  * Class PaymentController
@@ -54,19 +55,26 @@ class PaymentController extends Controller
     private $basketContract;
 
     /**
+     * @var SessionStorageService
+     */
+    private $sessionStorage;
+
+    /**
      * PaymentController constructor.
      *
-     * @param Application               $app
-     * @param Twig                      $twig
-     * @param ConfigRepository          $config
-     * @param Request                   $request
-     * @param PaymentHelper             $payHelper
-     * @param PaymentService            $paymentService
-     * @param BasketRepositoryContract  $basketContract
+     * @param Application $app
+     * @param Twig $twig
+     * @param Request $request
+     * @param ConfigRepository $config
+     * @param PaymentHelper $payHelper
+     * @param PaymentService $paymentService
+     * @param BasketRepositoryContract $basketContract
+     * @param SessionStorageService $sessionStorage
      */
     public function __construct(  Application $app, Twig $twig, Request $request,
                                   ConfigRepository $config, PaymentHelper $payHelper,
-                                  PaymentService $paymentService, BasketRepositoryContract $basketContract)
+                                  PaymentService $paymentService, BasketRepositoryContract $basketContract,
+                                  SessionStorageService $sessionStorage)
     {
         $this->app              = $app;
         $this->twig             = $twig;
@@ -75,6 +83,7 @@ class PaymentController extends Controller
         $this->payHelper        = $payHelper;
         $this->paymentService   = $paymentService;
         $this->basketContract   = $basketContract;
+        $this->sessionStorage   = $sessionStorage;
     }
 
     /**
@@ -82,6 +91,10 @@ class PaymentController extends Controller
     */
     public function payPalCheckoutCancel()
     {
+        // clear the PayPal session values
+        $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_PAY_ID, null);
+        $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_PAYER_ID, null);
+
         // Redirects to the cancellation page. The URL can be entered in the config.json.
         header("Location: ".$this->config->get('PayPal.cancelUrl'));
         exit();
@@ -97,16 +110,15 @@ class PaymentController extends Controller
         $payerId      = $this->request->get('PayerID');
 
         // Get the PayPal Pay ID from the session
-        $paypalPaymentData = $this->payHelper->getPayPalPaymentData();
-
-        $ppPayId    = $paypalPaymentData['PayPalPayId'];
-        $ppPayerId  = $paypalPaymentData['PayPalPayerId'];
+        $ppPayId    = $this->sessionStorage->getSessionValue(SessionStorageService::PAYPAL_PAY_ID);
 
         // Check whether the Pay ID from the session is equal to the given Pay ID by PayPal
         if($paymentId != $ppPayId)
         {
               $this->payPalCheckoutCancel();
         }
+
+        $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_PAYER_ID, $payerId);
 
         // Redirect to the success page. The URL can be entered in the config.json.
         header("Location: ".$this->config->get('PayPal.successUrl'));

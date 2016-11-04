@@ -10,8 +10,10 @@ use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Plugin\Libs\Contracts\LibraryCallContract;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
+use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 
 use PayPal\Helper\PaymentHelper;
+use PayPal\Services\SessionStorageService;
 
 /**
  * Class PaymentService
@@ -55,18 +57,31 @@ class PaymentService
       private $returnType = '';
 
       /**
-       * PaymentService constructor.
-       *
-       * @param PaymentMethodRepositoryContract $paymentMethodRepository
-       * @param PaymentRepositoryContract $paymentRepository
-       * @param ConfigRepository $config
-       * @param PaymentHelper $paymentHelper
-       * @param LibraryCallContract $libCall
-       * @param AddressRepositoryContract $addressRepo
-       */
+      * @var CountryRepositoryContract
+      */
+      private $countryRepo;
+
+     /**
+      * @var SessionStorageService
+      */
+      private $sessionStorage;
+
+    /**
+     * PaymentService constructor.
+     *
+     * @param PaymentMethodRepositoryContract $paymentMethodRepository
+     * @param PaymentRepositoryContract $paymentRepository
+     * @param ConfigRepository $config
+     * @param PaymentHelper $paymentHelper
+     * @param LibraryCallContract $libCall
+     * @param AddressRepositoryContract $addressRepo
+     * @param CountryRepositoryContract $countryRepo
+     * @param SessionStorageService $sessionStorage
+     */
       public function __construct(  PaymentMethodRepositoryContract $paymentMethodRepository, PaymentRepositoryContract $paymentRepository,
                                     ConfigRepository $config                                , PaymentHelper $paymentHelper,
-                                    LibraryCallContract $libCall                            , AddressRepositoryContract $addressRepo)
+                                    LibraryCallContract $libCall                            , AddressRepositoryContract $addressRepo,
+                                    CountryRepositoryContract $countryRepo                  , SessionStorageService $sessionStorage)
       {
             $this->paymentMethodRepository    = $paymentMethodRepository;
             $this->paymentRepository          = $paymentRepository;
@@ -74,6 +89,8 @@ class PaymentService
             $this->libCall                    = $libCall;
             $this->addressRepo                = $addressRepo;
             $this->config                     = $config;
+            $this->countryRepo                = $countryRepo;
+            $this->sessionStorage             = $sessionStorage;
 
             // Get the PayPal environment. The environment can be set in the config.json.
 
@@ -109,15 +126,9 @@ class PaymentService
 
             // Store the PayPal Pay ID in the session
             $ppPayId = $resultJson->id;
-            $ppPayerId = 'test';
             if(strlen($ppPayId))
             {
-                $ppPaymentData = array();
-
-                $ppPaymentData['PayPalPayId'] = $ppPayId;
-                $ppPaymentData['PayPalPayerId'] = $ppPayerId;
-
-                $this->paymentHelper->setPayPalPaymentData($ppPaymentData);
+                $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_PAY_ID, $ppPayId);
             }
 
             // Get the content of the PayPal container
@@ -164,10 +175,8 @@ class PaymentService
       public function executePayment()
       {
             // Load the mandatory PayPal data from session
-            $ppPaymentData = $this->paymentHelper->getPayPalPaymentData();
-
-            $ppPayId    = $ppPaymentData['PayPalPayId'];
-            $ppPayerId  = $ppPaymentData['PayPalPayerId'];
+            $ppPayId    = $this->sessionStorage->getSessionValue(SessionStorageService::PAYPAL_PAY_ID);
+            $ppPayerId  = $this->sessionStorage->getSessionValue(SessionStorageService::PAYPAL_PAYER_ID);
 
             // Set the execute parameters for the PayPal payment
             $executeParams = $this->getApiContextParams();
@@ -188,7 +197,8 @@ class PaymentService
             $result = json_encode($executeResponse);
 
             // Clear the session parameters
-            $this->paymentHelper->setPayPalPaymentData(null);
+            $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_PAY_ID, null);
+            $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_PAYER_ID, null);
 
             return (string)$result;
       }
@@ -247,28 +257,23 @@ class PaymentService
           $payPalRequestParams = $this->getApiContextParams();
 
           // Set the PayPal basic parameters
-          $payPalRequestParams['webProfileId']      = $this->config->get('PayPal.webProfileID');
+          $payPalRequestParams['webProfileId']  = $this->config->get('PayPal.webProfileID');
 
-          if(!is_null($basket))
+          $payPalRequestParams['basket']        = $basket;
+          $payPalRequestParams['basketItems']   = $basket->basketItems;
+
+          // Read the shipping address ID from the session
+          $shippingAddressId = $this->sessionStorage->getSessionValue(SessionStorageService::DELIVERY_ADDRESS_ID);
+
+          if(!is_null($shippingAddressId) && $shippingAddressId > 0)
           {
-              $payPalRequestParams['basket']            = $basket;
-              $payPalRequestParams['basketItems']       = $basket->basketItems;
-
-              // Fill the address and the country for PayPal parameters
-              $address = array();
-              $country = array();
-              $address['town']            = 'hofteister';
-              $country['isoCode2']        = 'DE';
-              $address['postalCode']      = '34369';
-              $address['firstname']       = 'Franz';
-              $address['lastname']        = 'stock';
-              $address['street']          = 'Krizstraße';
-              $address['houseNumber']     = '23';
-
-              $payPalRequestParams['shippingAddress']     = $address;
-              $payPalRequestParams['country']             = $country;
-
+              $shippingAddress = $this->addressRepo->findAddressById($shippingAddressId);
+              $payPalRequestParams['shippingAddress'] = $shippingAddress;
           }
+
+          // Fill the country for PayPal parameters
+          $country['isoCode2'] = $this->countryRepo->findIsoCode($basket->shippingCountryId, 'iso_code_2');
+          $payPalRequestParams['country'] = $country;
 
           // Get the URLs for PayPal parameters
           $urls = array('returnUrl' => $this->paymentHelper->getRestSuccessURL(),
