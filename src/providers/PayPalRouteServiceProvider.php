@@ -17,10 +17,10 @@ class PayPalRouteServiceProvider extends RouteServiceProvider
 	public function map(Router $router)
 	{
 		// Get the PayPal success and cancellation URLs
-		$router->get('payPal/checkoutSuccess', 'PayPal\Controllers\PaymentController@payPalCheckoutSuccess');
-		$router->get('payPal/checkoutCancel' , 'PayPal\Controllers\PaymentController@payPalCheckoutCancel' );
+		$router->get('payPal/checkoutSuccess', 'PayPal\Controllers\PaymentController@checkoutSuccess');
+		$router->get('payPal/checkoutCancel' , 'PayPal\Controllers\PaymentController@checkoutCancel' );
 
-        $router->get('payPal/expressCheckoutAction', 'PayPal\Controllers\PaymentController@payPalExpressCheckout');
+        $router->get('payPal/expressCheckout', 'PayPal\Controllers\PaymentController@expressCheckout');
 
         $router->post('payPal/notification', 'PayPal\Controllers\PaymentNotificationController@handleNotification');
 	}
