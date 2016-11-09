@@ -55,6 +55,10 @@ class PayPalHelper
 
         $transaction = $payment->getTransactions()[0];
 
+        /** @var PayPal\Api\Sale $sale */
+        $sale = $transaction->getRelatedResources()[0];
+
+        $returnArray['transactionId'] = $sale->getId();
         $returnArray['bookingText'] = $payment->getId();
         $returnArray['amount'] = $transaction->getAmount()->getTotal();
         $returnArray['currency'] = $transaction->getAmount()->getCurrency();

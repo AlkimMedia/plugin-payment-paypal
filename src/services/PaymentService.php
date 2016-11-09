@@ -2,6 +2,8 @@
 
 namespace PayPal\Services;
 
+use Plenty\Modules\Basket\Models\BasketItem;
+use Plenty\Modules\Item\Variation\Contracts\VariationRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Payment\Models\Payment;
@@ -21,50 +23,50 @@ use PayPal\Services\SessionStorageService;
  */
 class PaymentService
 {
-      /**
-      * @var PaymentMethodRepositoryContract
-      */
-      private $paymentMethodRepository;
+    /**
+     * @var PaymentMethodRepositoryContract
+     */
+    private $paymentMethodRepository;
 
-      /**
-      * @var PaymentRepositoryContract
-      */
-      private $paymentRepository;
+    /**
+     * @var PaymentRepositoryContract
+     */
+    private $paymentRepository;
 
-      /**
-      * @var PaymentHelper
-      */
-      private $paymentHelper;
+    /**
+     * @var PaymentHelper
+     */
+    private $paymentHelper;
 
-      /**
-      * @var LibraryCallContract
-      */
-      private $libCall;
+    /**
+     * @var LibraryCallContract
+     */
+    private $libCall;
 
-      /**
-      * @var AddressRepositoryContract
-      */
-      private $addressRepo;
+    /**
+     * @var AddressRepositoryContract
+     */
+    private $addressRepo;
 
-      /**
-      * @var ConfigRepository
-      */
-      private $config;
+    /**
+     * @var ConfigRepository
+     */
+    private $config;
 
-      /**
-      * @var string
-      */
-      private $returnType = '';
+    /**
+     * @var string
+     */
+    private $returnType = '';
 
-      /**
-      * @var CountryRepositoryContract
-      */
-      private $countryRepo;
+    /**
+     * @var CountryRepositoryContract
+     */
+    private $countryRepo;
 
-     /**
-      * @var SessionStorageService
-      */
-      private $sessionStorage;
+    /**
+     * @var SessionStorageService
+     */
+    private $sessionStorage;
 
     /**
      * PaymentService constructor.
@@ -78,224 +80,252 @@ class PaymentService
      * @param CountryRepositoryContract $countryRepo
      * @param SessionStorageService $sessionStorage
      */
-      public function __construct(  PaymentMethodRepositoryContract $paymentMethodRepository, PaymentRepositoryContract $paymentRepository,
-                                    ConfigRepository $config                                , PaymentHelper $paymentHelper,
-                                    LibraryCallContract $libCall                            , AddressRepositoryContract $addressRepo,
-                                    CountryRepositoryContract $countryRepo                  , SessionStorageService $sessionStorage)
-      {
-            $this->paymentMethodRepository    = $paymentMethodRepository;
-            $this->paymentRepository          = $paymentRepository;
-            $this->paymentHelper              = $paymentHelper;
-            $this->libCall                    = $libCall;
-            $this->addressRepo                = $addressRepo;
-            $this->config                     = $config;
-            $this->countryRepo                = $countryRepo;
-            $this->sessionStorage             = $sessionStorage;
+    public function __construct(  PaymentMethodRepositoryContract $paymentMethodRepository, PaymentRepositoryContract $paymentRepository,
+                                  ConfigRepository $config                                , PaymentHelper $paymentHelper,
+                                  LibraryCallContract $libCall                            , AddressRepositoryContract $addressRepo,
+                                  CountryRepositoryContract $countryRepo                  , SessionStorageService $sessionStorage)
+    {
+        $this->paymentMethodRepository    = $paymentMethodRepository;
+        $this->paymentRepository          = $paymentRepository;
+        $this->paymentHelper              = $paymentHelper;
+        $this->libCall                    = $libCall;
+        $this->addressRepo                = $addressRepo;
+        $this->config                     = $config;
+        $this->countryRepo                = $countryRepo;
+        $this->sessionStorage             = $sessionStorage;
+    }
 
-            // Get the PayPal environment. The environment can be set in the config.json.
+    /**
+     * Get the PayPal payment content
+     *
+     * @param Basket $basket
+     * @return string
+     */
+    public function getPaymentContent(Basket $basket, $mode = 'paypal'):string
+    {
+        $payPalRequestParams = $this->getPaypalParams($basket);
 
-      }
+        $payPalRequestParams['mode'] = $mode;
 
-      /**
-       * Get the PayPal payment content
-       *
-       * @param Basket $basket
-       * @return string
-       */
-      public function getPaymentContent(Basket $basket, $mode = 'paypal'):string
-      {
-            $payPalRequestParams = $this->getPaypalParams($basket);
+        // Prepare the PayPal payment
+        $result = $this->libCall->call('PayPal::preparePayment', $payPalRequestParams);
 
-            $payPalRequestParams['mode'] = $mode;
+        // Check for errors
+        if(is_array($result) && $result['error'])
+        {
+            $this->returnType = 'errorCode';
+            return $result['error_msg'];
+        }
 
-            // Prepare the PayPal payment
-            $result = $this->libCall->call('PayPal::preparePayment', $payPalRequestParams);
+        $resultJson = $result;
+        if(is_string($result))
+        {
+            $resultJson = json_decode((string)$result);
+        }
 
-            // Check for errors
-            if(is_array($result) && $result['error'])
+        // Store the PayPal Pay ID in the session
+        $ppPayId = $resultJson->id;
+        if(strlen($ppPayId))
+        {
+            $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_PAY_ID, $ppPayId);
+        }
+
+        // Get the content of the PayPal container
+        $paymentContent = '';
+        $links = $resultJson->links;
+        if(is_array($links))
+        {
+            foreach($links as $key => $value)
             {
-                $this->returnType = 'errorCode';
-                return $result['error_msg'];
+                // Get the redirect URLs for the content
+                if($value->method == 'REDIRECT')
+                {
+                    $paymentContent = $value->href;
+                    $this->returnType = 'redirectUrl';
+                }
             }
+        }
 
-            $resultJson = $result;
-            if(is_string($result))
-            {
-                $resultJson = json_decode((string)$result);
-            }
+        // Check whether the content is set. Else, return an error code.
+        if(!strlen($paymentContent))
+        {
+            $this->returnType = 'errorCode';
+            return 'An unknown error occured, please try again.';
+        }
 
-            // Store the PayPal Pay ID in the session
-            $ppPayId = $resultJson->id;
-            if(strlen($ppPayId))
-            {
-                $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_PAY_ID, $ppPayId);
-            }
+        return $paymentContent;
+    }
 
-            // Get the content of the PayPal container
-            $paymentContent = '';
-            $links = $resultJson->links;
-            if(is_array($links))
-            {
-                  foreach($links as $key => $value)
-                  {
-                        // Get the redirect URLs for the content
-                        if($value->method == 'REDIRECT')
-                        {
-                              $paymentContent = $value->href;
-                              $this->returnType = 'redirectUrl';
-                        }
-                  }
-            }
+    /**
+     * Get the type of payment from the content of the PayPal container
+     *
+     * @return string
+     */
+    public function getReturnType()
+    {
+        return $this->returnType;
+    }
 
-            // Check whether the content is set. Else, return an error code.
-            if(!strlen($paymentContent))
-            {
-              $this->returnType = 'errorCode';
-              return 'An unknown error occured, please try again.';
-            }
+    /**
+     * Execute the PayPal payment
+     *
+     * @return string
+     */
+    public function executePayment()
+    {
+        // Load the mandatory PayPal data from session
+        $ppPayId    = $this->sessionStorage->getSessionValue(SessionStorageService::PAYPAL_PAY_ID);
+        $ppPayerId  = $this->sessionStorage->getSessionValue(SessionStorageService::PAYPAL_PAYER_ID);
 
+        // Set the execute parameters for the PayPal payment
+        $executeParams = $this->getApiContextParams();
+
+        $executeParams['payId']     = $ppPayId;
+        $executeParams['payerId']   = $ppPayerId;
+
+        // Execute the PayPal payment
+        $executeResponse = $this->libCall->call('PayPal::executePayment', $executeParams);
+
+        // Check for errors
+        if(is_array($executeResponse) && $executeResponse['error'])
+        {
+            $this->returnType = 'errorCode';
+            return $executeResponse['error'].': '.$executeResponse['error_msg'];
+        }
+
+        $result = json_encode($executeResponse);
+
+        // Clear the session parameters
+        $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_PAY_ID, null);
+        $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_PAYER_ID, null);
+
+        return (string)$result;
+    }
+
+    public function preparePayPalExpressPayment(Basket $basket)
+    {
+        $paymentContent = $this->getPaymentContent($basket, 'paypalexpress');
+
+        $preparePaymentResult = $this->getReturnType();
+
+
+        if($preparePaymentResult == 'errorCode')
+        {
+            return 'http://master.plentymarkets.com/basket';
+        }
+        elseif($preparePaymentResult == 'redirectUrl')
+        {
             return $paymentContent;
-      }
+        }
+    }
 
-      /**
-       * Get the type of payment from the content of the PayPal container
-       *
-       * @return string
-       */
-      public function getReturnType()
-      {
-            return $this->returnType;
-      }
+    /**
+     * @param array $paymentData
+     * @return array
+     */
+    public function refundPayment($paymentData = array())
+    {
+        $requestParams = $this->getApiContextParams();
+        $requestParams['payment'] = $paymentData;
 
-      /**
-       * Execute the PayPal payment
-       *
-       * @return string
-       */
-      public function executePayment()
-      {
-            // Load the mandatory PayPal data from session
-            $ppPayId    = $this->sessionStorage->getSessionValue(SessionStorageService::PAYPAL_PAY_ID);
-            $ppPayerId  = $this->sessionStorage->getSessionValue(SessionStorageService::PAYPAL_PAYER_ID);
+        return $this->libCall->call('PayPal::refundPayment', $requestParams);
+    }
 
-            // Set the execute parameters for the PayPal payment
-            $executeParams = $this->getApiContextParams();
+    /**
+     * List all available webhooks
+     *
+     * @return array
+     */
+    public function listAvailableWebhooks()
+    {
+        $requestParams = $this->getApiContextParams();
 
-            $executeParams['payId']     = $ppPayId;
-            $executeParams['payerId']   = $ppPayerId;
+        $response = $this->libCall->call('PayPal::listAvailableWebhooks', $requestParams);
 
-            // Execute the PayPal payment
-            $executeResponse = $this->libCall->call('PayPal::executePayment', $executeParams);
+        return $response;
+    }
 
-            // Check for errors
-            if(is_array($executeResponse) && $executeResponse['error'])
+    /**
+     * Fill and return the Paypal parameters
+     *
+     * @param Basket $basket
+     * @return array
+     */
+    private function getPaypalParams(Basket $basket = null)
+    {
+        $payPalRequestParams = $this->getApiContextParams();
+
+        // Set the PayPal Web Profile ID
+        $payPalRequestParams['webProfileId'] = $this->config->get('PayPal.webProfileID');
+
+        /** @var Basket $basket */
+        $payPalRequestParams['basket'] = $basket;
+
+        /** @var \Plenty\Modules\Item\Item\Contracts\ItemRepositoryContract $itemContract */
+        $itemContract = pluginApp(\Plenty\Modules\Item\Item\Contracts\ItemRepositoryContract::class);
+
+        /** @var BasketItem $basketItem */
+        foreach($basket->basketItems as $basketItem)
+        {
+            /** @var \Plenty\Modules\Item\Item\Models\Item $item */
+            $item = $itemContract->show($basketItem->itemId);
+
+            $basketItem = $basketItem->getAttributes();
+
+            /** @var \Plenty\Modules\Item\Item\Models\ItemText $itemText */
+            $itemText = $item->texts;
+
+            $basketItem['name'] = $itemText->first()->name1;
+
+            $payPalRequestParams['basketItems'][] = $basketItem;
+        }
+
+        // Read the shipping address ID from the session
+        $shippingAddressId = $this->sessionStorage->getSessionValue(SessionStorageService::DELIVERY_ADDRESS_ID);
+
+        if(!is_null($shippingAddressId))
+        {
+            if($shippingAddressId == -99)
             {
-                  $this->returnType = 'errorCode';
-                  return $executeResponse['error'].': '.$executeResponse['error_msg'];
+                $shippingAddressId = $this->sessionStorage->getSessionValue(SessionStorageService::BILLING_ADDRESS_ID);
             }
 
-            $result = json_encode($executeResponse);
+            $shippingAddress = $this->addressRepo->findAddressById($shippingAddressId);
 
-            // Clear the session parameters
-            $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_PAY_ID, null);
-            $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_PAYER_ID, null);
+            $payPalRequestParams['shippingAddress']['town']           = $shippingAddress->town;
+            $payPalRequestParams['shippingAddress']['postalCode']     = $shippingAddress->postalCode;
+            $payPalRequestParams['shippingAddress']['firstname']      = $shippingAddress->firstName;
+            $payPalRequestParams['shippingAddress']['lastname']       = $shippingAddress->lastName;
+            $payPalRequestParams['shippingAddress']['street']         = $shippingAddress->street;
+            $payPalRequestParams['shippingAddress']['houseNumber']    = $shippingAddress->houseNumber;
+        }
 
-            return (string)$result;
-      }
+        // Fill the country for PayPal parameters
+        $country['isoCode2'] = $this->countryRepo->findIsoCode($basket->shippingCountryId, 'iso_code_2');
+        $payPalRequestParams['country'] = $country;
 
-      public function preparePayPalExpressPayment(Basket $basket)
-      {
-          $paymentContent = $this->getPaymentContent($basket, 'paypalexpress');
+        // Get the URLs for PayPal parameters
+        $urls = array(
+            'returnUrl' => $this->paymentHelper->getRestSuccessURL(),
+            'cancelUrl' => $this->paymentHelper->getRestCancelURL());
 
-          $preparePaymentResult = $this->getReturnType();
+        $payPalRequestParams['urls'] = $urls;
 
+        return $payPalRequestParams;
+    }
 
-          if($preparePaymentResult == 'errorCode')
-          {
-              return 'http://master.plentymarkets.com/basket';
-          }
-          elseif($preparePaymentResult == 'redirectUrl')
-          {
-              return $paymentContent;
-          }
-      }
+    private function getApiContextParams()
+    {
+        $apiContextParams = array();
+        $apiContextParams['clientSecret'] = $this->config->get('PayPal.clientSecret');
+        $apiContextParams['clientId'] = $this->config->get('PayPal.clientId');
 
-     /**
-      * @param array $paymentData
-      * @return array
-      */
-      public function refundPayment($paymentData = array())
-      {
-          $requestParams = $this->getApiContextParams();
-          $requestParams['payment'] = $paymentData;
+        $apiContextParams['sandbox'] = false;
+        if($this->config->get('PayPal.environment') == 1)
+        {
+            $apiContextParams['sandbox'] = true;
+        }
 
-          return $this->libCall->call('PayPal::refundPayment', $requestParams);
-      }
-
-      /**
-       * List all available webhooks
-       *
-       * @return array
-       */
-      public function listAvailableWebhooks()
-      {
-          $requestParams = $this->getApiContextParams();
-
-          $response = $this->libCall->call('PayPal::listAvailableWebhooks', $requestParams);
-
-          return $response;
-      }
-
-      /**
-       * Fill and return the Paypal parameters
-       *
-       * @param Basket $basket
-       * @return array
-       */
-      private function getPaypalParams(Basket $basket = null)
-      {
-          $payPalRequestParams = $this->getApiContextParams();
-
-          // Set the PayPal basic parameters
-          $payPalRequestParams['webProfileId']  = $this->config->get('PayPal.webProfileID');
-
-          $payPalRequestParams['basket']        = $basket;
-          $payPalRequestParams['basketItems']   = $basket->basketItems;
-
-          // Read the shipping address ID from the session
-          $shippingAddressId = $this->sessionStorage->getSessionValue(SessionStorageService::DELIVERY_ADDRESS_ID);
-
-          if(!is_null($shippingAddressId) && $shippingAddressId > 0)
-          {
-              $shippingAddress = $this->addressRepo->findAddressById($shippingAddressId);
-              $payPalRequestParams['shippingAddress'] = $shippingAddress;
-          }
-
-          // Fill the country for PayPal parameters
-          $country['isoCode2'] = $this->countryRepo->findIsoCode($basket->shippingCountryId, 'iso_code_2');
-          $payPalRequestParams['country'] = $country;
-
-          // Get the URLs for PayPal parameters
-          $urls = array('returnUrl' => $this->paymentHelper->getRestSuccessURL(),
-                        'cancelUrl' => $this->paymentHelper->getRestCancelURL());
-
-          $payPalRequestParams['urls'] = $urls;
-
-          return $payPalRequestParams;
-      }
-
-      private function getApiContextParams()
-      {
-          $apiContextParams = array();
-          $apiContextParams['clientSecret'] = $this->config->get('PayPal.clientSecret');
-          $apiContextParams['clientId'] = $this->config->get('PayPal.clientId');
-
-          $apiContextParams['sandbox'] = false;
-          if($this->config->get('PayPal.environment') == 1)
-          {
-              $apiContextParams['sandbox'] = true;
-          }
-
-          return $apiContextParams;
-      }
+        return $apiContextParams;
+    }
 }

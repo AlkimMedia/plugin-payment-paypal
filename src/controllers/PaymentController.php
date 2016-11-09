@@ -8,6 +8,7 @@ use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Templates\Twig;
 use Plenty\Plugin\Http\Request;
+use Plenty\Plugin\Http\Response;
 
 use PayPal\Services\SessionStorageService;
 use Paypal\Services\PaymentService;
@@ -20,28 +21,33 @@ use PayPal\Helper\PaymentHelper;
 class PaymentController extends Controller
 {
     /**
-    * @var Application
-    */
+     * @var Application
+     */
     protected $app;
 
     /**
-    * @var Twig
-    */
+     * @var Twig
+     */
     private $twig;
 
     /**
-    * @var Request
-    */
+     * @var Request
+     */
     private $request;
 
     /**
-    * @var ConfigRepository
-    */
+     * @var Response
+     */
+    private $response;
+
+    /**
+     * @var ConfigRepository
+     */
     private $config;
 
     /**
-    * @var PaymentHelper
-    */
+     * @var PaymentHelper
+     */
     private $payHelper;
 
     /**
@@ -70,15 +76,17 @@ class PaymentController extends Controller
      * @param PaymentService $paymentService
      * @param BasketRepositoryContract $basketContract
      * @param SessionStorageService $sessionStorage
+     * @param Response $response
      */
     public function __construct(  Application $app, Twig $twig, Request $request,
                                   ConfigRepository $config, PaymentHelper $payHelper,
                                   PaymentService $paymentService, BasketRepositoryContract $basketContract,
-                                  SessionStorageService $sessionStorage)
+                                  SessionStorageService $sessionStorage, Response $response)
     {
         $this->app              = $app;
         $this->twig             = $twig;
         $this->request          = $request;
+        $this->response         = $response;
         $this->config           = $config;
         $this->payHelper        = $payHelper;
         $this->paymentService   = $paymentService;
@@ -87,22 +95,21 @@ class PaymentController extends Controller
     }
 
     /**
-    * PayPal redirects to this page if the payment could not be executed or other problems occurred
-    */
-    public function payPalCheckoutCancel()
+     * PayPal redirects to this page if the payment could not be executed or other problems occurred
+     */
+    public function checkoutCancel()
     {
         // clear the PayPal session values
         $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_PAY_ID, null);
         $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_PAYER_ID, null);
 
         // Redirects to the cancellation page. The URL can be entered in the config.json.
-        header("Location: ".$this->config->get('PayPal.cancelUrl'));
-        exit();
+        return $this->response->redirectTo($this->config->get('PayPal.cancelUrl'));
     }
 
     /**
-    * PayPal redirects to this page if the payment was executed correctly
-    */
+     * PayPal redirects to this page if the payment was executed correctly
+     */
     public function checkoutSuccess()
     {
         // Get the PayPal payment data from the request
@@ -115,19 +122,17 @@ class PaymentController extends Controller
         // Check whether the Pay ID from the session is equal to the given Pay ID by PayPal
         if($paymentId != $ppPayId)
         {
-              $this->payPalCheckoutCancel();
+            return $this->checkoutCancel();
         }
 
         $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_PAYER_ID, $payerId);
 
         // Redirect to the success page. The URL can be entered in the config.json.
-        header("Location: ".$this->config->get('PayPal.successUrl'));
-        exit();
+        return $this->response->redirectTo('place-order');
     }
 
     /**
      * Redirect to PayPal Express Checkout
-     *
      */
     public function expressCheckout()
     {
@@ -136,7 +141,6 @@ class PaymentController extends Controller
         // get the paypal-express redirect URL
         $redirectURL = $this->paymentService->preparePayPalExpressPayment($basket);
 
-        header("Location: " . $redirectURL);
-        exit();
+        return $this->response->redirectTo($redirectURL);
     }
 }
