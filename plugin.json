@@ -14,5 +14,5 @@
     "runOnBuild": [
         "PayPal\\Migrations\\CreatePaymentMethod"
     ],
-    "dataProviders": [{"name":"PayPal\\Providers\\PayPalExpressButtonDataProvider", "description": "PayPal Express Button"}]
+    "dataProviders": [{"key":"PayPal\\Providers\\PayPalExpressButtonDataProvider", "name":"PayPal Express Button", "description": "PayPal Express Button"}]
 }
