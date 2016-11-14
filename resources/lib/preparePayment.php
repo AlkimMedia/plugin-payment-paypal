@@ -29,11 +29,11 @@ require_once __DIR__.'/PayPalHelper.php';
     foreach($basketItems as $basketItem)
     {
       $item = new Item();
-      $item ->setName('grüner tisch')
+      $item ->setName($basketItem['name'])
             ->setCurrency($basket['currency'])
-            ->setQuantity($basketItem['quantity'])
-            ->setSku($basketItem['variationId'])
-            ->setPrice($basketItem['price']);
+            ->setQuantity((int)$basketItem['quantity'])
+            ->setSku($basketItem['itemId'])
+            ->setPrice(number_format($basketItem['price'], 2));
 
       $itemList->addItem($item);
     }
@@ -94,7 +94,7 @@ require_once __DIR__.'/PayPalHelper.php';
     }
     catch(Exception $ex)
     {
-        return (STRING)$ex->getMessage();
+        return (STRING)$ex->getMessage().' PayPalPayment: '.print_r($payment, true);
     }
 
     return (STRING)$payment;
