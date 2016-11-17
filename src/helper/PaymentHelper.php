@@ -2,7 +2,7 @@
 
 namespace PayPal\Helper;
 
-use Plenty\Modules\Payment\Contracts\PaymentPropertyRepositoryContract;
+use Plenty\Modules\Payment\Models\PaymentProperty;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
@@ -10,7 +10,6 @@ use Plenty\Modules\Payment\Contracts\PaymentOrderRelationRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Payment\Method\Models\PaymentMethod;
-use Plenty\Modules\Payment\Models\PaymentProperty;
 use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Helper\Services\WebstoreHelper;
@@ -54,11 +53,6 @@ class PaymentHelper
     private $paymentOrderRelationRepo;
 
     /**
-     * @var PaymentPropertyRepositoryContract
-     */
-    private $paymentPropertyRepositoryContract;
-
-    /**
      * @var PaymentRepositoryContract
      */
     private $paymentRepository;
@@ -79,7 +73,6 @@ class PaymentHelper
      * @param Application $app
      * @param PaymentMethodRepositoryContract $paymentMethodRepository
      * @param PaymentRepositoryContract $paymentRepo
-     * @param PaymentPropertyRepositoryContract $paymentPropertyRepositoryContract
      * @param PaymentOrderRelationRepositoryContract $paymentOrderRelationRepo
      * @param ConfigRepository $config
      * @param SessionStorageService $sessionService
@@ -89,7 +82,6 @@ class PaymentHelper
     public function __construct(Application $app,
                                 PaymentMethodRepositoryContract $paymentMethodRepository,
                                 PaymentRepositoryContract $paymentRepo,
-                                PaymentPropertyRepositoryContract $paymentPropertyRepositoryContract,
                                 PaymentOrderRelationRepositoryContract $paymentOrderRelationRepo,
                                 ConfigRepository $config,
                                 SessionStorageService $sessionService,
@@ -103,7 +95,6 @@ class PaymentHelper
         $this->paymentMethodRepository                  = $paymentMethodRepository;
         $this->paymentOrderRelationRepo                 = $paymentOrderRelationRepo;
         $this->paymentRepository                        = $paymentRepo;
-        $this->paymentPropertyRepositoryContract        = $paymentPropertyRepositoryContract;
         $this->orderRepo                                = $orderRepo;
         $this->statusMap                                = array();
     }
@@ -195,57 +186,68 @@ class PaymentHelper
     }
 
     /**
-     * Create a payment in plentymarkets from the JSON data
+     * Create a payment in plentymarkets from the paypal execution response data
      *
-     * @param string $json
+     * @param array $paymentData
      * @return Payment
      */
-    public function createPlentyPaymentFromJson(string $json)
+    public function createPlentyPayment(array $paymentData)
     {
-        $payPalPayment = json_decode($json);
+        /** @var Payment $payment */
+        $payment = pluginApp( \Plenty\Modules\Payment\Models\Payment::class );
 
-        $paymentData = array();
+        $payment->mopId             = (int)$this->getPayPalMopId();
+        $payment->transactionType   = 2;
+        $payment->status            = $this->mapStatus($paymentData['status']);
+        $payment->currency          = $paymentData['currency'];
+        $payment->amount            = $paymentData['amount'];
+        $payment->receivedAt        = $paymentData['entryDate'];
 
-        // Set the payment data
-        $paymentData['mopId']           = (int)$this->getPayPalMopId();
-        $paymentData['transactionType'] = 2;
-        $paymentData['status']          = $this->mapStatus($payPalPayment->status);
-        $paymentData['currency']        = $payPalPayment->currency;
-        $paymentData['amount']          = $payPalPayment->amount;
-        $paymentData['receivedAt']       = $payPalPayment->entryDate;
-
-        $payment = $this->paymentRepository->createPayment($paymentData);
+        $paymentProperty = array();
 
         /**
          * Add payment property with type booking text
          */
-        $this->addPaymentProperty($payment->id, array('typeId'=>3, 'value'=>'PayPalPayID: '.(string)$payPalPayment->bookingText));
+        $paymentProperty[] = $this->getPaymentProperty(3, 'TransactionID: '.(string)$paymentData['bookingText']);
 
         /**
-         * Add payment property with type origin
+         * read the origin constants from the payment repository
          */
-        $originConstants        = $this->paymentRepository->getOriginConstants();
-        $paymentPropertyValue      = '';
+        $originConstants = $this->paymentRepository->getOriginConstants();
+
         if(!is_null($originConstants) && is_array($originConstants))
         {
-            $paymentPropertyValue = (string)$originConstants['plugin'];
+            $originValue = (string)$originConstants['plugin'];
+
+            /**
+             * Add payment property with type origin
+             */
+            $paymentProperty[] = $this->getPaymentProperty(23, $originValue);
         }
-        $this->addPaymentProperty($payment->id, array('typeId'=>23, 'value'=>$paymentPropertyValue));
+
+        $payment->property = $paymentProperty;
+
+        $payment = $this->paymentRepository->createPayment($payment);
 
         return $payment;
     }
 
     /**
-     * @param int $paymentId
+     * Returns a PaymentProperty with the given params
+     *
+     * @param Payment $payment
      * @param array $data
+     * @return PaymentProperty
      */
-    private function addPaymentProperty(int $paymentId, array $data)
+    private function getPaymentProperty($typeId, $value)
     {
-        $paymentPropertyData['paymentId'] = $paymentId;
-        $paymentPropertyData['typeId'] = $data['typeId'];
-        $paymentPropertyData['value'] = $data['value'];
+        /** @var PaymentProperty $paymentProperty */
+        $paymentProperty = pluginApp( \Plenty\Modules\Payment\Models\PaymentProperty::class );
 
-        $this->paymentPropertyRepositoryContract->createProperty($paymentPropertyData);
+        $paymentProperty->typeId = $typeId;
+        $paymentProperty->value = $value;
+
+        return $paymentProperty;
     }
 
     /**

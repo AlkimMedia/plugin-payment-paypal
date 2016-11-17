@@ -48,8 +48,12 @@ class PayPalServiceProvider extends ServiceProvider
      * @param PaymentMethodContainer   $payContainer
      * @param EventProceduresService   $eventProceduresService
      */
-    public function boot(   Dispatcher $eventDispatcher     , PaymentHelper $paymentHelper     , PaymentService $paymentService,
-                            BasketRepositoryContract $basket, PaymentMethodContainer $payContainer, EventProceduresService $eventProceduresService)
+    public function boot(   Dispatcher $eventDispatcher,
+                            PaymentHelper $paymentHelper,
+                            PaymentService $paymentService,
+                            BasketRepositoryContract $basket,
+                            PaymentMethodContainer $payContainer,
+                            EventProceduresService $eventProceduresService)
     {
         // Register the PayPal Express payment method in the payment method container
         $payContainer->register('plentyPayPal::PAYPALEXPRESS', PayPalExpressPaymentMethod::class,
@@ -87,13 +91,13 @@ class PayPalServiceProvider extends ServiceProvider
                 if($event->getMop() == $paymentHelper->getPayPalMopId())
                 {
                     // Execute the payment
-                    $payPalPayment = $paymentService->executePayment();
+                    $payPalPaymentData = $paymentService->executePayment();
 
                     // Check whether the PayPal payment has been executed successfully
                     if($paymentService->getReturnType() != 'errorCode')
                     {
-                        // Create a payment in plentymarkets with the PayPal payment data
-                        $plentyPayment = $paymentHelper->createPlentyPaymentFromJson($payPalPayment);
+                        // Create a plentymarkets payment from the paypal execution params
+                        $plentyPayment = $paymentHelper->createPlentyPayment($payPalPaymentData);
 
                         if($plentyPayment instanceof Payment)
                         {

@@ -169,7 +169,7 @@ class PaymentService
     /**
      * Execute the PayPal payment
      *
-     * @return string
+     * @return array
      */
     public function executePayment()
     {
@@ -193,13 +193,11 @@ class PaymentService
             return $executeResponse['error'].': '.$executeResponse['error_msg'];
         }
 
-        $result = json_encode($executeResponse);
-
         // Clear the session parameters
         $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_PAY_ID, null);
         $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_PAYER_ID, null);
 
-        return (string)$result;
+        return $executeResponse;
     }
 
     public function preparePayPalExpressPayment(Basket $basket)

@@ -13,14 +13,7 @@ $apiContext = PayPalHelper::getApiContext(  SdkRestApi::getParam('clientId', tru
 
 $paymentId = SdkRestApi::getParam('payId');
 
-try
-{
-    $payment = Payment::get($paymentId, $apiContext);
-}
-catch(PayPal\Exception\PPConnectionException $pce)
-{
-    return '<pre>';print_r(json_decode($pce->getData()));
-}
+$payment = Payment::get($paymentId, $apiContext);
 
 $execution = new PaymentExecution();
 
@@ -35,16 +28,9 @@ else
 
 $execution->setPayerId($payer);
 
-try
-{
-    $result = $payment->execute($execution, $apiContext);
+$result = $payment->execute($execution, $apiContext);
 
-    $paidPayment = Payment::get($paymentId, $apiContext);
-}
-catch(PayPal\Exception\PPConnectionException $pce)
-{
-    return '<pre>';print_r(json_decode($pce->getData()));
-}
+$paidPayment = Payment::get($paymentId, $apiContext);
 
 return PayPalHelper::mapPayment($paidPayment);
 

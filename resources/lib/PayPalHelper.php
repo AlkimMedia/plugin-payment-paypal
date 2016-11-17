@@ -51,15 +51,9 @@ class PayPalHelper
 
     static function mapPayment(Payment $payment)
     {
-        $returnArray = array();
-
         $transaction = $payment->getTransactions()[0];
 
-        /** @var PayPal\Api\Sale $sale */
-        $sale = $transaction->getRelatedResources()[0];
-
-        $returnArray['transactionId'] = $sale->getId();
-        $returnArray['bookingText'] = $payment->getId();
+        $returnArray['bookingText'] = $transaction->getRelatedResources()[0]->getSale()->getId();
         $returnArray['amount'] = $transaction->getAmount()->getTotal();
         $returnArray['currency'] = $transaction->getAmount()->getCurrency();
         $returnArray['entryDate'] = $payment->getCreateTime();
