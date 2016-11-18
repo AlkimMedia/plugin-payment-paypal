@@ -3,10 +3,8 @@
 namespace PayPal\Controllers;
 
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
-use Plenty\Plugin\Application;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Controller;
-use Plenty\Plugin\Templates\Twig;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 
@@ -20,16 +18,6 @@ use PayPal\Helper\PaymentHelper;
  */
 class PaymentController extends Controller
 {
-    /**
-     * @var Application
-     */
-    protected $app;
-
-    /**
-     * @var Twig
-     */
-    private $twig;
-
     /**
      * @var Request
      */
@@ -48,7 +36,7 @@ class PaymentController extends Controller
     /**
      * @var PaymentHelper
      */
-    private $payHelper;
+    private $paymentHelper;
 
     /**
      * @var PaymentService
@@ -68,27 +56,26 @@ class PaymentController extends Controller
     /**
      * PaymentController constructor.
      *
-     * @param Application $app
-     * @param Twig $twig
      * @param Request $request
      * @param ConfigRepository $config
-     * @param PaymentHelper $payHelper
+     * @param PaymentHelper $paymentHelper
      * @param PaymentService $paymentService
      * @param BasketRepositoryContract $basketContract
      * @param SessionStorageService $sessionStorage
      * @param Response $response
      */
-    public function __construct(  Application $app, Twig $twig, Request $request,
-                                  ConfigRepository $config, PaymentHelper $payHelper,
-                                  PaymentService $paymentService, BasketRepositoryContract $basketContract,
-                                  SessionStorageService $sessionStorage, Response $response)
+    public function __construct(  Request $request,
+                                  Response $response,
+                                  ConfigRepository $config,
+                                  PaymentHelper $paymentHelper,
+                                  PaymentService $paymentService,
+                                  BasketRepositoryContract $basketContract,
+                                  SessionStorageService $sessionStorage)
     {
-        $this->app              = $app;
-        $this->twig             = $twig;
         $this->request          = $request;
         $this->response         = $response;
         $this->config           = $config;
-        $this->payHelper        = $payHelper;
+        $this->paymentHelper    = $paymentHelper;
         $this->paymentService   = $paymentService;
         $this->basketContract   = $basketContract;
         $this->sessionStorage   = $sessionStorage;
@@ -129,6 +116,22 @@ class PaymentController extends Controller
 
         // Redirect to the success page. The URL can be entered in the config.json.
         return $this->response->redirectTo('place-order');
+    }
+
+    /**
+     * PayPal redirects to this page if the express payment could not be executed or other problems occurred
+     */
+    public function expressCheckoutCancel()
+    {
+        return $this->checkoutCancel();
+    }
+
+    /**
+     * PayPal redirects to this page if the express payment was executed correctly
+     */
+    public function expressCheckoutSuccess()
+    {
+        return $this->checkoutSuccess();
     }
 
     /**

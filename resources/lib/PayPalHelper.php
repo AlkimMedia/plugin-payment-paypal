@@ -6,11 +6,11 @@ use PayPal\Api\WebProfile;
 use PayPal\Api\Presentation;
 use PayPal\Api\Payment;
 
-
 class PayPalHelper
 {
     /**
-     * Helper method for getting an APIContext for all calls
+     * Creates the ApiContext with the given params
+     *
      * @param string $clientId Client ID
      * @param string $clientSecret Client Secret
      * @param bool $sandbox
@@ -25,30 +25,28 @@ class PayPalHelper
         }
         else
         {
-            //live environment
-            $mode = 'sandbox';
-            $endpoint = "https://test-api.sandbox.paypal.com";
+            $mode = 'live';
+            $endpoint = "https://api.paypal.com";
         }
 
+        /** @var ApiContext $apiContext */
         $apiContext = new ApiContext(
-            new OAuthTokenCredential(
-                $clientId,
-                $clientSecret
-            )
-        );
+            new OAuthTokenCredential(   $clientId,
+                                        $clientSecret));
 
         $apiContext->setConfig(
-            array(
-                'mode' => $mode,
-                'service.EndPoint'  => $endpoint,
-                'log.LogEnabled' => false,
-                'cache.enabled' => false,
-            )
-        );
+            array(  'mode'              => $mode,
+                    'service.EndPoint'  => $endpoint,
+                    'log.LogEnabled'    => false,
+                    'cache.enabled'     => false,));
 
         return $apiContext;
     }
 
+    /**
+     * @param Payment $payment
+     * @return mixed
+     */
     static function mapPayment(Payment $payment)
     {
         $transaction = $payment->getTransactions()[0];

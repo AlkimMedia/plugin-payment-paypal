@@ -3,7 +3,6 @@
 namespace PayPal\Helper;
 
 use Plenty\Modules\Payment\Models\PaymentProperty;
-use Plenty\Plugin\Application;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentOrderRelationRepositoryContract;
@@ -12,7 +11,6 @@ use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Payment\Method\Models\PaymentMethod;
 use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Modules\Order\Models\Order;
-use Plenty\Modules\Helper\Services\WebstoreHelper;
 
 use PayPal\Services\SessionStorageService;
 
@@ -22,15 +20,8 @@ use PayPal\Services\SessionStorageService;
  */
 class PaymentHelper
 {
-    /**
-     * @var Application
-     */
-    private $app;
-
-    /**
-     * @var WebstoreHelper
-     */
-    private $webstoreHelper;
+    const MODE_PAYPAL = 'paypal';
+    const MODE_PAYPALEXPRESS = 'paypalexpress';
 
     /**
      * @var PaymentMethodRepositoryContract
@@ -70,26 +61,20 @@ class PaymentHelper
     /**
      * PaymentHelper constructor.
      *
-     * @param Application $app
      * @param PaymentMethodRepositoryContract $paymentMethodRepository
      * @param PaymentRepositoryContract $paymentRepo
      * @param PaymentOrderRelationRepositoryContract $paymentOrderRelationRepo
      * @param ConfigRepository $config
      * @param SessionStorageService $sessionService
      * @param OrderRepositoryContract $orderRepo
-     * @param WebstoreHelper $webstoreHelper
      */
-    public function __construct(Application $app,
-                                PaymentMethodRepositoryContract $paymentMethodRepository,
+    public function __construct(PaymentMethodRepositoryContract $paymentMethodRepository,
                                 PaymentRepositoryContract $paymentRepo,
                                 PaymentOrderRelationRepositoryContract $paymentOrderRelationRepo,
                                 ConfigRepository $config,
                                 SessionStorageService $sessionService,
-                                OrderRepositoryContract $orderRepo,
-                                WebstoreHelper $webstoreHelper)
+                                OrderRepositoryContract $orderRepo)
     {
-        $this->app                                      = $app;
-        $this->webstoreHelper                           = $webstoreHelper;
         $this->config                                   = $config;
         $this->sessionService                           = $sessionService;
         $this->paymentMethodRepository                  = $paymentMethodRepository;
@@ -148,13 +133,18 @@ class PaymentHelper
     }
 
     /**
-     * Get the REST cancellation URL
+     * Get the REST return URLs for the given mode
      *
-     * @return string
+     * @param string $mode
+     * @return array(success => $url, cancel => $url)
      */
-    public function getRestCancelURL()
+    public function getRestReturnUrls($mode)
     {
-        $webstoreConfig = $this->webstoreHelper->getCurrentWebstoreConfiguration();
+        /** @var \Plenty\Modules\Helper\Services\WebstoreHelper $webstoreHelper */
+        $webstoreHelper = pluginApp(\Plenty\Modules\Helper\Services\WebstoreHelper::class);
+
+        /** @var \Plenty\Modules\System\Models\WebstoreConfiguration $webstoreConfig */
+        $webstoreConfig = $webstoreHelper->getCurrentWebstoreConfiguration();
 
         if(is_null($webstoreConfig))
         {
@@ -163,26 +153,21 @@ class PaymentHelper
 
         $domain = $webstoreConfig->domainSsl;
 
-        return $domain.'/payPal/checkoutCancel';
-    }
+        $urls = array();
 
-    /**
-     * Get the REST success URL
-     *
-     * @return string
-     */
-    public function getRestSuccessURL()
-    {
-        $webstoreConfig = $this->webstoreHelper->getCurrentWebstoreConfiguration();
-
-        if(is_null($webstoreConfig))
+        switch($mode)
         {
-            return 'error';
+            case self::MODE_PAYPAL:
+                $urls['success'] = $domain.'/payPal/checkoutSuccess';
+                $urls['cancel'] = $domain.'/payPal/checkoutCancel';
+                break;
+            case self::MODE_PAYPALEXPRESS:
+                $urls['success'] = $domain.'/payPal/expressCheckoutSuccess';
+                $urls['cancel'] = $domain.'/payPal/expressCheckoutCancel';
+                break;
         }
 
-        $domain = $webstoreConfig->domainSsl;
-
-        return $domain.'/payPal/checkoutSuccess';
+        return $urls;
     }
 
     /**

@@ -18,16 +18,19 @@ require_once __DIR__.'/PayPalHelper.php';
 
     $mode = SdkRestApi::getParam('mode', false);
 
+    /** @var Payer $payer */
     $payer = new Payer();
     $payer->setPaymentMethod('paypal');
 
     $basket         = SdkRestApi::getParam('basket');
     $basketItems    = SdkRestApi::getParam('basketItems');
 
+    /** @var ItemList $itemList */
     $itemList = new ItemList();
 
     foreach($basketItems as $basketItem)
     {
+      /** @var Item $item */
       $item = new Item();
       $item ->setName($basketItem['name'])
             ->setCurrency($basket['currency'])
@@ -43,6 +46,7 @@ require_once __DIR__.'/PayPalHelper.php';
 
     if($mode != 'paypalexpress')
     {
+        /** @var ShippingAddress $shippingAddress */
         $shippingAddress = new ShippingAddress();
         $shippingAddress->setCity($address['town'])
             ->setCountryCode($country['isoCode2'])
@@ -54,15 +58,18 @@ require_once __DIR__.'/PayPalHelper.php';
         $itemList->setShippingAddress($shippingAddress);
     }
 
+    /** @var Details $details */
     $details = new Details();
     $details->setShipping($basket['shippingAmount'])
             ->setSubtotal($basket['itemSum']);
 
+    /** @var Amount $amount */
     $amount = new Amount();
     $amount ->setCurrency($basket['currency'])
             ->setTotal($basket['basketAmount'])
             ->setDetails($details);
 
+    /** @var Transaction $transaction */
     $transaction = new Transaction();
     $transaction->setAmount($amount)
                 ->setItemList($itemList)
@@ -71,10 +78,12 @@ require_once __DIR__.'/PayPalHelper.php';
 
     $urls = SdkRestApi::getParam('urls');
 
+    /** @var RedirectUrls $redirectUrls */
     $redirectUrls = new RedirectUrls();
-    $redirectUrls ->setReturnUrl($urls['returnUrl'])
-                  ->setCancelUrl($urls['cancelUrl']);
+    $redirectUrls ->setReturnUrl($urls['success'])
+                  ->setCancelUrl($urls['cancel']);
 
+    /** @var Payment $payment */
     $payment = new Payment();
     $payment->setIntent('sale')
             ->setPayer($payer)
@@ -88,13 +97,6 @@ require_once __DIR__.'/PayPalHelper.php';
         $payment->setExperienceProfileId($webProfileId);
     }
 
-    try
-    {
-        $payment->create($apiContext);
-    }
-    catch(Exception $ex)
-    {
-        return (STRING)$ex->getMessage().' PayPalPayment: '.print_r($payment, true);
-    }
+    $payment->create($apiContext);
 
-    return (STRING)$payment;
+    return $payment->toArray();
