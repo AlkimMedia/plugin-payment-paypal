@@ -173,7 +173,7 @@ class PaymentHelper
     /**
      * Create a payment in plentymarkets from the paypal execution response data
      *
-     * @param array $paymentData
+     * @param $paymentData['status','currency','amount','entryDate','payId']
      * @return Payment
      */
     public function createPlentyPayment(array $paymentData)
@@ -182,33 +182,38 @@ class PaymentHelper
         $payment = pluginApp( \Plenty\Modules\Payment\Models\Payment::class );
 
         $payment->mopId             = (int)$this->getPayPalMopId();
-        $payment->transactionType   = 2;
+        $payment->transactionType   = 2; //Payment::TRANSACTION_TYPE_BOOKED_POSTING;
         $payment->status            = $this->mapStatus($paymentData['status']);
         $payment->currency          = $paymentData['currency'];
         $payment->amount            = $paymentData['amount'];
         $payment->receivedAt        = $paymentData['entryDate'];
+
+        if(isset($paymentData['type']))
+        {
+            $payment->type = $paymentData['type'];
+        }
+
+        if(isset($paymentData['unaccountable']))
+        {
+            $payment->unaccountable = $paymentData['unaccountable'];
+        }
 
         $paymentProperty = array();
 
         /**
          * Add payment property with type booking text
          */
-        $paymentProperty[] = $this->getPaymentProperty(3, 'TransactionID: '.(string)$paymentData['bookingText']);
+        $paymentProperty[] = $this->getPaymentProperty(3, 'TransactionID: '.(string)$paymentData['payId']);  //PaymentProperty::TYPE_BOOKING_TEXT
 
         /**
-         * read the origin constants from the payment repository
+         * Add payment property with type transactionId
          */
-        $originConstants = $this->paymentRepository->getOriginConstants();
+        $paymentProperty[] = $this->getPaymentProperty(1, $paymentData['payId']);  //PaymentProperty::TYPE_TRANSACTION_ID
 
-        if(!is_null($originConstants) && is_array($originConstants))
-        {
-            $originValue = (string)$originConstants['plugin'];
-
-            /**
-             * Add payment property with type origin
-             */
-            $paymentProperty[] = $this->getPaymentProperty(23, $originValue);
-        }
+        /**
+         * Add payment property with type origin
+         */
+        $paymentProperty[] = $this->getPaymentProperty(23, 6);  //PaymentProperty::TYPE_ORIGIN  Payment::ORIGIN_PLUGIN
 
         $payment->property = $paymentProperty;
 
@@ -283,4 +288,5 @@ class PaymentHelper
 
         return (int)$this->statusMap[$status];
     }
+
 }

@@ -10,6 +10,7 @@ use Plenty\Plugin\Http\Response;
 
 use PayPal\Services\SessionStorageService;
 use Paypal\Services\PaymentService;
+use Paypal\Services\ContactService;
 use PayPal\Helper\PaymentHelper;
 
 /**
@@ -54,15 +55,21 @@ class PaymentController extends Controller
     private $sessionStorage;
 
     /**
+     * @var ContactService
+     */
+    private $contactService;
+
+    /**
      * PaymentController constructor.
      *
      * @param Request $request
+     * @param Response $response
      * @param ConfigRepository $config
      * @param PaymentHelper $paymentHelper
      * @param PaymentService $paymentService
      * @param BasketRepositoryContract $basketContract
      * @param SessionStorageService $sessionStorage
-     * @param Response $response
+     * @param ContactService $contactService
      */
     public function __construct(  Request $request,
                                   Response $response,
@@ -70,7 +77,8 @@ class PaymentController extends Controller
                                   PaymentHelper $paymentHelper,
                                   PaymentService $paymentService,
                                   BasketRepositoryContract $basketContract,
-                                  SessionStorageService $sessionStorage)
+                                  SessionStorageService $sessionStorage,
+                                  ContactService $contactService)
     {
         $this->request          = $request;
         $this->response         = $response;
@@ -79,6 +87,7 @@ class PaymentController extends Controller
         $this->paymentService   = $paymentService;
         $this->basketContract   = $basketContract;
         $this->sessionStorage   = $sessionStorage;
+        $this->contactService   = $contactService;
     }
 
     /**
@@ -114,6 +123,9 @@ class PaymentController extends Controller
 
         $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_PAYER_ID, $payerId);
 
+        // update or create a contact
+        $this->contactService->handlePayPalContact($paymentId);
+
         // Redirect to the success page. The URL can be entered in the config.json.
         return $this->response->redirectTo('place-order');
     }
@@ -146,4 +158,5 @@ class PaymentController extends Controller
 
         return $this->response->redirectTo($redirectURL);
     }
+
 }

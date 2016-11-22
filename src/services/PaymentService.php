@@ -13,6 +13,7 @@ use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 
 use PayPal\Helper\PaymentHelper;
 use PayPal\Services\SessionStorageService;
+use PayPal\Services\SettingsService;
 
 /**
  * @package PayPal\Services
@@ -216,12 +217,19 @@ class PaymentService
      * @param array $paymentData
      * @return array
      */
-    public function refundPayment($paymentData = array())
+    public function refundPayment($payId, $paymentData = array())
     {
         $requestParams = $this->getApiContextParams();
-        $requestParams['payment'] = $paymentData;
+        $requestParams['payId'] = $payId;
 
-        return $this->libCall->call('PayPal::refundPayment', $requestParams);
+        if(!empty($paymentData))
+        {
+            $requestParams['payment'] = $paymentData;
+        }
+
+        $response = $this->libCall->call('PayPal::refundPayment', $requestParams);
+
+        return $response;
     }
 
     /**
@@ -236,6 +244,55 @@ class PaymentService
         $response = $this->libCall->call('PayPal::listAvailableWebhooks', $requestParams);
 
         return $response;
+    }
+
+    /**
+     * @return mixed
+     * @throws \Exception
+     */
+    public function createWebProfile()
+    {
+        $webProfileParams = $this->getApiContextParams();
+
+        $webProfileParams['editableShipping']   = 0;
+        $webProfileParams['addressOverride']    = 0;
+        $webProfileParams['shopLogo']           = false;
+        $webProfileParams['brandName']          = 'shopDerShops GmbH';
+        $webProfileParams['shopName']           = 'SuperDuperShop';
+
+        $webProfileResult = $this->libCall->call('PayPal::createWebProfile', $webProfileParams);
+
+        if(is_array($webProfileResult) && $webProfileResult['error'])
+        {
+            throw new \Exception($webProfileResult['error_msg']);
+        }
+
+        /** @var SettingsService $settingsService */
+        $settingsService = pluginApp(SettingsService::class);
+
+        // save the webProfile
+        $settingsService->setSettingsValue(SettingsService::WEB_PROFILE, $webProfileResult);
+
+        return $webProfileResult;
+    }
+
+    /**
+     * request the paypal payment for the given payId
+     *
+     * @param $payId
+     * @return array
+     * @throws \Exception
+     */
+    public function getPayPalPayment($payId)
+    {
+        $paymentResult = $this->libCall->call('PayPal::getPayPalPayment', ['payId' => $payId]);
+
+        if(is_array($paymentResult) && $paymentResult['error'])
+        {
+            throw new \Exception($paymentResult['error_msg']);
+        }
+
+        return $paymentResult;
     }
 
     /**
@@ -310,6 +367,9 @@ class PaymentService
         return $payPalRequestParams;
     }
 
+    /**
+     * @return array
+     */
     private function getApiContextParams()
     {
         $apiContextParams = array();
