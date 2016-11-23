@@ -51,11 +51,12 @@ class PayPalHelper
     {
         $transaction = $payment->getTransactions()[0];
 
-        $returnArray['bookingText'] = $transaction->getRelatedResources()[0]->getSale()->getId();
+        $returnArray['saleId'] = $transaction->getRelatedResources()[0]->getSale()->getId();
         $returnArray['amount'] = $transaction->getAmount()->getTotal();
         $returnArray['currency'] = $transaction->getAmount()->getCurrency();
         $returnArray['entryDate'] = $payment->getCreateTime();
         $returnArray['status'] = $payment->getState();
+        $returnArray['payerInfo'] = $payment->getPayer()->getPayerInfo();
 
         return $returnArray;
     }

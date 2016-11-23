@@ -70,7 +70,7 @@ class RefundEventProcedure
                                                 'currency'  => $refundResult['amount']['currency'],
                                                 'amount'    => $refundResult['amount']['total'],
                                                 'entryDate' => $refundResult['create_time'],
-                                                'payId'     => $refundResult['sale_id'],
+                                                'saleId'    => $refundResult['sale_id'],
                                                 'type'      => 'debit');  //Payment::TYPE_DEBIT
 
                         // if the refund is pending, set the payment unaccountable

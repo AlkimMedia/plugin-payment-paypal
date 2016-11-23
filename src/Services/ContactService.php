@@ -2,9 +2,6 @@
 
 namespace PayPal\Services;
 
-use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
-use Plenty\Modules\Account\Contact\Models\Contact;
-
 use PayPal\Services\PaymentService;
 
 /**
@@ -13,57 +10,23 @@ use PayPal\Services\PaymentService;
  */
 class ContactService
 {
-    /**
-     * @var ContactRepositoryContract
-     */
-    private $contactRepository;
-
-    /**
-     * @var PaymentService
-     */
-    private $paymentService;
 
     /**
      * ContactService constructor.
-     * @param ContactRepositoryContract $contactRepository
-     * @param PaymentService $paymentService
      */
-    public function __construct(ContactRepositoryContract $contactRepository,
-                                PaymentService $paymentService)
+    public function __construct()
     {
-        $this->contactRepository = $contactRepository;
-        $this->paymentService = $paymentService;
     }
 
     /**
-     * Get a contact by ID
-     *
-     * @param int $contactId
-     * @return Contact
+     * @param array $payerInfo
      */
-    public function getContactById(int $contactId):Contact
+    public function handlePayPalContact($payerInfo)
     {
-        return $this->contactRepository->findContactById($contactId);
-    }
 
-    /**
-     * Create a contact
-     *
-     * @param array $contact
-     * @return Contact
-     */
-    public function createContact(array $contact):Contact
-    {
-        return $this->contactRepository->createContact($contact);
-    }
-
-    /**
-     * @param $payId
-     */
-    public function handlePayPalContact($payId)
-    {
-        $payment = $this->paymentService->getPayPalPayment($payId);
-
+        $bla = $payerInfo;
         // TODO add the contact data from paypal or update if contact data changed
+
+
     }
 }

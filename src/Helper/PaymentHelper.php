@@ -203,12 +203,12 @@ class PaymentHelper
         /**
          * Add payment property with type booking text
          */
-        $paymentProperty[] = $this->getPaymentProperty(3, 'TransactionID: '.(string)$paymentData['payId']);  //PaymentProperty::TYPE_BOOKING_TEXT
+        $paymentProperty[] = $this->getPaymentProperty(3, 'TransactionID: '.(string)$paymentData['saleId']);  //PaymentProperty::TYPE_BOOKING_TEXT
 
         /**
          * Add payment property with type transactionId
          */
-        $paymentProperty[] = $this->getPaymentProperty(1, $paymentData['payId']);  //PaymentProperty::TYPE_TRANSACTION_ID
+        $paymentProperty[] = $this->getPaymentProperty(1, $paymentData['saleId']);  //PaymentProperty::TYPE_TRANSACTION_ID
 
         /**
          * Add payment property with type origin
