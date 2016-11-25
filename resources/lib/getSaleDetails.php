@@ -1,5 +1,5 @@
 <?php
-use PayPal\Api\Payment;
+use PayPal\Api\Sale;
 
 require_once __DIR__.'/PayPalHelper.php';
 
@@ -8,9 +8,9 @@ require_once __DIR__.'/PayPalHelper.php';
                                                 SdkRestApi::getParam('clientSecret', true),
                                                 SdkRestApi::getParam('sandbox', true));
 
-    $paymentId = SdkRestApi::getParam('payId');
+    $saleId = SdkRestApi::getParam('saleId');
 
-    /** @var Payment $payment */
-    $payment = Payment::get($paymentId, $apiContext);
+    /** @var Sale $sale */
+    $sale = Sale::get($saleId, $apiContext);
 
-    return $payment->toArray();
+    return $sale->toArray();

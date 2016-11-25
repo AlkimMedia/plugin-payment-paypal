@@ -4,7 +4,6 @@ namespace PayPal\Procedures;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Modules\Payment\Models\PaymentProperty;
-use Plenty\Modules\Payment\Contracts\PaymentPropertyRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\EventProcedures\Events\EventProceduresTriggered;
 
@@ -18,80 +17,111 @@ use PayPal\Helper\PaymentHelper;
 class RefundEventProcedure
 {
     /**
-     * @param EventProceduresTriggered $eventProceduresTriggered
+     * @param EventProceduresTriggered $eventTriggered
      * @param PaymentService $paymentService
      * @param PaymentRepositoryContract $paymentContract
+     * @param PaymentHelper $paymentHelper
      * @throws \Exception
      */
-    public function run(EventProceduresTriggered $eventProceduresTriggered,
+    public function run(EventProceduresTriggered $eventTriggered,
                         PaymentService $paymentService,
                         PaymentRepositoryContract $paymentContract,
-                        PaymentHelper $paymentHelper,
-                        PaymentPropertyRepositoryContract $paymentPropertyRepositoryContract)
+                        PaymentHelper $paymentHelper)
     {
         /** @var Order $order */
-        $order = $eventProceduresTriggered->getOrder();
+        $order = $eventTriggered->getOrder();
 
-        /** @var Payment[] $payment */
-        $payments = $paymentContract->getPaymentsByOrderId($order->id);
-
-        /** @var Payment $payment */
-        foreach($payments as $payment)
+        // only sales orders and credit notes are allowed order types to refund
+        if($order->typeId == 1   //sales order
+        OR $order->typeId == 4)  //credit note
         {
-            if($payment->mopId == $paymentHelper->getPayPalMopId()
-            OR $payment->mopId == $paymentHelper->getPayPalExpressMopId())
+            /** @var Payment[] $payment */
+            $payments = $paymentContract->getPaymentsByOrderId($order->id);
+
+            /** @var Payment $payment */
+            foreach($payments as $payment)
             {
-                $properties = $paymentPropertyRepositoryContract->allByPaymentId($payment->id);
-
-                foreach($properties as $property)
+                if($payment->mopId == $paymentHelper->getPayPalMopId()
+                OR $payment->mopId == $paymentHelper->getPayPalExpressMopId())
                 {
-                    if($property->id == 1)  //PaymentProperty::TYPE_TRANSACTION_ID
-                    {
-                        $payId = $property->value;
-                    }
-                }
+                    // the paypal transactionsId is mandatory for the paypal refund
+                    $properties = $payment->property;
 
-                if(isset($payId))
-                {
-                    $refundResult = $paymentService->refundPayment($payId);
-
-                    if($refundResult['error'])
+                    if(is_array($properties))
                     {
-                        throw new \Exception($refundResult['error_msg']);
-                    }
-
-                    if($refundResult['state'] == 'failed')
-                    {
-                        //TODO log the reason_code
-                    }
-                    else
-                    {
-                        $paymentData = array(   'status'    => $refundResult['state'],
-                                                'currency'  => $refundResult['amount']['currency'],
-                                                'amount'    => $refundResult['amount']['total'],
-                                                'entryDate' => $refundResult['create_time'],
-                                                'saleId'    => $refundResult['sale_id'],
-                                                'type'      => 'debit');  //Payment::TYPE_DEBIT
-
-                        // if the refund is pending, set the payment unaccountable
-                        if($refundResult['state'] == 'pending')
+                        /** @var PaymentProperty $property */
+                        foreach($properties as $property)
                         {
-                            $paymentData['unaccountable'] = 1;  //1 true 0 false
-                        }
-
-                        /** @var Payment $payment */
-                        $payment = $paymentHelper->createPlentyPayment($paymentData);
-
-                        if($payment instanceof Payment)
-                        {
-                            if($refundResult['state'] == 'completed')
+                            if($property instanceof PaymentProperty)
                             {
-                                $paymentHelper->assignPlentyPaymentToPlentyOrder($payment, $order->id);
+                                if($property->typeId == 1)  //PaymentProperty::TYPE_TRANSACTION_ID
+                                {
+                                    $saleId = $property->value;
+                                    break;
+                                }
                             }
                         }
                     }
 
-                    unset($payId);
+                    if(isset($saleId))
+                    {
+                        // refund the payment
+                        $refundResult = $paymentService->refundPayment($saleId);
+
+                        if($refundResult['error'])
+                        {
+                            throw new \Exception($refundResult['error_msg']);
+                        }
+
+                        if($refundResult['state'] == 'failed')
+                        {
+                            //TODO log the reason_code
+                        }
+                        else
+                        {
+                            $paymentData = array(
+                                'status'    => $refundResult['state'],
+                                'currency'  => $refundResult['amount']['currency'],
+                                'amount'    => $refundResult['amount']['total'],
+                                'entryDate' => $refundResult['create_time'],
+                                'saleId'    => $refundResult['id'],
+                                'parentId'  => $payment->id,
+                                'type'      => 'debit');  //Payment::TYPE_DEBIT
+
+                            // if the refund is pending, set the payment unaccountable
+                            if($refundResult['state'] == 'pending')
+                            {
+                                $paymentData['unaccountable'] = 1;  //1 true 0 false
+                            }
+
+                            // create the new debit payment
+                            /** @var Payment $debitPayment */
+                            $debitPayment = $paymentHelper->createPlentyPayment($paymentData);
+
+                            // get the sale details of the refunded payment
+                            $saleDetails = $paymentService->getSaleDetails($saleId);
+
+                            if(!isset($saleDetails['error']))
+                            {
+                                // read the payment status of the refunded payment
+                                $payment->status = $paymentHelper->mapStatus($saleDetails['state']);
+
+                                // update the refunded payment
+                                $paymentContract->updatePayment($payment);
+                            }
+
+                            if($debitPayment instanceof Payment)
+                            {
+                                if($refundResult['state'] == 'completed')
+                                {
+                                    // assign the new debit payment to the order
+                                    $paymentHelper->assignPlentyPaymentToPlentyOrder($debitPayment, $order->id);
+                                }
+                            }
+                        }
+
+                        unset($saleId);
+                    }
                 }
             }
         }

@@ -28,7 +28,7 @@ require_once __DIR__.'/PayPalHelper.php';
 
     /** @var Sale $sale */
     $sale = new Sale();
-    $sale->setId(SdkRestApi::getParam('payId'));
+    $sale->setId(SdkRestApi::getParam('saleId'));
 
     /** @var Refund $refundedSale */
     $refundedSale = $sale->refundSale($refundRequest, $apiContext);

@@ -228,10 +228,10 @@ class PaymentService
      * @param array $paymentData
      * @return array
      */
-    public function refundPayment($payId, $paymentData = array())
+    public function refundPayment($saleId, $paymentData = array())
     {
         $requestParams = $this->getApiContextParams();
-        $requestParams['payId'] = $payId;
+        $requestParams['saleId'] = $saleId;
 
         if(!empty($paymentData))
         {
@@ -288,22 +288,22 @@ class PaymentService
     }
 
     /**
-     * request the paypal payment for the given payId
+     * request the paypal sale for the given saleId
      *
-     * @param $payId
+     * @param $saleId
      * @return array
      * @throws \Exception
      */
-    public function getPayPalPayment($payId)
+    public function getSaleDetails($saleId)
     {
-        $paymentResult = $this->libCall->call('PayPal::getPayPalPayment', ['payId' => $payId]);
+        $saleDetailsResult = $this->libCall->call('PayPal::getSaleDetails', ['saleId' => $saleId]);
 
-        if(is_array($paymentResult) && $paymentResult['error'])
+        if(is_array($saleDetailsResult) && $saleDetailsResult['error'])
         {
-            throw new \Exception($paymentResult['error_msg']);
+            throw new \Exception($saleDetailsResult['error_msg']);
         }
 
-        return $paymentResult;
+        return $saleDetailsResult;
     }
 
     /**

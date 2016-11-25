@@ -193,6 +193,11 @@ class PaymentHelper
             $payment->type = $paymentData['type'];
         }
 
+        if(isset($paymentData['parentId']))
+        {
+            $payment->parentId = $paymentData['parentId'];
+        }
+
         if(isset($paymentData['unaccountable']))
         {
             $payment->unaccountable = $paymentData['unaccountable'];
