@@ -1,0 +1,18 @@
+{
+  "defaultEntryPoint": "index.html",
+  "namespace": "PlentyPayPal",
+  "menuEntries": [
+    {
+      "label": "Grundeinstellungen",
+      "menu": "settings/orders/paypal",
+      "urlKey": "settings",
+      "entryPoint": "index.html?action=settings"
+    },
+    {
+      "label": "Händlereinstellungen",
+      "menu": "settings/orders/paypal",
+      "urlKey": "merchant-settings",
+      "entryPoint": "index.html?action=permissions"
+    }
+  ]
+}
