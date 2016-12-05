@@ -12,11 +12,17 @@ use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
 class SettingsService
 {
     const WEB_PROFILE = "webProfile";
+    const SETTINGS = "settings";
+    const ACCOUNTS = "accounts";
+
 
     /**
      * @var array
      */
-    private $settingsID = [self::WEB_PROFILE => 1];
+    private $settingsID = [
+        self::WEB_PROFILE   =>  1,
+        self::SETTINGS      =>  2,
+        self::ACCOUNTS      =>  3];
 
     /**
      * @var DataBase
@@ -79,7 +85,7 @@ class SettingsService
 
         if($settings instanceof Settings)
         {
-            return json_decode($settings->value);
+            return $settings->value;
         }
 
         return false;

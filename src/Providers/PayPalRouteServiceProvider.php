@@ -28,5 +28,13 @@ class PayPalRouteServiceProvider extends RouteServiceProvider
         $router->get('payPal/expressCheckout', 'PayPal\Controllers\PaymentController@expressCheckout');
 
         $router->post('payPal/notification', 'PayPal\Controllers\PaymentNotificationController@handleNotification');
+
+        $router->post('payPal/settings/', 'PayPal\Controllers\SettingsController@saveSettings');
+        $router->get('payPal/settings/', 'PayPal\Controllers\SettingsController@loadSettings');
+
+        $router->get('payPal/accounts/', 'PayPal\Controllers\SettingsController@loadAccounts');
+        $router->post('payPal/account/', 'PayPal\Controllers\SettingsController@createAccount');
+        $router->put('payPal/account/', 'PayPal\Controllers\SettingsController@updateAccount');
+        $router->delete('payPal/account/', 'PayPal\Controllers\SettingsController@deleteAccount');
     }
 }
