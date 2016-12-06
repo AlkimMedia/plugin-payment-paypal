@@ -8,7 +8,8 @@
 
 namespace PayPal\Controllers;
 
-use PayPal\Services\SettingsService;
+use PayPal\Services\Database\AccountService;
+use PayPal\Services\Database\SettingsService;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
 
@@ -20,12 +21,20 @@ class SettingsController extends Controller
     private $settingsService;
 
     /**
+     * @var AccountService
+     */
+    private $accountService;
+
+    /**
      * SettingsController constructor.
      * @param SettingsService $settingsService
+     * @param AccountService $accountService
      */
-    public function __construct(SettingsService $settingsService)
+    public function __construct(    SettingsService $settingsService,
+                                    AccountService $accountService)
     {
         $this->settingsService = $settingsService;
+        $this->accountService = $accountService;
     }
 
     /**
@@ -36,18 +45,16 @@ class SettingsController extends Controller
         $newAccount = $request->get('account');
         if($newAccount)
         {
-            $accounts = array();
-            $accounts = json_decode($this->settingsService->getSettingsValue(SettingsService::ACCOUNTS), true);
-            $accounts[$newAccount['email']] = $newAccount;
-            $this->settingsService->setSettingsValue(SettingsService::ACCOUNTS, $accounts);
-
-            $this->loadAccounts();
+            if($this->accountService->createAccount($newAccount))
+            {
+                $this->loadAccounts();
+            }
         }
     }
 
     public function loadAccounts()
     {
-        echo $this->settingsService->getSettingsValue(SettingsService::ACCOUNTS);
+        echo $this->accountService->getAccounts();
     }
 
     /**
@@ -55,8 +62,10 @@ class SettingsController extends Controller
      */
     public function loadAccount(Request $request)
     {
-        $accounts = json_decode($this->settingsService->getSettingsValue(SettingsService::ACCOUNTS), true);
-        echo $accounts[$request->get('accountId')];
+        if($request->get('accountId') && $request->get('accountId') > 0)
+        {
+            echo $this->accountService->getAccount($request->get('accountId'));
+        }
     }
 
     /**
@@ -66,15 +75,10 @@ class SettingsController extends Controller
     {
         $updatedAccount = $request->get('accountId');
 
-        $accounts = array();
-        if($updatedAccount)
+        if($this->accountService->updateAccount($updatedAccount))
         {
-            $accounts = json_decode($this->settingsService->getSettingsValue(SettingsService::ACCOUNTS), true);
-            $accounts = array_merge($accounts, $updatedAccount);
-            $this->settingsService->setSettingsValue(SettingsService::ACCOUNTS, $accounts);
+            echo true;
         }
-
-        echo "true";
     }
 
     /**
@@ -85,12 +89,8 @@ class SettingsController extends Controller
         $accountId = $request->get('accountId');
         if($accountId)
         {
-            $accounts = json_decode($this->settingsService->getSettingsValue(SettingsService::ACCOUNTS), true);
-            if(array_key_exists($accountId, $accounts))
+            if($this->accountService->deleteAccount($accountId))
             {
-                unset($accounts[$accountId]);
-                $this->settingsService->setSettingsValue(SettingsService::ACCOUNTS, $accounts);
-
                 $this->loadAccounts();
             }
         }
@@ -101,7 +101,13 @@ class SettingsController extends Controller
      */
     public function saveSettings(Request $request)
     {
-        $this->settingsService->setSettingsValue(SettingsService::SETTINGS, $request->get('settings'));
+        if($request->get('settings'))
+        {
+            if($this->settingsService->saveSettings($request->get('settings')))
+            {
+                echo true;
+            }
+        }
     }
 
     /**
@@ -109,6 +115,6 @@ class SettingsController extends Controller
      */
     public function loadSettings()
     {
-        echo $this->settingsService->getSettingsValue(SettingsService::SETTINGS);
+        echo $this->settingsService->loadSettings();
     }
 }

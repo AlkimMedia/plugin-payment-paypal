@@ -2,20 +2,50 @@
 
 namespace PayPal\Migrations;
 
-use PayPal\Models\Settings;
-use Plenty\Modules\Plugin\DataBase\Contracts\Migrate;
+use Plenty\Modules\Plugin\DynamoDb\Contracts\DynamoDbRepositoryContract;
 
 /**
  * Class CreateSettingsTable
  */
 class CreateSettingsTable
 {
-
     /**
-     * @param Migrate $migrate
+     * @param DynamoDbRepositoryContract $dynamoDbRepositoryContract
      */
-    public function run(Migrate $migrate)
+    public function run(DynamoDbRepositoryContract $dynamoDbRepositoryContract)
     {
-        $migrate->createTable(Settings::class, 10, 20);
+        $dynamoDbRepositoryContract->createTable(
+            'PayPal',
+            'settings',
+            [
+                [
+                    'AttributeName' => 'Webstore',
+                    'AttributeType' => 'N',
+                ]
+            ],
+            [
+                [
+                    'AttributeName' => 'Webstore',
+                    'KeyType'       => 'HASH'
+                ]
+            ]
+        );
+
+        $dynamoDbRepositoryContract->createTable(
+            'PayPal',
+            'accounts',
+            [
+                [
+                    'AttributeName' => 'Email',
+                    'AttributeType' => 'S',
+                ]
+            ],
+            [
+                [
+                    'AttributeName' => 'Email',
+                    'KeyType'       => 'RANGE'
+                ]
+            ]
+        );
     }
 }

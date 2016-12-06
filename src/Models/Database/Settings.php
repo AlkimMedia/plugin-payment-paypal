@@ -1,6 +1,6 @@
 <?php
 
-namespace PayPal\Models;
+namespace PayPal\Models\Database;
 
 use Plenty\Modules\Plugin\DataBase\Contracts\Model;
 
