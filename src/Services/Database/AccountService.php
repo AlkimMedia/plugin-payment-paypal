@@ -2,15 +2,16 @@
 
 namespace PayPal\Services\Database;
 
-use Plenty\Modules\Plugin\DynamoDb\Contracts\DynamoDbRepositoryContract;
+use PayPal\Models\Database\Account;
+use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
 
 class AccountService extends DatabaseBaseService
 {
     protected $tableName = 'settings';
 
-    public function __construct(DynamoDbRepositoryContract $dynamoDbRepositoryContract)
+    public function __construct(DataBase $dataBase)
     {
-        parent::__construct($dynamoDbRepositoryContract);
+        parent::__construct($dataBase);
     }
 
     /**
@@ -20,7 +21,7 @@ class AccountService extends DatabaseBaseService
      */
     public function getAccounts()
     {
-        return json_decode($this->getValue($this->tableName), true);
+        return json_decode($this->getValues($this->tableName), true);
     }
 
     /**
@@ -40,9 +41,9 @@ class AccountService extends DatabaseBaseService
         if($newAccount)
         {
             $accounts = array();
-            $accounts = json_decode($this->getValue($this->tableName), true);
+            $accounts = json_decode($this->getValues($this->tableName), true);
             $accounts[$newAccount['email']] = $newAccount;
-            $this->setValue($this->tableName, $accounts);
+            $this->setValue(pluginApp(Account::class));
             return true;
         }
     }
@@ -52,9 +53,9 @@ class AccountService extends DatabaseBaseService
         $accounts = array();
         if($updatedAccount)
         {
-            $accounts = json_decode($this->getValue($this->tableName), true);
+            $accounts = json_decode($this->getValues($this->tableName), true);
             $accounts = array_merge($accounts, $updatedAccount);
-            $this->setValue($this->tableName, $accounts);
+            $this->setValue(pluginApp(Account::class));
             return true;
         }
     }
@@ -63,11 +64,11 @@ class AccountService extends DatabaseBaseService
     {
         if($accountId)
         {
-            $accounts = json_decode($this->getValue($this->tableName), true);
+            $accounts = json_decode($this->getValues($this->tableName), true);
             if(array_key_exists($accountId, $accounts))
             {
                 unset($accounts[$accountId]);
-                $this->setValue($this->tableName, $accounts);
+                $this->setValue(pluginApp(Account::class));
 
                 return true;
             }

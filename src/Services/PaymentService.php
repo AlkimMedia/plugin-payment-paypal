@@ -278,11 +278,8 @@ class PaymentService
             throw new \Exception($webProfileResult['error_msg']);
         }
 
-        /** @var SettingsService $settingsService */
-        $settingsService = pluginApp(SettingsService::class);
-
         // save the webProfile
-        $settingsService->setSettingsValue(SettingsService::WEB_PROFILE, $webProfileResult);
+//        $settingsService->setSettingsValue(SettingsService::WEB_PROFILE, $webProfileResult);
 
         return $webProfileResult;
     }

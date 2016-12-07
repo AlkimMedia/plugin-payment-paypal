@@ -9,11 +9,11 @@
     "require": [],
     "serviceProvider": "PayPal\\Providers\\PayPalServiceProvider",
     "dependencies":{
-      "paypal/rest-api-sdk-php":"*"
+        "paypal/rest-api-sdk-php":"*"
     },
     "runOnBuild": [
         "PayPal\\Migrations\\CreatePaymentMethod",
-        "PayPal\\Migrations\\CreateSettingsTable"
+        "PayPal\\Migrations\\CreateTables"
     ],
     "dataProviders": [{"key":"PayPal\\Providers\\PayPalExpressButtonDataProvider", "name":"PayPal Express Button", "description": "PayPal Express Button"}]
 }

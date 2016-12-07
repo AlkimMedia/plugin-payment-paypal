@@ -103,10 +103,7 @@ class SettingsController extends Controller
     {
         if($request->get('settings'))
         {
-            if($this->settingsService->saveSettings($request->get('settings')))
-            {
-                echo true;
-            }
+            echo $this->settingsService->saveSettings($request->get('settings'));
         }
     }
 
@@ -115,6 +112,11 @@ class SettingsController extends Controller
      */
     public function loadSettings()
     {
-        echo $this->settingsService->loadSettings();
+        echo json_encode($this->settingsService->loadSettings());
+    }
+
+    public function loadSetting($webstore)
+    {
+        echo json_encode($this->settingsService->loadSetting($webstore));
     }
 }

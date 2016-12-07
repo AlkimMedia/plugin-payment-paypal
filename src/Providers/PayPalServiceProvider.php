@@ -4,6 +4,8 @@ namespace PayPal\Providers;
 
 use Plenty\Modules\EventProcedures\Services\Entries\ProcedureEntry;
 use Plenty\Modules\EventProcedures\Services\EventProceduresService;
+use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
+use Plenty\Modules\Frontend\Events\FrontendShippingCountryChanged;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodContainer;
 use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
@@ -57,11 +59,22 @@ class PayPalServiceProvider extends ServiceProvider
     {
         // Register the PayPal Express payment method in the payment method container
         $payContainer->register('plentyPayPal::PAYPALEXPRESS', PayPalExpressPaymentMethod::class,
-            [ AfterBasketChanged::class, AfterBasketItemAdd::class, AfterBasketCreate::class  ]);
+            [
+                AfterBasketChanged::class,
+                AfterBasketItemAdd::class,
+                AfterBasketCreate::class,
+                FrontendLanguageChanged::class,
+                FrontendShippingCountryChanged::class
+            ]);
 
         // Register the PayPal payment method in the payment method container
         $payContainer->register('plentyPayPal::PAYPAL', PayPalPaymentMethod::class,
-            [ AfterBasketChanged::class, AfterBasketItemAdd::class, AfterBasketCreate::class  ]);
+            [   AfterBasketChanged::class,
+                AfterBasketItemAdd::class,
+                AfterBasketCreate::class,
+                FrontendLanguageChanged::class,
+                FrontendShippingCountryChanged::class
+            ]);
 
         // Register PayPal Refund Event Procedure
         $eventProceduresService->registerProcedure(

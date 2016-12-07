@@ -5,7 +5,7 @@ namespace PayPal\Models\Database;
 use Plenty\Modules\Plugin\DataBase\Contracts\Model;
 
 /**
- * Class Settings
+ * Class Account
  *
  * @property int $id
  * @property string $name
@@ -13,7 +13,7 @@ use Plenty\Modules\Plugin\DataBase\Contracts\Model;
  * @property string $createdAt
  * @property string $updatedAt
  */
-class Settings extends Model
+class Account extends Model
 {
     public $id = 0;
     public $name = '';
@@ -26,6 +26,6 @@ class Settings extends Model
      */
     public function getTableName():string
     {
-        return 'PayPal::settings';
+        return 'PayPal::accounts';
     }
 }

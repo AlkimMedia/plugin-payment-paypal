@@ -7,8 +7,10 @@ use PayPal\Services\Database\SettingsService;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
+use Plenty\Modules\Frontend\Services\SystemService;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodService;
 use Plenty\Plugin\ConfigRepository;
+use Plenty\Modules\Frontend\Contracts\Checkout;
 
 /**
  * Class PayPalPaymentMethod
@@ -20,6 +22,11 @@ class PayPalPaymentMethod extends PaymentMethodService
      * @var BasketRepositoryContract
      */
     private $basketRepo;
+
+    /**
+     * @var Checkout
+     */
+    private $checkout;
 
     /**
      * @var ContactRepositoryContract
@@ -52,6 +59,11 @@ class PayPalPaymentMethod extends PaymentMethodService
     private $addressRepo;
 
     /**
+     * @var SystemService
+     */
+    private $systemService;
+
+    /**
      * PayPalExpressPaymentMethod constructor.
      *
      * @param BasketRepositoryContract $basketRepo
@@ -60,20 +72,26 @@ class PayPalPaymentMethod extends PaymentMethodService
      * @param SettingsService $settingsService
      * @param SessionStorageService $sessionStorageService
      * @param AddressRepositoryContract $addressRepositoryContract
+     * @param Checkout $checkout
+     * @param SystemService $systemService
      */
     public function __construct(BasketRepositoryContract    $basketRepo,
                                 ContactRepositoryContract   $contactRepo,
                                 ConfigRepository            $configRepo,
                                 SettingsService             $settingsService,
                                 SessionStorageService       $sessionStorageService,
-                                AddressRepositoryContract   $addressRepositoryContract)
+                                AddressRepositoryContract   $addressRepositoryContract,
+                                Checkout                    $checkout,
+                                SystemService               $systemService)
     {
         $this->basketRepo       = $basketRepo;
+        $this->checkout         = $checkout;
         $this->contactRepo      = $contactRepo;
         $this->configRepo       = $configRepo;
         $this->settingsService  = $settingsService;
         $this->sessionStorage   = $sessionStorageService;
         $this->addressRepo      = $addressRepositoryContract;
+        $this->systemService    = $systemService;
 
         $this->loadCurrentSettings();
     }
@@ -88,13 +106,10 @@ class PayPalPaymentMethod extends PaymentMethodService
         /**
          * Check the allowed shipping countries
          */
-        $basket = $this->basketRepo->load();
-
-        $shippingCountries = array();
         if(array_key_exists('shippingCountries', $this->settings))
         {
             $shippingCountries = $this->settings['shippingCountries'];
-            if(is_array($shippingCountries) && in_array($basket->shippingCountryId, $shippingCountries))
+            if(is_array($shippingCountries) && in_array($this->checkout->getShippingCountryId(), $shippingCountries))
             {
                 return true;
             }
@@ -139,10 +154,12 @@ class PayPalPaymentMethod extends PaymentMethodService
     {
         $fee = 0;
         $basket = $this->basketRepo->load();
+        $basketAmount = $basket->basketAmount;
 
+        $shippingCountryId = $this->checkout->getShippingCountryId();
         if(array_key_exists('markup', $this->settings) && array_key_exists('webstore', $this->settings['markup']))
         {
-            if($basket->shippingCountryId && $basket->shippingCountryId != 1)
+            if($shippingCountryId && $shippingCountryId != 1)
             {
                 if(array_key_exists('flatForeign', $this->settings['markup']['webstore']))
                 {
@@ -150,7 +167,7 @@ class PayPalPaymentMethod extends PaymentMethodService
                 }
                 if(array_key_exists('percentageForeign', $this->settings['markup']['webstore']))
                 {
-                    $fee += $basket->basketAmount / 100 * $this->settings['markup']['webstore']['percentageForeign'];
+                    $fee += $basketAmount / 100 * $this->settings['markup']['webstore']['percentageForeign'];
                 }
             }
             else
@@ -161,11 +178,10 @@ class PayPalPaymentMethod extends PaymentMethodService
                 }
                 if(array_key_exists('percentageDomestic', $this->settings['markup']['webstore']))
                 {
-                    $fee += $basket->basketAmount / 100 * $this->settings['markup']['webstore']['percentageDomestic'];
+                    $fee += $basketAmount / 100 * $this->settings['markup']['webstore']['percentageDomestic'];
                 }
             }
         }
-
 
         return (float)$fee;
     }
@@ -214,7 +230,7 @@ class PayPalPaymentMethod extends PaymentMethodService
         $settings = json_decode($this->settingsService->loadSettings(), true);
         if(is_array($settings) && count($settings) > 0)
         {
-            $aktStore = 'PID_1000';
+            $aktStore = 'PID_'.$this->systemService->getWebstoreId();
             foreach ($settings as $set)
             {
                 if(array_key_exists($aktStore, $settings))

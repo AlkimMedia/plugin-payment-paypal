@@ -2,7 +2,9 @@
 
 namespace PayPal\Services\Database;
 
+use Illuminate\Support\Facades\App;
 use PayPal\Models\Database\Settings;
+use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
 use Plenty\Modules\Plugin\DynamoDb\Contracts\DynamoDbRepositoryContract;
 
 /**
@@ -17,26 +19,64 @@ class SettingsService extends DatabaseBaseService
      * SettingsService constructor.
      * @param DynamoDbRepositoryContract $dynamoDbRepositoryContract
      */
-    public function __construct(DynamoDbRepositoryContract $dynamoDbRepositoryContract)
+    public function __construct(DataBase $dataBase)
     {
-        parent::__construct($dynamoDbRepositoryContract);
+        parent::__construct($dataBase);
+    }
+
+    public function loadSetting($webstore)
+    {
+        $setting = $this->getValue(Settings::class, $webstore);
+        if($setting instanceof Settings)
+        {
+            return $setting->value;
+        }
+        return null;
     }
 
     public function loadSettings()
     {
-        return $this->getValue($this->tableName);
+        $settings = array();
+        $results = $this->getValues(Settings::class);
+        if(is_array($results))
+        {
+            foreach ($results as $item)
+            {
+                if($item instanceof Settings)
+                {
+                    $settings[] = ['PID_'.$item->id => $item->value];
+                }
+            }
+        }
+        return $settings;
     }
 
     public function saveSettings($settings)
     {
         if($settings)
         {
-            $settings = [
-                'Webstore'      => ['N' => '1000'],
-                'Value'         => ['S' => $settings]
-            ];
+            foreach ($settings as $setting)
+            {
+                foreach ($setting as $store => $values)
+                {
+                    $store = str_replace('PID_', '', $store);
+                    /** @var Settings $settingModel */
+                    $settingModel = pluginApp(Settings::class);
+                    $settingModel->id = $store;
+                    $settingModel->name = 'settings';
+                    $settingModel->value = $values;
+                    $settingModel->updatedAt = date('Y-m-d H:i:s');
 
-            return $this->setValue($this->tableName, $settings);
+                    $this->setValue($settingModel);
+                }
+            }
+
+            return true;
         }
+    }
+
+    public function saveSetting($setting)
+    {
+
     }
 }
