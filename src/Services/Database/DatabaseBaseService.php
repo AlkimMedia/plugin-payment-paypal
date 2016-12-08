@@ -30,18 +30,34 @@ class DatabaseBaseService
         {
             return $this->dataBase->save($model);
         }
+        return false;
+    }
+
+    /**
+     * Delete the give model from the database
+     *
+     * @param Model $model
+     * @return bool
+     */
+    public function deleteValue($model)
+    {
+        if($model instanceof Model)
+        {
+            return $this->dataBase->delete($model);
+        }
+        return false;
     }
 
     /**
      * Get the settings value
      *
-     * @param Model $model
+     * @param string $modelClassName
      * @param mixed $key
      * @return bool|mixed
      */
-    protected function getValue($model, $key)
+    protected function getValue($modelClassName, $key)
     {
-        $result = $this->dataBase->find($model, $key);
+        $result = $this->dataBase->find($modelClassName, $key);
 
         if($result)
         {
@@ -51,12 +67,12 @@ class DatabaseBaseService
     }
 
     /**
-     * @param Model $model
+     * @param string $modelClassName
      * @return bool|string
      */
-    protected function getValues($model, $field='', $value = '', $operator='=')
+    protected function getValues($modelClassName, $field='', $value = '', $operator='=')
     {
-        $query = $this->dataBase->query($model);
+        $query = $this->dataBase->query($modelClassName);
 
         $results = $query->get();
 

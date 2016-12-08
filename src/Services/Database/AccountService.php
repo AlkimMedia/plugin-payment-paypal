@@ -21,7 +21,20 @@ class AccountService extends DatabaseBaseService
      */
     public function getAccounts()
     {
-        return json_decode($this->getValues($this->tableName), true);
+        $accounts = array();
+        $results = $this->getValues(Account::class);
+        if($results)
+        {
+            foreach ($results as $account)
+            {
+                if($account instanceof Account)
+                {
+                    $accounts[$account->id] = $account->value;
+                }
+            }
+        }
+
+        return $accounts;
     }
 
     /**
@@ -30,10 +43,17 @@ class AccountService extends DatabaseBaseService
      * @param $accountId
      * @return array
      */
-    public function getAccount($accountId)
+    public function getAccount($accountId=0)
     {
-        $accounts = $this->getAccounts();
-        return $accounts[$accountId];
+        if($accountId > 0)
+        {
+            $account = $this->getValue(Account::class, $accountId);
+            if($account instanceof Account)
+            {
+                return [$account->id => $account->value];
+            }
+        }
+        return null;
     }
 
     public function createAccount($newAccount)
@@ -41,37 +61,44 @@ class AccountService extends DatabaseBaseService
         if($newAccount)
         {
             $accounts = array();
-            $accounts = json_decode($this->getValues($this->tableName), true);
-            $accounts[$newAccount['email']] = $newAccount;
-            $this->setValue(pluginApp(Account::class));
-            return true;
+            /** @var Account $accountModel */
+            $accountModel = pluginApp(Account::class);
+            $accountModel->name = $newAccount['email'];
+            $accountModel->value = $newAccount;
+            return $this->setValue($accountModel);
         }
+        return false;
     }
 
     public function updateAccount($updatedAccount)
     {
-        $accounts = array();
-        if($updatedAccount)
+        if(is_array($updatedAccount) && count($updatedAccount) > 0)
         {
-            $accounts = json_decode($this->getValues($this->tableName), true);
-            $accounts = array_merge($accounts, $updatedAccount);
-            $this->setValue(pluginApp(Account::class));
+            foreach ($updatedAccount as $accountId => $accountData)
+            {
+                $account = $this->getValue(Account::class, $accountId);
+                if($account instanceof Account)
+                {
+                    $account->value = $accountData;
+                    $account->updatedAt = date('Y-m-d H:i:s');
+                    $this->setValue($account);
+                }
+            }
             return true;
         }
+        return false;
     }
 
     public function deleteAccount($accountId)
     {
-        if($accountId)
+        if($accountId && $accountId > 0)
         {
-            $accounts = json_decode($this->getValues($this->tableName), true);
-            if(array_key_exists($accountId, $accounts))
-            {
-                unset($accounts[$accountId]);
-                $this->setValue(pluginApp(Account::class));
+            /** @var Account $accountModel */
+            $accountModel = pluginApp(Account::class);
+            $accountModel->id = $accountId;
 
-                return true;
-            }
+            return $this->deleteValue($accountModel);
         }
+        return false;
     }
 }

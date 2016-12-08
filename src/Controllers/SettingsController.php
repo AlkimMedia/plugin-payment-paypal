@@ -54,17 +54,17 @@ class SettingsController extends Controller
 
     public function loadAccounts()
     {
-        echo $this->accountService->getAccounts();
+        echo json_encode($this->accountService->getAccounts());
     }
 
     /**
-     * @param Request $request
+     * @param int $accountId
      */
-    public function loadAccount(Request $request)
+    public function loadAccount($accountId)
     {
-        if($request->get('accountId') && $request->get('accountId') > 0)
+        if($accountId && $accountId > 0)
         {
-            echo $this->accountService->getAccount($request->get('accountId'));
+            echo json_encode($this->accountService->getAccount($accountId));
         }
     }
 
@@ -73,12 +73,9 @@ class SettingsController extends Controller
      */
     public function updateAccount(Request $request)
     {
-        $updatedAccount = $request->get('accountId');
+        $updatedAccount = $request->get('account');
 
-        if($this->accountService->updateAccount($updatedAccount))
-        {
-            echo true;
-        }
+        echo $this->accountService->updateAccount($updatedAccount);
     }
 
     /**
@@ -115,6 +112,11 @@ class SettingsController extends Controller
         echo json_encode($this->settingsService->loadSettings());
     }
 
+    /**
+     * Load the settings for one webshop
+     *
+     * @param $webstore
+     */
     public function loadSetting($webstore)
     {
         echo json_encode($this->settingsService->loadSetting($webstore));
