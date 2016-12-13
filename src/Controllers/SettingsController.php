@@ -36,7 +36,7 @@ class SettingsController extends Controller
         $newAccount = $request->get('account');
         if($newAccount)
         {
-            $accounts = array();
+            $accounts = [];
             $accounts = json_decode($this->settingsService->getSettingsValue(SettingsService::ACCOUNTS), true);
             $accounts[$newAccount['email']] = $newAccount;
             $this->settingsService->setSettingsValue(SettingsService::ACCOUNTS, $accounts);
@@ -66,7 +66,7 @@ class SettingsController extends Controller
     {
         $updatedAccount = $request->get('accountId');
 
-        $accounts = array();
+        $accounts = [];
         if($updatedAccount)
         {
             $accounts = json_decode($this->settingsService->getSettingsValue(SettingsService::ACCOUNTS), true);

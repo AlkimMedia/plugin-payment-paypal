@@ -63,7 +63,6 @@ class PaymentController extends Controller
      * @param PaymentService $paymentService
      * @param BasketRepositoryContract $basketContract
      * @param SessionStorageService $sessionStorage
-     * @param ContactService $contactService
      */
     public function __construct(  Request $request,
                                   Response $response,
