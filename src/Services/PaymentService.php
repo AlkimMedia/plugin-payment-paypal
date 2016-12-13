@@ -326,6 +326,7 @@ class PaymentService
         /** @var \Plenty\Modules\Item\Item\Contracts\ItemRepositoryContract $itemContract */
         $itemContract = pluginApp(\Plenty\Modules\Item\Item\Contracts\ItemRepositoryContract::class);
 
+        /** declarce the variable as array */
         $payPalRequestParams['basketItems'] = [];
 
         /** @var BasketItem $basketItem */
@@ -358,6 +359,7 @@ class PaymentService
             {
                 $shippingAddress = $this->addressRepo->findAddressById($shippingAddressId);
 
+                /** declarce the variable as array */
                 $payPalRequestParams['shippingAddress'] = [];
                 $payPalRequestParams['shippingAddress']['town']           = $shippingAddress->town;
                 $payPalRequestParams['shippingAddress']['postalCode']     = $shippingAddress->postalCode;
