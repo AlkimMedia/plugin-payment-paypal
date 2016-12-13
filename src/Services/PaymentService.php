@@ -323,6 +323,9 @@ class PaymentService
         /** @var \Plenty\Modules\Item\Item\Contracts\ItemRepositoryContract $itemContract */
         $itemContract = pluginApp(\Plenty\Modules\Item\Item\Contracts\ItemRepositoryContract::class);
 
+        /** declarce the variable as array */
+        $payPalRequestParams['basketItems'] = [];
+
         /** @var BasketItem $basketItem */
         foreach($basket->basketItems as $basketItem)
         {
@@ -353,6 +356,8 @@ class PaymentService
             {
                 $shippingAddress = $this->addressRepo->findAddressById($shippingAddressId);
 
+                /** declarce the variable as array */
+                $payPalRequestParams['shippingAddress'] = [];
                 $payPalRequestParams['shippingAddress']['town']           = $shippingAddress->town;
                 $payPalRequestParams['shippingAddress']['postalCode']     = $shippingAddress->postalCode;
                 $payPalRequestParams['shippingAddress']['firstname']      = $shippingAddress->firstName;
@@ -366,6 +371,7 @@ class PaymentService
         $countryRepo = pluginApp(\Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract::class);
 
         // Fill the country for PayPal parameters
+        $country = [];
         $country['isoCode2'] = $countryRepo->findIsoCode($basket->shippingCountryId, 'iso_code_2');
         $payPalRequestParams['country'] = $country;
 
@@ -380,7 +386,7 @@ class PaymentService
      */
     private function getApiContextParams()
     {
-        $apiContextParams = array();
+        $apiContextParams = [];
         $apiContextParams['clientSecret'] = $this->config->get('PayPal.clientSecret');
         $apiContextParams['clientId'] = $this->config->get('PayPal.clientId');
 

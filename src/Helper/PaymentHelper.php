@@ -153,7 +153,7 @@ class PaymentHelper
 
         $domain = $webstoreConfig->domainSsl;
 
-        $urls = array();
+        $urls = [];
 
         switch($mode)
         {
@@ -203,7 +203,7 @@ class PaymentHelper
             $payment->unaccountable = $paymentData['unaccountable'];
         }
 
-        $paymentProperty = array();
+        $paymentProperty = [];
 
         /**
          * Add payment property with type booking text
