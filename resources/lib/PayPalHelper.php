@@ -21,12 +21,10 @@ class PayPalHelper
         if($sandbox)
         {
             $mode = 'sandbox';
-            $endpoint = "https://api.sandbox.paypal.com";
         }
         else
         {
             $mode = 'live';
-            $endpoint = "https://api.paypal.com";
         }
 
         /** @var ApiContext $apiContext */
@@ -36,7 +34,6 @@ class PayPalHelper
 
         $apiContext->setConfig(
             array(  'mode'              => $mode,
-                    'service.EndPoint'  => $endpoint,
                     'log.LogEnabled'    => false,
                     'cache.enabled'     => false,));
 
