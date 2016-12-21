@@ -1,19 +1,28 @@
 {
-    "version": 1.0,
     "name": "PayPal",
-    "description": "The official PayPal plugin for plentymarkets",
-    "author": "plentymarkets GmbH",
-    "keywords": ["paypal", "official", "plentymarkets", "payment"],
-    "type": "payment",
     "namespace": "PayPal",
-    "require": [],
+    "type": "payment",
+    "version": "1.0.0",
+    "licences": "",
+    "pluginIcon": "",
+    "price": "0",
+    "description": "The official PayPal plugin for plentymarkets",
+    "shortDescription": "The official PayPal plugin for plentymarkets",
+    "keywords": ["paypal", "official", "plentymarkets", "payment"],
+    "author": "plentymarkets GmbH",
+    "authorIcon": "",
+    "email": "payment@plentymarkets.eu",
+    "phone": "",
     "serviceProvider": "PayPal\\Providers\\PayPalServiceProvider",
+    "containers": [],
+    "dataProviders": [{"key":"PayPal\\Providers\\PayPalExpressButtonDataProvider", "name":"PayPal Express Button", "description": "PayPal Express Button"}],
+    "javaScriptFiles": [],
+    "require": [],
     "dependencies":{
       "paypal/rest-api-sdk-php":"*"
     },
     "runOnBuild": [
         "PayPal\\Migrations\\CreatePaymentMethod",
         "PayPal\\Migrations\\CreateSettingsTable"
-    ],
-    "dataProviders": [{"key":"PayPal\\Providers\\PayPalExpressButtonDataProvider", "name":"PayPal Express Button", "description": "PayPal Express Button"}]
+    ]
 }
