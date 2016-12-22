@@ -315,7 +315,11 @@ class PaymentService
         $payPalRequestParams = $this->getApiContextParams();
 
         // Set the PayPal Web Profile ID
-        $payPalRequestParams['webProfileId'] = $this->config->get('PayPal.webProfileID');
+        $webProfilId = $this->config->get('PayPal.webProfileID');
+        if(isset($webProfilId) && strlen($webProfilId) > 0 )
+        {
+            $payPalRequestParams['webProfileId'] = $webProfilId;
+        }
 
         /** @var Basket $basket */
         $payPalRequestParams['basket'] = $basket;
