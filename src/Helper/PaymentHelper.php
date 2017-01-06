@@ -20,8 +20,14 @@ use PayPal\Services\SessionStorageService;
  */
 class PaymentHelper
 {
+    const PAYMENTKEY_PAYPAL = 'PAYPAL';
+    const PAYMENTKEY_PAYPALEXPRESS = 'PAYPALEXPRESS';
+    const PAYMENTKEY_PAYPALPLUS = 'PAYPALPLUS';
+    const PAYMENTKEY_PAYPALINSTALLMENT = 'PAYPALINSTALLMENT';
+
     const MODE_PAYPAL = 'paypal';
     const MODE_PAYPALEXPRESS = 'paypalexpress';
+    const MODE_PAYPAL_PLUS = 'plus';
 
     /**
      * @var PaymentMethodRepositoryContract
@@ -84,47 +90,21 @@ class PaymentHelper
         $this->statusMap                                = array();
     }
 
-    /**
-     * Get the ID of the PayPal payment method
-     *
-     * @return mixed
-     */
-    public function getPayPalMopId()
+    public function getPayPalMopIdByPaymentKey($paymentKey)
     {
-        // List all payment methods for the given plugin
-        $paymentMethods = $this->paymentMethodRepository->allForPlugin('plentyPayPal');
-
-        if( !is_null($paymentMethods) )
+        if(strlen($paymentKey))
         {
-            foreach($paymentMethods as $paymentMethod)
+            // List all payment methods for the given plugin
+            $paymentMethods = $this->paymentMethodRepository->allForPlugin('plentyPayPal');
+
+            if( !is_null($paymentMethods) )
             {
-                if($paymentMethod->paymentKey == 'PAYPAL')
+                foreach($paymentMethods as $paymentMethod)
                 {
-                    return $paymentMethod->id;
-                }
-            }
-        }
-
-        return 'no_paymentmethod_found';
-    }
-
-    /**
-     * Get the ID of the PayPal Express payment method
-     *
-     * @return mixed
-     */
-    public function getPayPalExpressMopId()
-    {
-        // List all payment methods for the given plugin
-        $paymentMethods = $this->paymentMethodRepository->allForPlugin('plentyPayPal');
-
-        if( !is_null($paymentMethods) )
-        {
-            foreach($paymentMethods as $paymentMethod)
-            {
-                if($paymentMethod->paymentKey == 'PAYPALEXPRESS')
-                {
-                    return $paymentMethod->id;
+                    if($paymentMethod->paymentKey == $paymentKey)
+                    {
+                        return $paymentMethod->id;
+                    }
                 }
             }
         }
@@ -152,11 +132,16 @@ class PaymentHelper
         }
 
         $domain = $webstoreConfig->domainSsl;
+        if($domain == 'http://dbmaster.plenty-showcase.de')
+        {
+            $domain = 'http://master.plentymarkets.com';
+        }
 
         $urls = [];
 
         switch($mode)
         {
+            case self::MODE_PAYPAL_PLUS:
             case self::MODE_PAYPAL:
                 $urls['success'] = $domain.'/payPal/checkoutSuccess';
                 $urls['cancel'] = $domain.'/payPal/checkoutCancel';
@@ -181,7 +166,7 @@ class PaymentHelper
         /** @var Payment $payment */
         $payment = pluginApp( \Plenty\Modules\Payment\Models\Payment::class );
 
-        $payment->mopId             = (int)$this->getPayPalMopId();
+        $payment->mopId             = (int)$this->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPAL);
         $payment->transactionType   = 2; //Payment::TRANSACTION_TYPE_BOOKED_POSTING;
         $payment->status            = $this->mapStatus($paymentData['status']);
         $payment->currency          = $paymentData['currency'];

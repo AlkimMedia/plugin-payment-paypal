@@ -41,8 +41,8 @@ class RefundEventProcedure
             /** @var Payment $payment */
             foreach($payments as $payment)
             {
-                if($payment->mopId == $paymentHelper->getPayPalMopId()
-                OR $payment->mopId == $paymentHelper->getPayPalExpressMopId())
+                if($payment->mopId == $paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPAL)
+                OR $payment->mopId == $paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALEXPRESS))
                 {
                     // the paypal transactionsId is mandatory for the paypal refund
                     $properties = $payment->property;

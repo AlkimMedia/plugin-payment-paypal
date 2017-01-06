@@ -111,7 +111,7 @@ class PaymentService
      *
      * @param Basket $basket
      * @param string $mode
-     * @return string
+     * @return string|array
      */
     public function getPaymentContent(Basket $basket, $mode = ''):string
     {
@@ -346,28 +346,35 @@ class PaymentService
             $payPalRequestParams['basketItems'][] = $basketItem;
         }
 
-        // Read the shipping address ID from the session
-        $shippingAddressId = $this->sessionStorage->getSessionValue(SessionStorageService::DELIVERY_ADDRESS_ID);
-
-        if(!is_null($shippingAddressId))
+        /**
+         * Don't send the address to paypal when using paypal plus during the first request
+         * The Shipping address will be set during update payment
+         */
+        if($mode != PaymentHelper::MODE_PAYPAL_PLUS && $mode != PaymentHelper::MODE_PAYPALEXPRESS)
         {
-            if($shippingAddressId == -99)
-            {
-                $shippingAddressId = $this->sessionStorage->getSessionValue(SessionStorageService::BILLING_ADDRESS_ID);
-            }
+            // Read the shipping address ID from the session
+            $shippingAddressId = $this->sessionStorage->getSessionValue(SessionStorageService::DELIVERY_ADDRESS_ID);
 
             if(!is_null($shippingAddressId))
             {
-                $shippingAddress = $this->addressRepo->findAddressById($shippingAddressId);
+                if($shippingAddressId == -99)
+                {
+                    $shippingAddressId = $this->sessionStorage->getSessionValue(SessionStorageService::BILLING_ADDRESS_ID);
+                }
 
-                /** declarce the variable as array */
-                $payPalRequestParams['shippingAddress'] = [];
-                $payPalRequestParams['shippingAddress']['town']           = $shippingAddress->town;
-                $payPalRequestParams['shippingAddress']['postalCode']     = $shippingAddress->postalCode;
-                $payPalRequestParams['shippingAddress']['firstname']      = $shippingAddress->firstName;
-                $payPalRequestParams['shippingAddress']['lastname']       = $shippingAddress->lastName;
-                $payPalRequestParams['shippingAddress']['street']         = $shippingAddress->street;
-                $payPalRequestParams['shippingAddress']['houseNumber']    = $shippingAddress->houseNumber;
+                if(!is_null($shippingAddressId))
+                {
+                    $shippingAddress = $this->addressRepo->findAddressById($shippingAddressId);
+
+                    /** declarce the variable as array */
+                    $payPalRequestParams['shippingAddress'] = [];
+                    $payPalRequestParams['shippingAddress']['town']           = $shippingAddress->town;
+                    $payPalRequestParams['shippingAddress']['postalCode']     = $shippingAddress->postalCode;
+                    $payPalRequestParams['shippingAddress']['firstname']      = $shippingAddress->firstName;
+                    $payPalRequestParams['shippingAddress']['lastname']       = $shippingAddress->lastName;
+                    $payPalRequestParams['shippingAddress']['street']         = $shippingAddress->street;
+                    $payPalRequestParams['shippingAddress']['houseNumber']    = $shippingAddress->houseNumber;
+                }
             }
         }
 
@@ -388,7 +395,7 @@ class PaymentService
     /**
      * @return array
      */
-    private function getApiContextParams()
+    public function getApiContextParams()
     {
         $apiContextParams = [];
         $apiContextParams['clientSecret'] = $this->config->get('PayPal.clientSecret');

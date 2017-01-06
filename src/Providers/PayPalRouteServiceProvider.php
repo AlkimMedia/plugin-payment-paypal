@@ -29,6 +29,9 @@ class PayPalRouteServiceProvider extends RouteServiceProvider
 
         $router->post('payPal/notification', 'PayPal\Controllers\PaymentNotificationController@handleNotification');
 
+        /**
+         * Routes for the PayPal Settings
+         */
         $router->post('payPal/settings/', 'PayPal\Controllers\SettingsController@saveSettings');
         $router->get('payPal/settings/', 'PayPal\Controllers\SettingsController@loadSettings');
         $router->get('payPal/setting/{webstore}', 'PayPal\Controllers\SettingsController@loadSetting');
@@ -38,5 +41,10 @@ class PayPalRouteServiceProvider extends RouteServiceProvider
         $router->post('payPal/account/', 'PayPal\Controllers\SettingsController@createAccount');
         $router->put('payPal/account/', 'PayPal\Controllers\SettingsController@updateAccount');
         $router->delete('payPal/account/', 'PayPal\Controllers\SettingsController@deleteAccount');
+
+        /**
+         * Routes for the PayPal Plus Wall and Checkout
+         */
+
     }
 }
