@@ -9,6 +9,7 @@
 namespace PayPal\Services;
 
 
+use PayPal\Api\Payment;
 use PayPal\Helper\PaymentHelper;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
@@ -50,6 +51,11 @@ class PayPalPlusService
     private $frontendPaymentMethodRepositoryContract;
 
     /**
+     * @var PaymentHelper
+     */
+    private $paymentHelper;
+
+    /**
      * PayPalPlusService constructor.
      * @param PaymentService $paymentService
      * @param LibraryCallContract $libraryCallContract
@@ -61,7 +67,8 @@ class PayPalPlusService
                                     LibraryCallContract $libraryCallContract,
                                     SessionStorageService $sessionStorage,
                                     AddressRepositoryContract $addressRepo,
-                                    FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepositoryContract
+                                    FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepositoryContract,
+                                    PaymentHelper $paymentHelper
                                     )
     {
         $this->paymentService = $paymentService;
@@ -69,6 +76,7 @@ class PayPalPlusService
         $this->sessionStorage = $sessionStorage;
         $this->addressRepo = $addressRepo;
         $this->frontendPaymentMethodRepositoryContract = $frontendPaymentMethodRepositoryContract;
+        $this->paymentHelper = $paymentHelper;
     }
 
     /**
@@ -93,20 +101,31 @@ class PayPalPlusService
              */
             $currentPaymentMethods = $this->frontendPaymentMethodRepositoryContract->getCurrentPaymentMethodsList();
             $thirdPartyPaymentMethods = [];
+            $changeCase = [];
             if(is_array($currentPaymentMethods) && count($currentPaymentMethods) > 0)
             {
                 /** @var PaymentMethod $paymentMethod */
                 foreach ($currentPaymentMethods as $paymentMethod)
                 {
+                    if($paymentMethod->id == $this->paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALPLUS))
+                    {
+                        continue;
+                    }
                     $thirdPartyPaymentMethods[] = [
+                        'redirectUrl'   => 'https://master.plentymarkets.com/checkout/',
                         'methodName'    => $this->frontendPaymentMethodRepositoryContract->getPaymentMethodName($paymentMethod, 'de'),
-                        'imageUrl'      => $this->frontendPaymentMethodRepositoryContract->getPaymentMethodIcon($paymentMethod, 'de'),
+                        'imageUrl'      => 'https://master.plentymarkets.com/'.$this->frontendPaymentMethodRepositoryContract->getPaymentMethodIcon($paymentMethod, 'de'),
                         'description'   => $this->frontendPaymentMethodRepositoryContract->getPaymentMethodDescription($paymentMethod, 'de')
                     ];
+
+                    $changeCase[] = 'case "'.$this->frontendPaymentMethodRepositoryContract->getPaymentMethodName($paymentMethod, 'de').'": $.post("payPalPlus/changePaymentMethod/", { "paymentMethod" : "'.$paymentMethod->id.'" } ); break;';
                 }
             }
 
             $content = '<script src="https://www.paypalobjects.com/webstatic/ppplus/ppplus.min.js" type="text/javascript"></script>
+                                <header class="m-b-1">
+                                    <h3>Zahlungsart</h3>
+                                </header>
                                 <div id="ppplus"> </div>
                                 <script type="application/javascript"> var ppp = PAYPAL.apps.PPP({
                                         "approvalUrl": "'.$approvalUrl.'", 
@@ -115,7 +134,24 @@ class PayPalPlusService
                                         "country": "'.$country.'",
                                         "buttonLocation" : "outside",
                                         "language" : "'.$language.'",
-                                        "thirdPartyPaymentMethods" : '.json_encode($thirdPartyPaymentMethods).'
+                                        "showPuiOnSandbox": true,
+                                        "showLoadingIndicator": true,';
+
+            if(is_array($thirdPartyPaymentMethods) && count($thirdPartyPaymentMethods) > 0)
+            {
+                $content .= '           "thirdPartyPaymentMethods" : '.json_encode($thirdPartyPaymentMethods).',
+                                        "enableContinue": function(){
+                                            switch (ppp.getPaymentMethod())
+                                            {
+                                                '.implode("\n",$changeCase).'
+                                                default:
+                                                    $.post("payPalPlus/changePaymentMethod/", { "paymentMethod" : "'.$this->paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALPLUS).'" } );
+                                                    break;
+                                            }
+                                        },';
+            }
+
+            $content .= '
                                      });
                                 </script>';
         }

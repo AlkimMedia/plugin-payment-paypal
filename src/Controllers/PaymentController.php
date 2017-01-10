@@ -147,4 +147,23 @@ class PaymentController extends Controller
         return $this->response->redirectTo($redirectURL);
     }
 
+    /**
+     * Change the payment method in the basket when user select a none paypal plus method
+     *
+     * @param $paymentMethod
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function changePaymentMethod(Request $request)
+    {
+        $paymentMethod = $request->get('paymentMethod');
+        if(isset($paymentMethod) && $paymentMethod > 0)
+        {
+            $basket = $this->basketContract->load();
+            $basket->methodOfPaymentId = $paymentMethod;
+
+            // TODO change to setter
+            $this->sessionStorage->setSessionValue('MethodOfPaymentID', $paymentMethod);
+        }
+    }
+
 }

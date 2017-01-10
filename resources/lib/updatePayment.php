@@ -11,6 +11,7 @@ $apiContext = PayPalHelper::getApiContext(  SdkRestApi::getParam('clientId', tru
                                             SdkRestApi::getParam('sandbox', true));
 
 $paymentId =  SdkRestApi::getParam('paymentId', true);
+$result = false;
 
 if(isset($paymentId))
 {
@@ -18,14 +19,17 @@ if(isset($paymentId))
 
     if($createdPayment instanceof Payment)
     {
+        $patches = [];
+
         /**
          * Upadate Shipping Address
          */
         $address = SdkRestApi::getParam('shippingAddress');
         $country = SdkRestApi::getParam('country');
 
-        $patchAdd = new Patch();
-        $patchAdd->
+
+        $patchAddress = new Patch();
+        $patchAddress->
             setOp('add')->
             setPath('/transactions/0/item_list/shipping_address')->
             setValue(json_decode('{
@@ -36,18 +40,16 @@ if(isset($paymentId))
                                     "country_code": "'.$country['isoCode2'].'"
                                 }')
                     );
-
-        /**
-         * Update Items
-         */
-        $basket         = SdkRestApi::getParam('basket');
-        $basketItems    = SdkRestApi::getParam('basketItems');
+        $patches[] = $patchAddress;
 
         /**
          * Upadate Total Amount
          */
-        $patchReplace = new Patch();
-        $patchReplace->
+        $basket         = SdkRestApi::getParam('basket');
+
+
+        $patchAmount = new Patch();
+        $patchAmount->
             setOp('replace')->
             setPath('/transactions/0/amount')->
             setValue(json_decode('{
@@ -60,23 +62,25 @@ if(isset($paymentId))
                                     }
                                 }')
                     );
+
+        $patches[] = $patchAmount;
+
+        $patchRequest = new PatchRequest();
+        $patchRequest->setPatches($patches);
+
+        try
+        {
+            $result = $createdPayment->update($patchRequest, $apiContext);
+        }
+        catch (PayPal\Exception\PPConnectionException $ex)
+        {
+            return json_decode($ex->getData());
+        }
+        catch (Exception $e)
+        {
+            return json_decode($e->getData());
+        }
     }
-}
-
-$patchRequest = new PatchRequest();
-$patchRequest->setPatches(array($patchReplace, $patchAdd));
-
-try
-{
-    $result = $createdPayment->update($patchRequest, $apiContext);
-}
-catch (PayPal\Exception\PPConnectionException $ex)
-{
-    return json_decode($ex->getData());
-}
-catch (Exception $e)
-{
-    return json_decode($e->getData());
 }
 
 if ($result == true)
