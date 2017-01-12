@@ -4,6 +4,7 @@ namespace PayPal\Providers;
 
 use PayPal\Methods\PayPalInstallmentPaymentMethod;
 use PayPal\Methods\PayPalPlusPaymentMethod;
+use PayPal\Services\PayPalInstallmentService;
 use PayPal\Services\PayPalPlusService;
 use Plenty\Modules\EventProcedures\Services\Entries\ProcedureEntry;
 use Plenty\Modules\EventProcedures\Services\EventProceduresService;
@@ -50,6 +51,7 @@ class PayPalServiceProvider extends ServiceProvider
      * @param PaymentHelper            $paymentHelper
      * @param PaymentService           $paymentService
      * @param PayPalPlusService        $payPalPlusService
+     * @param PayPalInstallmentService $payPalInstallmentService
      * @param BasketRepositoryContract $basket
      * @param PaymentMethodContainer   $payContainer
      * @param EventProceduresService   $eventProceduresService
@@ -58,6 +60,7 @@ class PayPalServiceProvider extends ServiceProvider
                             PaymentHelper $paymentHelper,
                             PaymentService $paymentService,
                             PayPalPlusService $payPalPlusService,
+                            PayPalInstallmentService $payPalInstallmentService,
                             BasketRepositoryContract $basket,
                             PaymentMethodContainer $payContainer,
                             EventProceduresService $eventProceduresService)
@@ -107,9 +110,20 @@ class PayPalServiceProvider extends ServiceProvider
                 'en' => 'Refund the PayPal-Payment'],
             '\PayPal\Procedures\RefundEventProcedure@run');
 
+        // Listen for the basket changed event
+        $eventDispatcher->listen(AfterBasketChanged::class,
+            function (AfterBasketChanged $event) use ($paymentHelper, $eventDispatcher)
+            {
+                $basket = $event->getBasket();
+                if($basket->methodOfPaymentId == $paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALPLUS))
+                {
+
+                }
+            });
+
         // Listen for the event that gets the payment method content
         $eventDispatcher->listen(GetPaymentMethodContent::class,
-            function(GetPaymentMethodContent $event) use( $paymentHelper,  $basket,  $paymentService, $payPalPlusService)
+            function(GetPaymentMethodContent $event) use( $paymentHelper,  $basket,  $paymentService, $payPalPlusService, $payPalInstallmentService)
             {
                 if($event->getMop() == $paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPAL))
                 {
@@ -124,6 +138,13 @@ class PayPalServiceProvider extends ServiceProvider
                     $basket = $basket->load();
                     $event->setValue($payPalPlusService->updatePayment($basket));
                     $event->setType($payPalPlusService->getReturnType());
+                }
+                elseif ($event->getMop() == $paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALINSTALLMENT))
+                {
+                    $basket = $basket->load();
+                    $event->setValue($payPalInstallmentService->getPaymentContent($basket));
+                    $event->setType($payPalInstallmentService->getReturnType());
+
                 }
             });
 

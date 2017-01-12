@@ -28,6 +28,7 @@ class PaymentHelper
     const MODE_PAYPAL = 'paypal';
     const MODE_PAYPALEXPRESS = 'paypalexpress';
     const MODE_PAYPAL_PLUS = 'plus';
+    const MODE_PAYPAL_INSTALLMENT = 'installment';
 
     /**
      * @var PaymentMethodRepositoryContract
@@ -142,6 +143,7 @@ class PaymentHelper
         switch($mode)
         {
             case self::MODE_PAYPAL_PLUS:
+            case self::MODE_PAYPAL_INSTALLMENT:
             case self::MODE_PAYPAL:
                 $urls['success'] = $domain.'/payPal/checkoutSuccess';
                 $urls['cancel'] = $domain.'/payPal/checkoutCancel';

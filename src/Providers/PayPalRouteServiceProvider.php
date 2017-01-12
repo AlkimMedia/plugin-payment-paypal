@@ -46,5 +46,10 @@ class PayPalRouteServiceProvider extends RouteServiceProvider
          * Routes for the PayPal Plus Wall and Checkout
          */
         $router->post('payPalPlus/changePaymentMethod/', 'PayPal\Controllers\PaymentController@changePaymentMethod');
+
+        /**
+         * Routes for the PayPal Installment
+         */
+        $router->get('payPalInstallment/financingOptions/{amount}', 'PayPal\Controllers\PaymentController@calculateFinancingOptions');
     }
 }

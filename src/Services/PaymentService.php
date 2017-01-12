@@ -310,7 +310,7 @@ class PaymentService
      * @param String $mode
      * @return array
      */
-    private function getPaypalParams(Basket $basket = null, $mode)
+    public function getPaypalParams(Basket $basket = null, $mode)
     {
         $payPalRequestParams = $this->getApiContextParams();
 
@@ -353,13 +353,13 @@ class PaymentService
         if($mode != PaymentHelper::MODE_PAYPAL_PLUS && $mode != PaymentHelper::MODE_PAYPALEXPRESS)
         {
             // Read the shipping address ID from the session
-            $shippingAddressId = $this->sessionStorage->getSessionValue(SessionStorageService::DELIVERY_ADDRESS_ID);
+            $shippingAddressId = $basket->customerShippingAddressId;
 
             if(!is_null($shippingAddressId))
             {
                 if($shippingAddressId == -99)
                 {
-                    $shippingAddressId = $this->sessionStorage->getSessionValue(SessionStorageService::BILLING_ADDRESS_ID);
+                    $shippingAddressId = $basket->customerInvoiceAddressId;
                 }
 
                 if(!is_null($shippingAddressId))

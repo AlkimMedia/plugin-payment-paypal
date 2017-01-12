@@ -1,0 +1,37 @@
+<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+
+<div class="wrapper paypal-installment-specific-promotion text-md-center" style="border: 2px solid #009CDE; border-radius: 10px; padding: 5px;">
+    {% if basketAmount < 99 or basketAmount > 5000 %}
+        <p>Finanzierung verfügbar ab 99€ bis 5.000€<br>Warenwert mit</p>
+    {% else %}
+        <p>Sie können diesen Warenkorb auch finanzieren mit</p>
+    {% endif %}
+    <img class="img-fluid" src="{{ plugin_path('PayPal') }}/images/buttons/installment/HorizontalLockup/FullColor/pp_credit-german_h_rgb.png" />
+    {% if basketAmount < 99.99 or basketAmount > 5000 %}
+    {% else %}
+        <a href="#" data-toggle="modal" data-target="#installmentSpecificPromotionModal">Informationen zu Möglichen Raten</a>
+
+        <!-- Modal -->
+        <div class="modal fade" id="installmentSpecificPromotionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content" style="border: 2px solid #009CDE; border-radius: 10px; padding-top: 30px; padding-bottom: 30px;">
+                    <div class="modal-body">Loading ...</div>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            $(function () {
+                $('#installmentSpecificPromotionModal').on('show.bs.modal', function () {
+                    $.get("http://master.plentymarkets.com/payPalInstallment/financingOptions/{{ basketAmount }}", function(data)
+                    {
+                        $('#installmentSpecificPromotionModal .modal-content').html(data);
+                    });
+                });
+                $('#installmentSpecificPromotionModal').on('hidden.bs.modal', function () {
+                    $('#installmentSpecificPromotionModal .modal-content').html('<div class="modal-body">Loading ...</div>');
+                });
+            });
+        </script>
+    {% endif %}
+</div>

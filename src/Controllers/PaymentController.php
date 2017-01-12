@@ -2,7 +2,10 @@
 
 namespace PayPal\Controllers;
 
+use PayPal\Services\PayPalInstallmentService;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
+use Plenty\Modules\Frontend\Contracts\Checkout;
+use Plenty\Modules\Plugin\Libs\Contracts\LibraryCallContract;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
@@ -11,6 +14,7 @@ use Plenty\Plugin\Http\Response;
 use PayPal\Services\SessionStorageService;
 use Paypal\Services\PaymentService;
 use PayPal\Helper\PaymentHelper;
+use Plenty\Plugin\Templates\Twig;
 
 /**
  * Class PaymentController
@@ -153,16 +157,34 @@ class PaymentController extends Controller
      * @param $paymentMethod
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function changePaymentMethod(Request $request)
+    public function changePaymentMethod(Checkout $checkout, Request $request)
     {
         $paymentMethod = $request->get('paymentMethod');
         if(isset($paymentMethod) && $paymentMethod > 0)
         {
-            $basket = $this->basketContract->load();
-            $basket->methodOfPaymentId = $paymentMethod;
+            $checkout->setPaymentMethodId($paymentMethod);
 
             // TODO change to setter
             $this->sessionStorage->setSessionValue('MethodOfPaymentID', $paymentMethod);
+        }
+    }
+
+    public function calculateFinancingOptions(PayPalInstallmentService $payPalInstallmentService, Twig $twig, $amount)
+    {
+        if($amount > 99 && $amount < 5000)
+        {
+            $qualifyingFinancingOptions = [];
+            $financingOptions = $payPalInstallmentService->getFinancingOptions($amount);
+
+            if(is_array($financingOptions) && array_key_exists('financing_options', $financingOptions))
+            {
+                if(is_array($financingOptions['financing_options'][0]) && is_array(($financingOptions['financing_options'][0]['qualifying_financing_options'])))
+                {
+                    $qualifyingFinancingOptions = $financingOptions['financing_options'][0]['qualifying_financing_options'];
+                }
+            }
+
+            return $twig->render('PayPal::PayPalInstallment.InstallmentOverlay', ['basketAmount'=>$amount, 'financingOptions'=>$qualifyingFinancingOptions]);
         }
     }
 

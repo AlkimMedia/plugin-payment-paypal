@@ -24,7 +24,7 @@ class PayPalInstallmentPaymentMethod extends PaymentMethodService
      */
     public function isActive()
     {
-        return false;
+        return true;
     }
 
     /**
