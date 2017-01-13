@@ -153,7 +153,8 @@ class PayPalServiceProvider extends ServiceProvider
             function(ExecutePayment $event) use ( $paymentHelper, $paymentService)
             {
                 if( $event->getMop() == $paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPAL) ||
-                    $event->getMop() == $paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALPLUS))
+                    $event->getMop() == $paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALPLUS) ||
+                    $event->getMop() == $paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALINSTALLMENT) )
                 {
                     // Execute the payment
                     $payPalPaymentData = $paymentService->executePayment();
