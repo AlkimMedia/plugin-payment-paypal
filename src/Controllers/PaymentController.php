@@ -184,7 +184,7 @@ class PaymentController extends Controller
                 }
             }
 
-            return $twig->render('PayPal::PayPalInstallment.InstallmentOverlay', ['basketAmount'=>$amount, 'financingOptions'=>$qualifyingFinancingOptions]);
+            return $twig->render('PayPal::PayPalInstallment.InstallmentOverlay', ['basketAmount'=>$amount, 'financingOptions'=>$qualifyingFinancingOptions, 'merchantName'=>'Testfirma', 'merchantAddress'=>'Teststraße 1, 34117 Kassel']);
         }
     }
 

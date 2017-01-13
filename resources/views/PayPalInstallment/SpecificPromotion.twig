@@ -1,12 +1,50 @@
 <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 
-<div class="wrapper paypal-installment-specific-promotion text-md-center" style="border: 2px solid #009CDE; border-radius: 10px; padding: 5px;">
+<div class="wrapper paypal-installment-specific-promotion">
     {% if basketAmount < 99 or basketAmount > 5000 %}
-        <p>Finanzierung verfügbar ab 99€ bis 5.000€<br>Warenwert mit</p>
+        <h4 style="text-align: center">Finanzierung verfügbar ab 99€ bis 5.000€<br>Warenwert mit</h4>
+        <img class="img-fluid" src="{{ plugin_path('PayPal') }}/images/buttons/installment/HorizontalLockup/FullColor/pp_credit-german_h_rgb.png" />
     {% else %}
-        <p>Sie können diesen Warenkorb auch finanzieren mit</p>
+        {% if financingOptions is not empty %}
+            {% if financingOptions.credit_financing.apr == '0.00' %}
+                <h4 style="text-align: center">Finanzierung ab {{ financingOptions.monthly_payment.value }} € im Monat mit</h4>
+                <img class="img-fluid" src="{{ plugin_path('PayPal') }}/images/buttons/installment/HorizontalLockup/FullColor/pp_credit-german_h_rgb.png" />
+            {% else %}
+                <b style="font-weight: bold; text-align: left">Finanzierung ab {{ financingOptions.monthly_payment.value }} € in {{ financingOptions.credit_financing.term }} monatlichen Raten<br>mit Ratenzahlung Powered by PayPal</b><br>
+                Repräsentatives Beispiel gem. § 6a PAngV:
+                <div class="paypal-installment-specific-promotion-financing-option">
+                    <table>
+                        <tr>
+                            <td>Nettodarlehensbetrag:</td>
+                            <td>{{ basketAmount|number_format(2, ',', '.') }} €</td>
+                        </tr>
+                        <tr>
+                            <td>fester Sollzinssatz:</td>
+                            <td>{{ financingOptions.credit_financing.nominal_rate|number_format(2, ',', '.') }} %</td>
+                        </tr>
+                        <tr>
+                            <td>effektiver Jahreszins:</td>
+                            <td>{{ financingOptions.credit_financing.apr|number_format(2, ',', '.') }} %</td>
+                        </tr>
+                        <tr>
+                            <td>zu zahlender Gesamtbetrag:</td>
+                            <td>{{ financingOptions.total_cost.value|number_format(2, ',', '.') }} €</td>
+                        </tr>
+                        <tr>
+                            <td>{{ financingOptions.credit_financing.term }} monatliche Raten in Höhe von je</td>
+                            <td>{{ financingOptions.monthly_payment.value }} €</td>
+                        </tr>
+                    </table>
+                </div>
+                <span>Darlehnsgeber: {{ merchantName }}, {{ merchantAddress }}</span><br>
+            {% endif %}
+        {% else %}
+            <h4 style="text-align: center;">Sie können diesen Warenkorb auch finanzieren mit</h4>
+            <img class="img-fluid" src="{{ plugin_path('PayPal') }}/images/buttons/installment/HorizontalLockup/FullColor/pp_credit-german_h_rgb.png" />
+        {% endif %}
     {% endif %}
-    <img class="img-fluid" src="{{ plugin_path('PayPal') }}/images/buttons/installment/HorizontalLockup/FullColor/pp_credit-german_h_rgb.png" />
+
+
     {% if basketAmount < 99.99 or basketAmount > 5000 %}
     {% else %}
         <a href="#" data-toggle="modal" data-target="#installmentSpecificPromotionModal">Informationen zu Möglichen Raten</a>
@@ -34,4 +72,32 @@
             });
         </script>
     {% endif %}
+
+    <style>
+        .paypal-installment-specific-promotion
+        {
+            border: 2px solid #009CDE;
+            border-radius: 10px;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+        .paypal-installment-specific-promotion .paypal-installment-specific-promotion-financing-option
+        {
+            background-color: #f1f1f1; /* #ededed */
+            padding: 5px;
+        }
+        .paypal-installment-specific-promotion .paypal-installment-specific-promotion-financing-option table
+        {
+            width: 100%;
+        }
+        .paypal-installment-specific-promotion .paypal-installment-specific-promotion-financing-option table tr td:first-child
+        {
+            text-align: left !important;
+        }
+        .paypal-installment-specific-promotion .paypal-installment-specific-promotion-financing-option table tr td:nth-child(2)
+        {
+            text-align: right !important;
+            font-weight: bold;
+        }
+    </style>
 </div>
