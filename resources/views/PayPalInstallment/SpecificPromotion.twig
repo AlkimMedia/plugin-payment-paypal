@@ -1,7 +1,7 @@
 <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 
 <div class="wrapper paypal-installment-specific-promotion">
-    {% if basketAmount < 99 or basketAmount > 5000 %}
+    {% if amount < 99 or amount > 5000 %}
         <h4 style="text-align: center">Finanzierung verfügbar ab 99€ bis 5.000€<br>Warenwert mit</h4>
         <img class="img-fluid" src="{{ plugin_path('PayPal') }}/images/buttons/installment/HorizontalLockup/FullColor/pp_credit-german_h_rgb.png" />
     {% else %}
@@ -16,7 +16,7 @@
                     <table>
                         <tr>
                             <td>Nettodarlehensbetrag:</td>
-                            <td>{{ basketAmount|number_format(2, ',', '.') }} €</td>
+                            <td>{{ amount|number_format(2, ',', '.') }} €</td>
                         </tr>
                         <tr>
                             <td>fester Sollzinssatz:</td>
@@ -39,13 +39,13 @@
                 <span>Darlehnsgeber: {{ merchantName }}, {{ merchantAddress }}</span><br>
             {% endif %}
         {% else %}
-            <h4 style="text-align: center;">Sie können diesen Warenkorb auch finanzieren mit</h4>
+            <h4 style="text-align: center;">Sie können diesen {% if item is not null %}Artikel{% else %}Warenkorb{% endif %} auch finanzieren mit</h4>
             <img class="img-fluid" src="{{ plugin_path('PayPal') }}/images/buttons/installment/HorizontalLockup/FullColor/pp_credit-german_h_rgb.png" />
         {% endif %}
     {% endif %}
 
 
-    {% if basketAmount < 99.99 or basketAmount > 5000 %}
+    {% if amount < 99.99 or amount > 5000 %}
     {% else %}
         <a href="#" data-toggle="modal" data-target="#installmentSpecificPromotionModal">Informationen zu Möglichen Raten</a>
 
@@ -61,7 +61,7 @@
         <script type="text/javascript">
             $(function () {
                 $('#installmentSpecificPromotionModal').on('show.bs.modal', function () {
-                    $.get("http://master.plentymarkets.com/payPalInstallment/financingOptions/{{ basketAmount }}", function(data)
+                    $.get("http://master.plentymarkets.com/payPalInstallment/financingOptions/{{ amount }}", function(data)
                     {
                         $('#installmentSpecificPromotionModal .modal-content').html(data);
                     });
