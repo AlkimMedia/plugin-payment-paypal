@@ -6,7 +6,7 @@ This is the official PayPal plugin developed by plentymarkets. Integrate the pay
 
 ## Requirements
 
-This is a plugin for [plentymarkets 7](https://www.plentymarkets.com). A layout plugin is required in order to integrate PayPal in your online store. We recommend using the plentymarkets plugin [Callisto 4](https://github.com/plentymarkets/callisto-4).
+This is a plugin for [plentymarkets 7](https://www.plentymarkets.com). A layout plugin is required in order to integrate PayPal in your online store. We recommend using the plentymarkets plugin [Ceres](https://github.com/plentymarkets/plugin-ceres).
 
 ## Installing
 
