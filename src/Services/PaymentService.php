@@ -13,7 +13,7 @@ use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 
 use PayPal\Helper\PaymentHelper;
 use PayPal\Services\SessionStorageService;
-use PayPal\Services\SettingsService;
+use PayPal\Services\Database\SettingsService;
 use PayPal\Services\ContactService;
 
 /**
@@ -194,14 +194,25 @@ class PaymentService
             return $executeResponse['error'].': '.$executeResponse['error_msg'];
         }
 
-        // update or create a contact
-        $this->contactService->handlePayPalContact($executeResponse['payerInfo']);
-
         // Clear the session parameters
         $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_PAY_ID, null);
         $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_PAYER_ID, null);
 
         return $executeResponse;
+    }
+
+    /**
+     * @param $paymentId
+     */
+    public function handlePayPalCustomer($paymentId)
+    {
+        $requestParams = $this->getApiContextParams();
+        $requestParams['paymentId'] = $paymentId;
+
+        $response = $this->libCall->call('PayPal::getPaymentDetails', $requestParams);
+
+        // update or create a contact
+        $this->contactService->handlePayPalContact($response['payer']);
     }
 
     /**

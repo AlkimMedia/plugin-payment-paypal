@@ -29,6 +29,7 @@ class PaymentHelper
     const MODE_PAYPALEXPRESS = 'paypalexpress';
     const MODE_PAYPAL_PLUS = 'plus';
     const MODE_PAYPAL_INSTALLMENT = 'installment';
+    const MODE_PAYPAL_NOTIFICATION = 'notification';
 
     /**
      * @var PaymentMethodRepositoryContract
@@ -145,12 +146,15 @@ class PaymentHelper
             case self::MODE_PAYPAL_PLUS:
             case self::MODE_PAYPAL_INSTALLMENT:
             case self::MODE_PAYPAL:
-                $urls['success'] = $domain.'/payPal/checkoutSuccess';
-                $urls['cancel'] = $domain.'/payPal/checkoutCancel';
+                $urls['success'] = $domain.'/payment/payPal/checkoutSuccess';
+                $urls['cancel'] = $domain.'/payment/payPal/checkoutCancel';
                 break;
             case self::MODE_PAYPALEXPRESS:
-                $urls['success'] = $domain.'/payPal/expressCheckoutSuccess';
-                $urls['cancel'] = $domain.'/payPal/expressCheckoutCancel';
+                $urls['success'] = $domain.'/payment/payPal/expressCheckoutSuccess';
+                $urls['cancel'] = $domain.'/payment/payPal/expressCheckoutCancel';
+                break;
+            case self::MODE_PAYPAL_NOTIFICATION:
+                $urls[self::MODE_PAYPAL_NOTIFICATION] = $domain.'/payment/payPal/notification';
                 break;
         }
 

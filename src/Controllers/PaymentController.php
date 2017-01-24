@@ -5,7 +5,7 @@ namespace PayPal\Controllers;
 use PayPal\Services\PayPalInstallmentService;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Frontend\Contracts\Checkout;
-use Plenty\Modules\Plugin\Libs\Contracts\LibraryCallContract;
+use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
@@ -118,6 +118,9 @@ class PaymentController extends Controller
 
         $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_PAYER_ID, $payerId);
 
+        // update or create a contact
+        $this->paymentService->handlePayPalCustomer($paymentId);
+
         // Redirect to the success page. The URL can be entered in the config.json.
         return $this->response->redirectTo('place-order');
     }
@@ -143,7 +146,13 @@ class PaymentController extends Controller
      */
     public function expressCheckout()
     {
+        /** @var Basket $basket */
         $basket = $this->basketContract->load();
+
+        /** @var Checkout $checkout */
+        $checkout = pluginApp(\Plenty\Modules\Frontend\Contracts\Checkout::class);
+
+        $checkout->setPaymentMethodId($this->paymentHelper->getPayPalExpressMopId());
 
         // get the paypal-express redirect URL
         $redirectURL = $this->paymentService->preparePayPalExpressPayment($basket);
