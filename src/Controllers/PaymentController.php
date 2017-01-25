@@ -152,7 +152,7 @@ class PaymentController extends Controller
         /** @var Checkout $checkout */
         $checkout = pluginApp(\Plenty\Modules\Frontend\Contracts\Checkout::class);
 
-        $checkout->setPaymentMethodId($this->paymentHelper->getPayPalExpressMopId());
+        $checkout->setPaymentMethodId($this->paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALEXPRESS));
 
         // get the paypal-express redirect URL
         $redirectURL = $this->paymentService->preparePayPalExpressPayment($basket);
