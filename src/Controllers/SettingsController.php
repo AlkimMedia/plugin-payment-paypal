@@ -64,7 +64,7 @@ class SettingsController extends Controller
     {
         if($accountId && $accountId > 0)
         {
-            return json_decode($this->accountService->getAccount($accountId));
+            return $this->accountService->getAccount($accountId);
         }
     }
 
@@ -75,7 +75,7 @@ class SettingsController extends Controller
     {
         $updatedAccount = $request->get('account');
 
-        return json_decode($this->accountService->updateAccount($updatedAccount));
+        return $this->accountService->updateAccount($updatedAccount);
     }
 
     /**
@@ -100,7 +100,7 @@ class SettingsController extends Controller
     {
         if($request->get('settings'))
         {
-            return json_decode($this->settingsService->saveSettings($request->get('settings')));
+            return $this->settingsService->saveSettings($request->get('settings'));
         }
     }
 
@@ -119,6 +119,6 @@ class SettingsController extends Controller
      */
     public function loadSetting($webstore)
     {
-        return json_decode($this->settingsService->loadSetting($webstore));
+        return $this->settingsService->loadSetting($webstore);
     }
 }
