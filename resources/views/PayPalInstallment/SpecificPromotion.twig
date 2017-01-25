@@ -61,7 +61,7 @@
         <script type="text/javascript">
             $(function () {
                 $('#installmentSpecificPromotionModal').on('show.bs.modal', function () {
-                    $.get("http://master.plentymarkets.com/payPalInstallment/financingOptions/{{ amount }}", function(data)
+                    $.get("http://master.plentymarkets.com/payment/payPalInstallment/financingOptions/{{ amount }}", function(data)
                     {
                         $('#installmentSpecificPromotionModal .modal-content').html(data);
                     });
