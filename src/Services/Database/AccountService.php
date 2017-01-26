@@ -17,7 +17,7 @@ class AccountService extends DatabaseBaseService
     /**
      * Load all accounts from the database
      *
-     * @return mixed
+     * @return array
      */
     public function getAccounts()
     {
@@ -29,7 +29,7 @@ class AccountService extends DatabaseBaseService
             {
                 if($account instanceof Account)
                 {
-                    $accounts[$account->id] = $account->value;
+                    $accounts[] = ["id"=>$account->id, "clientId"=> $account->value['clientId'], 'clientSecret'=>$account->value['clientSecret'], "email"=>$account->value['email']];
                 }
             }
         }

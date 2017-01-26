@@ -54,7 +54,7 @@ class SettingsController extends Controller
 
     public function loadAccounts()
     {
-        return $this->accountService->getAccounts();
+        return json_encode($this->accountService->getAccounts());
     }
 
     /**
