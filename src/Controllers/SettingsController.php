@@ -109,7 +109,7 @@ class SettingsController extends Controller
      */
     public function loadSettings()
     {
-        return $this->settingsService->loadSettings();
+        return json_decode($this->settingsService->loadSettings());
     }
 
     /**
