@@ -5,7 +5,6 @@
     "version": "1.0.0",
     "licences": "",
     "pluginIcon": "",
-    "price": "0",
     "description": "The official PayPal plugin for plentymarkets",
     "shortDescription": "The official PayPal plugin for plentymarkets",
     "keywords": ["paypal", "official", "plentymarkets", "payment"],
@@ -15,7 +14,6 @@
     "phone": "",
     "serviceProvider": "PayPal\\Providers\\PayPalServiceProvider",
     "containers": [],
-    "dataProviders": [{"key":"PayPal\\Providers\\PayPalExpressButtonDataProvider", "name":"PayPal Express Button", "description": "PayPal Express Button"}],
     "javaScriptFiles": [],
     "require": [],
     "dependencies":{
