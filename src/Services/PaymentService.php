@@ -161,7 +161,7 @@ class PaymentService
         if(is_null($paymentContent) OR !strlen($paymentContent))
         {
             $this->returnType = 'errorCode';
-            return 'An unknown error occured, please try again.';
+            return json_encode($preparePaymentResult);
         }
 
         return $paymentContent;
