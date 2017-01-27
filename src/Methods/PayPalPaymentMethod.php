@@ -103,18 +103,21 @@ class PayPalPaymentMethod extends PaymentMethodService
      */
     public function isActive()
     {
-        /**
-         * Check the allowed shipping countries
-         */
-        if(array_key_exists('shippingCountries', $this->settings))
-        {
-            $shippingCountries = $this->settings['shippingCountries'];
-            if(is_array($shippingCountries) && in_array($this->checkout->getShippingCountryId(), $shippingCountries))
-            {
-                return true;
-            }
-        }
-        return false;
+        return true;
+
+        //TODO: use this part for the new UI
+//        /**
+//         * Check the allowed shipping countries
+//         */
+//        if(array_key_exists('shippingCountries', $this->settings))
+//        {
+//            $shippingCountries = $this->settings['shippingCountries'];
+//            if(is_array($shippingCountries) && in_array($this->checkout->getShippingCountryId(), $shippingCountries))
+//            {
+//                return true;
+//            }
+//        }
+//        return false;
     }
 
     /**
