@@ -34,7 +34,7 @@ class SettingsService extends DatabaseBaseService
         return null;
     }
 
-    public function loadSettings()
+    public function loadSettings($settingType)
     {
         $settings = array();
         $results = $this->getValues(Settings::class);
@@ -42,7 +42,7 @@ class SettingsService extends DatabaseBaseService
         {
             foreach ($results as $item)
             {
-                if($item instanceof Settings)
+                if($item instanceof Settings && $item->name == $settingType)
                 {
                     $settings[] = ['PID_'.$item->id => $item->value];
                 }
