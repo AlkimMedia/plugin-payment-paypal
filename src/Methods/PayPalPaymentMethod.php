@@ -93,7 +93,7 @@ class PayPalPaymentMethod extends PaymentMethodService
         $this->addressRepo      = $addressRepositoryContract;
         $this->systemService    = $systemService;
 
-        $this->loadCurrentSettings();
+        $this->loadCurrentSettings('paypal');
     }
 
     /**
@@ -228,9 +228,9 @@ class PayPalPaymentMethod extends PaymentMethodService
         return $desc;
     }
 
-    protected function loadCurrentSettings()
+    protected function loadCurrentSettings($settingsType)
     {
-        $settings = $this->settingsService->loadSettings();
+        $settings = $this->settingsService->loadSettings($settingsType);
         if(is_array($settings) && count($settings) > 0)
         {
             $aktStore = 'PID_'.$this->systemService->getWebstoreId();
