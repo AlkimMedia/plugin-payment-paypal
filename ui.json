@@ -3,16 +3,28 @@
   "namespace": "PlentyPayPal",
   "menuEntries": [
     {
-      "label": "Grundeinstellungen",
+      "label": "Kontoeinstellungen",
       "menu": "settings/orders/paypal",
-      "urlKey": "settings",
-      "entryPoint": "index.html?action=settings"
+      "urlKey": "accounts",
+      "entryPoint": "index.html?action=permissions"
     },
     {
-      "label": "Händlereinstellungen",
+      "label": "PayPal",
       "menu": "settings/orders/paypal",
-      "urlKey": "merchant-settings",
-      "entryPoint": "index.html?action=permissions"
+      "urlKey": "settings",
+      "entryPoint": "index.html?action=settings_paypal"
+    },
+    {
+      "label": "PayPal PLUS",
+      "menu": "settings/orders/paypal",
+      "urlKey": "settings",
+      "entryPoint": "index.html?action=settings_paypal_plus"
+    },
+    {
+      "label": "PayPal Ratenkauf",
+      "menu": "settings/orders/paypal",
+      "urlKey": "settings",
+      "entryPoint": "index.html?action=settings_paypal_installment"
     }
   ]
 }
