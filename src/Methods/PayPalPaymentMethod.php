@@ -230,7 +230,7 @@ class PayPalPaymentMethod extends PaymentMethodService
 
     protected function loadCurrentSettings()
     {
-        $settings = json_decode($this->settingsService->loadSettings(), true);
+        $settings = $this->settingsService->loadSettings();
         if(is_array($settings) && count($settings) > 0)
         {
             $aktStore = 'PID_'.$this->systemService->getWebstoreId();
