@@ -34,7 +34,7 @@ class PayPalRouteServiceProvider extends RouteServiceProvider
          * Routes for the PayPal Settings
          */
         $router->post('payment/payPal/settings/', 'PayPal\Controllers\SettingsController@saveSettings');
-        $router->get('payment/payPal/settings/', 'PayPal\Controllers\SettingsController@loadSettings');
+        $router->get('payment/payPal/settings/{settingType}', 'PayPal\Controllers\SettingsController@loadSettings');
         $router->get('payment/payPal/setting/{webstore}', 'PayPal\Controllers\SettingsController@loadSetting');
 
         $router->get('payment/payPal/account/{accountId}', 'PayPal\Controllers\SettingsController@loadAccount');

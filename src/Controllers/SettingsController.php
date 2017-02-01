@@ -98,18 +98,26 @@ class SettingsController extends Controller
      */
     public function saveSettings(Request $request)
     {
-        if($request->get('settings'))
+        if($request->get('paypal'))
         {
-            return $this->settingsService->saveSettings($request->get('settings'));
+            return $this->settingsService->saveSettings($request->get('paypal'));
+        }
+        elseif($request->get('paypal_plus'))
+        {
+            return $this->settingsService->saveSettings($request->get('paypal_plus'));
+        }
+        elseif($request->get('paypal_installment'))
+        {
+            return $this->settingsService->saveSettings($request->get('paypal_installment'));
         }
     }
 
     /**
      * @return bool|mixed
      */
-    public function loadSettings()
+    public function loadSettings($settingType)
     {
-        return json_decode($this->settingsService->loadSettings());
+        return json_decode($this->settingsService->loadSettings($settingType));
     }
 
     /**
