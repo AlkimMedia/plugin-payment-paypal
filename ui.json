@@ -15,12 +15,6 @@
       "entryPoint": "index.html?action=settings_paypal"
     },
     {
-      "label": "PayPal PLUS",
-      "menu": "settings/orders/paypal",
-      "urlKey": "settings",
-      "entryPoint": "index.html?action=settings_paypal_plus"
-    },
-    {
       "label": "PayPal Ratenkauf",
       "menu": "settings/orders/paypal",
       "urlKey": "settings",
