@@ -63,8 +63,8 @@ class SettingsService extends DatabaseBaseService
                     /** @var Settings $settingModel */
                     $settingModel = pluginApp(Settings::class);
                     $settingModel->id = $store;
-                    $settingModel->name = 'settings';
-                    $settingModel->value = [$mode => $values];
+                    $settingModel->name = $mode;
+                    $settingModel->value = $values;
                     $settingModel->updatedAt = date('Y-m-d H:i:s');
 
                     $this->setValue($settingModel);
