@@ -11,13 +11,13 @@
     {
       "label": "PayPal",
       "menu": "settings/orders/paypal",
-      "urlKey": "settings",
+      "urlKey": "settings-paypal",
       "entryPoint": "index.html?action=settings_paypal"
     },
     {
       "label": "PayPal Ratenkauf",
       "menu": "settings/orders/paypal",
-      "urlKey": "settings",
+      "urlKey": "settings-paypal-installment",
       "entryPoint": "index.html?action=settings_paypal_installment"
     }
   ]
