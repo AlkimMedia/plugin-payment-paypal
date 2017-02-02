@@ -51,7 +51,7 @@ class SettingsService extends DatabaseBaseService
         return $settings;
     }
 
-    public function saveSettings($settings)
+    public function saveSettings($mode, $settings)
     {
         if($settings)
         {
@@ -64,7 +64,7 @@ class SettingsService extends DatabaseBaseService
                     $settingModel = pluginApp(Settings::class);
                     $settingModel->id = $store;
                     $settingModel->name = 'settings';
-                    $settingModel->value = $values;
+                    $settingModel->value = [$mode => $values];
                     $settingModel->updatedAt = date('Y-m-d H:i:s');
 
                     $this->setValue($settingModel);
