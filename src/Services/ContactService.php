@@ -5,6 +5,9 @@ namespace PayPal\Services;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Account\Address\Models\Address;
 use Plenty\Modules\Account\Address\Models\AddressOption;
+use Plenty\Modules\Account\Address\Models\AddressRelationType;
+use Plenty\Modules\Account\Contact\Contracts\ContactAddressRepositoryContract;
+use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Frontend\Contracts\Checkout;
@@ -18,14 +21,14 @@ use Plenty\Modules\Order\Shipping\Countries\Models\Country;
 class ContactService
 {
     /**
-     * @var AddressRepositoryContract
-     */
-    private $addressContract;
-
-    /**
      * @var BasketRepositoryContract
      */
     private $basketContract;
+
+    /**
+     * @var AddressRepositoryContract
+     */
+    private $addressContract;
 
     /**
      * @var Checkout
@@ -35,12 +38,12 @@ class ContactService
     /**
      * ContactService constructor.
      */
-    public function __construct(AddressRepositoryContract $addressRepositoryContract,
-                                BasketRepositoryContract $basketRepositoryContract,
+    public function __construct(BasketRepositoryContract $basketRepositoryContract,
+                                AddressRepositoryContract $addressRepositoryContract,
                                 Checkout $checkout)
     {
-        $this->addressContract = $addressRepositoryContract;
         $this->basketContract = $basketRepositoryContract;
+        $this->addressContract = $addressRepositoryContract;
         $this->checkout = $checkout;
     }
 
@@ -54,21 +57,33 @@ class ContactService
             /** @var Basket $basket */
             $basket = $this->basketContract->load();
 
-            /** @var Address $address */
+            /**
+             * Map the PayPal address to a plenty address
+             * @var Address $address
+             */
             $address = $this->mapPPAddressToAddress($payer['payer_info']['shipping_address'], $payer['payer_info']['email']);
 
-            if($basket->customerShippingAddressId)
+            $customerID = $basket->customerId;
+
+            // if the user is logged in, update the contact address
+            if(!empty($customerID) && $customerID > 0)
             {
-                $this->addressContract->updateAddress($address->toArray(), $basket->customerShippingAddressId);
+                /** @var ContactAddressRepositoryContract $contactAddress */
+                $contactAddress = pluginApp(\Plenty\Modules\Account\Contact\Contracts\ContactAddressRepositoryContract::class);
+
+                $createdAddress = $contactAddress->createAddress($address->toArray(), $customerID, AddressRelationType::DELIVERY_ADDRESS);
             }
+            // if the user is a guest, create a address and set the invoice address ID
             else
             {
-                /** @var Address $createdAddress */
                 $createdAddress = $this->addressContract->createAddress($address->toArray());
 
-                /** update the customer shipping address ID */
-                $this->checkout->setCustomerShippingAddressId($createdAddress->id);
+                // set the customer invoice address ID
+                $this->checkout->setCustomerInvoiceAddressId($createdAddress->id);
             }
+
+            // update/set the customer shipping address ID
+            $this->checkout->setCustomerShippingAddressId($createdAddress->id);
         }
     }
 
@@ -91,7 +106,6 @@ class ContactService
         /** @var Country $country */
         $country = $countryContract->getCountryByIso($ppShippingAddress['country_code'], 'isoCode2');
 
-        $address->setAttribute('email', $email);
         $address->setAttribute('name2', $name[0]);
         $address->setAttribute('name3', $name[1]);
         $address->setAttribute('address1', $street[0]);
