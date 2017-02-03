@@ -98,7 +98,7 @@ class SettingsController extends Controller
      */
     public function saveSettings(Request $request)
     {
-        if($request->get('PayPalMode') == 'paypal' OR $request->get('PayPalMode') == 'paypal_installment')
+        if($request->get('PayPalMode') == 'paypal' || $request->get('PayPalMode') == 'paypal_installment')
         {
             return $this->settingsService->saveSettings($request->get('PayPalMode'), $request->get('settings'));
         }

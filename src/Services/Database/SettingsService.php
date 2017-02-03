@@ -59,10 +59,25 @@ class SettingsService extends DatabaseBaseService
             {
                 foreach ($setting as $store => $values)
                 {
+                    $id = 0;
                     $store = str_replace('PID_', '', $store);
+
+                    $existValue = $this->getValues(Settings::class, ['name', 'webstore'], [$mode, $store], ['=','=']);
+                    if(isset($existValue) && is_array($existValue))
+                    {
+                        if($existValue[0] instanceof Settings)
+                        {
+                            $id = $existValue[0]->id;
+                        }
+                    }
+
                     /** @var Settings $settingModel */
                     $settingModel = pluginApp(Settings::class);
-                    $settingModel->id = $store;
+                    if($id > 0)
+                    {
+                        $settingModel->id = $id;
+                    }
+                    $settingModel->webstore = $store;
                     $settingModel->name = $mode;
                     $settingModel->value = $values;
                     $settingModel->updatedAt = date('Y-m-d H:i:s');
@@ -70,7 +85,6 @@ class SettingsService extends DatabaseBaseService
                     $this->setValue($settingModel);
                 }
             }
-
             return true;
         }
     }

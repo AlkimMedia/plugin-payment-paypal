@@ -8,6 +8,7 @@ use Plenty\Modules\Plugin\DataBase\Contracts\Model;
  * Class Settings
  *
  * @property int $id
+ * @property int $webstore
  * @property string $name
  * @property array $value
  * @property string $createdAt
@@ -16,6 +17,7 @@ use Plenty\Modules\Plugin\DataBase\Contracts\Model;
 class Settings extends Model
 {
     public $id = 0;
+    public $webstore = 0;
     public $name = '';
     public $value = array();
     public $createdAt = '';

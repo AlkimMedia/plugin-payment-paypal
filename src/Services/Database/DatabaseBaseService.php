@@ -68,11 +68,21 @@ class DatabaseBaseService
 
     /**
      * @param string $modelClassName
-     * @return bool|string
+     * @return bool|array
      */
-    protected function getValues($modelClassName, $field='', $value = '', $operator='=')
+    protected function getValues($modelClassName, $fields=[], $values=[], $operator=['='])
     {
         $query = $this->dataBase->query($modelClassName);
+
+        if( is_array($fields) && is_array($values) &&
+            count($fields) > 0 && count($values) && count($values) == count($fields)
+        )
+        {
+            foreach ($fields as $key => $field)
+            {
+                $query->where($field, array_key_exists($key,$operator)?$operator[$key]:'=', $values[$key]);
+            }
+        }
 
         $results = $query->get();
 
