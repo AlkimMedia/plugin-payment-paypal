@@ -44,7 +44,7 @@ class SettingsService extends DatabaseBaseService
             {
                 if($item instanceof Settings && $item->name == $settingType)
                 {
-                    $settings[] = ['PID_'.$item->id => $item->value];
+                    $settings[] = ['PID_'.$item->webstore => $item->value];
                 }
             }
         }
