@@ -2,7 +2,9 @@
 
 namespace PayPal\Services;
 
+use PayPal\Services\Database\AccountService;
 use Plenty\Modules\Basket\Models\BasketItem;
+use Plenty\Modules\Frontend\Services\SystemService;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Payment\Models\Payment;
@@ -67,6 +69,26 @@ class PaymentService
     private $contactService;
 
     /**
+     * @var SystemService
+     */
+    private $systemService;
+
+    /**
+     * @var SettingsService
+     */
+    private $settingsService;
+
+    /**
+     * @var AccountService
+     */
+    private $accountService;
+
+    /**
+     * @var array
+     */
+    public $settings = [];
+
+    /**
      * PaymentService constructor.
      *
      * @param PaymentMethodRepositoryContract $paymentMethodRepository
@@ -76,6 +98,8 @@ class PaymentService
      * @param LibraryCallContract $libCall
      * @param AddressRepositoryContract $addressRepo
      * @param SessionStorageService $sessionStorage
+     * @param SystemService $systemService
+     * @param SettingsService $settingsService
      */
     public function __construct(  PaymentMethodRepositoryContract $paymentMethodRepository,
                                   PaymentRepositoryContract $paymentRepository,
@@ -84,7 +108,10 @@ class PaymentService
                                   LibraryCallContract $libCall,
                                   AddressRepositoryContract $addressRepo,
                                   SessionStorageService $sessionStorage,
-                                  ContactService $contactService)
+                                  ContactService $contactService,
+                                  SystemService $systemService,
+                                  SettingsService $settingsService,
+                                  AccountService  $accountService)
     {
         $this->paymentMethodRepository    = $paymentMethodRepository;
         $this->paymentRepository          = $paymentRepository;
@@ -94,6 +121,9 @@ class PaymentService
         $this->config                     = $config;
         $this->sessionStorage             = $sessionStorage;
         $this->contactService             = $contactService;
+        $this->systemService              = $systemService;
+        $this->settingsService            = $settingsService;
+        $this->accountService             = $accountService;
     }
 
     /**
@@ -321,9 +351,9 @@ class PaymentService
      * @param String $mode
      * @return array
      */
-    public function getPaypalParams(Basket $basket = null, $mode)
+    public function getPaypalParams(Basket $basket = null, $mode=PaymentHelper::MODE_PAYPAL)
     {
-        $payPalRequestParams = $this->getApiContextParams();
+        $payPalRequestParams = $this->getApiContextParams($mode);
 
         // Set the PayPal Web Profile ID
         $webProfilId = $this->config->get('PayPal.webProfileID');
@@ -406,19 +436,62 @@ class PaymentService
     /**
      * @return array
      */
-    public function getApiContextParams()
+    public function getApiContextParams($mode=PaymentHelper::MODE_PAYPAL)
     {
+        $settingType = 'paypal';
+        if($mode == PaymentHelper::MODE_PAYPAL_INSTALLMENT)
+        {
+            $settingType = 'paypal_installment';
+        }
+        $account = $this->loadCurrecntAccountSettings($settingType);
+
         $apiContextParams = [];
-        $apiContextParams['clientSecret'] = $this->config->get('PayPal.clientSecret');
-        $apiContextParams['clientId'] = $this->config->get('PayPal.clientId');
+        $apiContextParams['clientSecret'] = $account['clientSecret'];
+        $apiContextParams['clientId'] = $account['clientId'];
 
         $apiContextParams['sandbox'] = false;
 
-        if($this->config->get('PayPal.environment') == 1)
+        if($account['environment'] == 1)
         {
             $apiContextParams['sandbox'] = true;
         }
 
         return $apiContextParams;
+    }
+
+    /**
+     * @param $settingsType
+     * @return array|null
+     */
+    public function loadCurrentSettings($settingsType='paypal')
+    {
+        $setting = $this->settingsService->loadSetting($this->systemService->getPlentyId(), $settingsType);
+        if(is_array($setting) && count($setting) > 0)
+        {
+            $this->settings = $setting;
+        }
+    }
+
+    public function loadCurrecntAccountSettings($settingsType='paypal')
+    {
+        $account = [];
+        $accountId = 0;
+        if(is_array($this->settings) && count($this->settings) > 0)
+        {
+            $accountName = $this->settings['account'];
+        }
+        else
+        {
+            $this->loadCurrentSettings($settingsType);
+            $accountId = $this->settings['account'];
+        }
+
+        if($accountId > 0)
+        {
+            $result = $this->accountService->getAccount($accountId);
+            $account = $result[$accountId];
+        }
+
+        return $account;
     }
 }

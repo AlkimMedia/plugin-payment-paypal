@@ -24,12 +24,12 @@ class SettingsService extends DatabaseBaseService
         parent::__construct($dataBase);
     }
 
-    public function loadSetting($webstore)
+    public function loadSetting($webstore, $mode)
     {
-        $setting = $this->getValue(Settings::class, $webstore);
-        if($setting instanceof Settings)
+        $setting = $this->getValues(Settings::class, ['name', 'webstore'], [$mode, $webstore], ['=','=']);
+        if(is_array($setting) && $setting[0] instanceof Settings)
         {
-            return $setting->value;
+            return $setting[0]->value;
         }
         return null;
     }

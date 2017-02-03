@@ -2,12 +2,8 @@
 
 namespace PayPal\Methods;
 
-use PayPal\Services\SessionStorageService;
-use PayPal\Services\Database\SettingsService;
-use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
-use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
+use PayPal\Services\PaymentService;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
-use Plenty\Modules\Frontend\Services\SystemService;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodService;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Modules\Frontend\Contracts\Checkout;
@@ -29,71 +25,33 @@ class PayPalPaymentMethod extends PaymentMethodService
     private $checkout;
 
     /**
-     * @var ContactRepositoryContract
-     */
-    private $contactRepo;
-
-    /**
      * @var ConfigRepository
      */
     private $configRepo;
 
     /**
-     * @var SettingsService
+     * @var PaymentService
      */
-    private $settingsService;
-
-    /**
-     * @var array
-     */
-    private $settings;
-
-    /**
-     * @var SessionStorageService
-     */
-    private $sessionStorage;
-
-    /**
-     * @var AddressRepositoryContract
-     */
-    private $addressRepo;
-
-    /**
-     * @var SystemService
-     */
-    private $systemService;
+    private $paymentService;
 
     /**
      * PayPalExpressPaymentMethod constructor.
      *
      * @param BasketRepositoryContract $basketRepo
-     * @param ContactRepositoryContract $contactRepo
      * @param ConfigRepository $configRepo
-     * @param SettingsService $settingsService
-     * @param SessionStorageService $sessionStorageService
-     * @param AddressRepositoryContract $addressRepositoryContract
      * @param Checkout $checkout
-     * @param SystemService $systemService
+     * @param PaymentService $paymentService
      */
     public function __construct(BasketRepositoryContract    $basketRepo,
-                                ContactRepositoryContract   $contactRepo,
                                 ConfigRepository            $configRepo,
-                                SettingsService             $settingsService,
-                                SessionStorageService       $sessionStorageService,
-                                AddressRepositoryContract   $addressRepositoryContract,
                                 Checkout                    $checkout,
-                                SystemService               $systemService)
+                                PaymentService              $paymentService)
     {
         $this->basketRepo       = $basketRepo;
-        $this->checkout         = $checkout;
-        $this->contactRepo      = $contactRepo;
         $this->configRepo       = $configRepo;
-        $this->settingsService  = $settingsService;
-        $this->sessionStorage   = $sessionStorageService;
-        $this->addressRepo      = $addressRepositoryContract;
-        $this->systemService    = $systemService;
-
-        $this->loadCurrentSettings('paypal');
+        $this->checkout         = $checkout;
+        $this->paymentService   = $paymentService;
+        $this->paymentService->loadCurrentSettings('paypal');
     }
 
     /**
@@ -103,21 +61,18 @@ class PayPalPaymentMethod extends PaymentMethodService
      */
     public function isActive()
     {
-        return true;
-
-        //TODO: use this part for the new UI
-//        /**
-//         * Check the allowed shipping countries
-//         */
-//        if(array_key_exists('shippingCountries', $this->settings))
-//        {
-//            $shippingCountries = $this->settings['shippingCountries'];
-//            if(is_array($shippingCountries) && in_array($this->checkout->getShippingCountryId(), $shippingCountries))
-//            {
-//                return true;
-//            }
-//        }
-//        return false;
+        /**
+         * Check the allowed shipping countries
+         */
+        if(array_key_exists('shippingCountries', $this->paymentService->settings))
+        {
+            $shippingCountries = $this->paymentService->settings['shippingCountries'];
+            if(is_array($shippingCountries) && in_array($this->checkout->getShippingCountryId(), $shippingCountries))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -129,13 +84,13 @@ class PayPalPaymentMethod extends PaymentMethodService
     {
         $name = '';
         $lang = 'de';
-        if(array_key_exists('language', $this->settings))
+        if(array_key_exists('language', $this->paymentService->settings))
         {
-            if(array_key_exists($lang, $this->settings['language']))
+            if(array_key_exists($lang, $this->paymentService->settings['language']))
             {
-                if(array_key_exists('name', $this->settings['language'][$lang]))
+                if(array_key_exists('name', $this->paymentService->settings['language'][$lang]))
                 {
-                    $name = $this->settings['language'][$lang];
+                    $name = $this->paymentService->settings['language'][$lang];
                 }
             }
         }
@@ -160,28 +115,28 @@ class PayPalPaymentMethod extends PaymentMethodService
         $basketAmount = $basket->basketAmount;
 
         $shippingCountryId = $this->checkout->getShippingCountryId();
-        if(array_key_exists('markup', $this->settings) && array_key_exists('webstore', $this->settings['markup']))
+        if(array_key_exists('markup', $this->paymentService->settings) && array_key_exists('webstore', $this->paymentService->settings['markup']))
         {
             if($shippingCountryId && $shippingCountryId != 1)
             {
-                if(array_key_exists('flatForeign', $this->settings['markup']['webstore']))
+                if(array_key_exists('flatForeign', $this->paymentService->settings['markup']['webstore']))
                 {
-                    $fee += $this->settings['markup']['webstore']['flatForeign'];
+                    $fee += $this->paymentService->settings['markup']['webstore']['flatForeign'];
                 }
-                if(array_key_exists('percentageForeign', $this->settings['markup']['webstore']))
+                if(array_key_exists('percentageForeign', $this->paymentService->settings['markup']['webstore']))
                 {
-                    $fee += $basketAmount / 100 * $this->settings['markup']['webstore']['percentageForeign'];
+                    $fee += $basketAmount / 100 * $this->paymentService->settings['markup']['webstore']['percentageForeign'];
                 }
             }
             else
             {
-                if(array_key_exists('flatDomestic', $this->settings['markup']['webstore']))
+                if(array_key_exists('flatDomestic', $this->paymentService->settings['markup']['webstore']))
                 {
-                    $fee += $this->settings['markup']['webstore']['flatDomestic'];
+                    $fee += $this->paymentService->settings['markup']['webstore']['flatDomestic'];
                 }
-                if(array_key_exists('percentageDomestic', $this->settings['markup']['webstore']))
+                if(array_key_exists('percentageDomestic', $this->paymentService->settings['markup']['webstore']))
                 {
-                    $fee += $basketAmount / 100 * $this->settings['markup']['webstore']['percentageDomestic'];
+                    $fee += $basketAmount / 100 * $this->paymentService->settings['markup']['webstore']['percentageDomestic'];
                 }
             }
         }
@@ -197,11 +152,11 @@ class PayPalPaymentMethod extends PaymentMethodService
     public function getIcon()
     {
         $lang = 'de';
-        if( array_key_exists('language', $this->settings) &&
-            array_key_exists($lang, $this->settings['language']) &&
-            array_key_exists('logo', $this->settings['language'][$lang]))
+        if( array_key_exists('language', $this->paymentService->settings) &&
+            array_key_exists($lang, $this->paymentService->settings['language']) &&
+            array_key_exists('logo', $this->paymentService->settings['language'][$lang]))
         {
-            switch ($this->settings['language'][$lang]['logo'])
+            switch ($this->paymentService->settings['language'][$lang]['logo'])
             {
                 case 0:
                     break;
@@ -226,22 +181,5 @@ class PayPalPaymentMethod extends PaymentMethodService
         $desc = $this->configRepo->get('PayPal.description');
 
         return $desc;
-    }
-
-    protected function loadCurrentSettings($settingsType)
-    {
-        $settings = $this->settingsService->loadSettings($settingsType);
-        if(is_array($settings) && count($settings) > 0)
-        {
-            $aktStore = 'PID_'.$this->systemService->getWebstoreId();
-            foreach ($settings as $set)
-            {
-                if(array_key_exists($aktStore, $settings))
-                {
-                    $this->settings = $set[$aktStore];
-                    break;
-                }
-            }
-        }
     }
 }
