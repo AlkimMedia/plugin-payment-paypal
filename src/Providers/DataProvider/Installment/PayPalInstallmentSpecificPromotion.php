@@ -8,6 +8,7 @@
 
 namespace PayPal\Providers\DataProvider\Installment;
 
+use PayPal\Services\PaymentService;
 use PayPal\Services\PayPalInstallmentService;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Item\DataLayer\Models\Record;
@@ -18,6 +19,7 @@ class PayPalInstallmentSpecificPromotion
     public function call(   Twig $twig,
                             BasketRepositoryContract $basketRepositoryContract,
                             PayPalInstallmentService $payPalInstallmentService,
+                            PaymentService $paymentService,
                             $arg)
     {
         $item = null;
@@ -39,8 +41,9 @@ class PayPalInstallmentSpecificPromotion
 
         $qualifyingFinancingOptions = [];
 
-        // TODO Load Config to check show with or without calculated financing options
-        if(false)
+        $paymentService->loadCurrentSettings('paypal_installment');
+
+        if($paymentService->settings['calcFinancing'] == 1)
         {
             /**
              * Load the specific promotion with calculated financing options
