@@ -117,8 +117,8 @@ class SettingsController extends Controller
      *
      * @param $webstore
      */
-    public function loadSetting($webstore)
+    public function loadSetting($webstore, $mode)
     {
-        return $this->settingsService->loadSetting($webstore);
+        return $this->settingsService->loadSetting($webstore, $mode);
     }
 }
