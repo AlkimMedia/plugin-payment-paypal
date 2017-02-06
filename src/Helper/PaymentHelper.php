@@ -134,7 +134,7 @@ class PaymentHelper
         }
 
         $domain = $webstoreConfig->domainSsl;
-        if($domain == 'http://dbmaster.plenty-showcase.de')
+        if($domain == 'http://dbmaster.plenty-showcase.de' OR $domain == 'http://dbmaster-beta7.plentymarkets.eu')
         {
             $domain = 'http://master.plentymarkets.com';
         }
@@ -164,16 +164,18 @@ class PaymentHelper
     /**
      * Create a payment in plentymarkets from the paypal execution response data
      *
-     * @param $paymentData['status','currency','amount','entryDate','payId']
+     * @param $paypalPaymentData
      * @return Payment
      */
-    public function createPlentyPayment(array $paymentData)
+    public function createPlentyPayment(array $paypalPaymentData)
     {
+        $paymentData = [];
+
         /** @var Payment $payment */
         $payment = pluginApp( \Plenty\Modules\Payment\Models\Payment::class );
 
         $payment->mopId             = (int)$this->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPAL);
-        $payment->transactionType   = 2; //Payment::TRANSACTION_TYPE_BOOKED_POSTING;
+        $payment->transactionType   = Payment::TRANSACTION_TYPE_BOOKED_POSTING;
         $payment->status            = $this->mapStatus($paymentData['status']);
         $payment->currency          = $paymentData['currency'];
         $payment->amount            = $paymentData['amount'];
@@ -199,17 +201,22 @@ class PaymentHelper
         /**
          * Add payment property with type booking text
          */
-        $paymentProperty[] = $this->getPaymentProperty(3, 'TransactionID: '.(string)$paymentData['saleId']);  //PaymentProperty::TYPE_BOOKING_TEXT
+        $paymentProperty[] = $this->getPaymentProperty(PaymentProperty::TYPE_BOOKING_TEXT, 'TransactionID: '.(string)$paymentData['saleId']);
 
         /**
          * Add payment property with type transactionId
          */
-        $paymentProperty[] = $this->getPaymentProperty(1, $paymentData['saleId']);  //PaymentProperty::TYPE_TRANSACTION_ID
+        $paymentProperty[] = $this->getPaymentProperty(PaymentProperty::TYPE_TRANSACTION_ID, $paymentData['saleId']);
 
         /**
          * Add payment property with type origin
          */
-        $paymentProperty[] = $this->getPaymentProperty(23, 6);  //PaymentProperty::TYPE_ORIGIN  Payment::ORIGIN_PLUGIN
+        $paymentProperty[] = $this->getPaymentProperty(PaymentProperty::TYPE_ORIGIN, Payment::ORIGIN_PLUGIN);
+
+        /**
+         * Add payment property with type account of the receiver
+         */
+        $paymentProperty[] = $this->getPaymentProperty(PaymentProperty::TYPE_ACCOUNT_OF_RECEIVER, 'PAY-473493948'); //TODO IBAN BIC empfänger property
 
         $payment->property = $paymentProperty;
 
@@ -254,6 +261,12 @@ class PaymentHelper
             $this->paymentOrderRelationRepo->createOrderRelation($payment, $order);
         }
     }
+
+
+
+    // TODO: assignPlentyPaymentToPlentyContact
+
+
 
     /**
      * Map the PayPal payment status to the plentymarkets payment status

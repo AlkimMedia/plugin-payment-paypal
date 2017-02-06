@@ -35,26 +35,9 @@ class PayPalHelper
         $apiContext->setConfig(
             array(  'mode'              => $mode,
                     'log.LogEnabled'    => false,
-                    'cache.enabled'     => false,));
+                    'cache.enabled'     => false,
+                    'http.CURLOPT_CONNECTTIMEOUT' => 30));
 
         return $apiContext;
-    }
-
-    /**
-     * @param Payment $payment
-     * @return mixed
-     */
-    static function mapPayment(Payment $payment)
-    {
-        $transaction = $payment->getTransactions()[0];
-
-        $returnArray['saleId'] = $transaction->getRelatedResources()[0]->getSale()->getId();
-        $returnArray['amount'] = $transaction->getAmount()->getTotal();
-        $returnArray['currency'] = $transaction->getAmount()->getCurrency();
-        $returnArray['entryDate'] = $payment->getCreateTime();
-        $returnArray['status'] = $payment->getState();
-        $returnArray['payerInfo'] = $payment->getPayer()->getPayerInfo();
-
-        return $returnArray;
     }
 }
