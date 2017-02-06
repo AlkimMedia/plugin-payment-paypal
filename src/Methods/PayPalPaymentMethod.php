@@ -64,12 +64,15 @@ class PayPalPaymentMethod extends PaymentMethodService
         /**
          * Check the allowed shipping countries
          */
-        if(array_key_exists('shippingCountries', $this->paymentService->settings))
+        if(!array_key_exists('payPalPlus',$this->paymentService->settings) || (array_key_exists('payPalPlus',$this->paymentService->settings) && $this->paymentService->settings['payPalPlus'] == 0) )
         {
-            $shippingCountries = $this->paymentService->settings['shippingCountries'];
-            if(is_array($shippingCountries) && in_array($this->checkout->getShippingCountryId(), $shippingCountries))
+            if(array_key_exists('shippingCountries', $this->paymentService->settings))
             {
-                return true;
+                $shippingCountries = $this->paymentService->settings['shippingCountries'];
+                if(is_array($shippingCountries) && in_array($this->checkout->getShippingCountryId(), $shippingCountries))
+                {
+                    return true;
+                }
             }
         }
         return false;
@@ -90,7 +93,7 @@ class PayPalPaymentMethod extends PaymentMethodService
             {
                 if(array_key_exists('name', $this->paymentService->settings['language'][$lang]))
                 {
-                    $name = $this->paymentService->settings['language'][$lang];
+                    $name = $this->paymentService->settings['language'][$lang]['name'];
                 }
             }
         }

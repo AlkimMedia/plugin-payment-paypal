@@ -52,6 +52,7 @@ class PayPalPlusPaymentMethod extends PaymentMethodService
         $this->basketRepo       = $basketRepo;
         $this->configRepo       = $configRepo;
         $this->checkout         = $checkout;
+        $this->paymentService   = $paymentService;
         $this->paymentService->loadCurrentSettings('paypal');
     }
 
@@ -94,7 +95,7 @@ class PayPalPlusPaymentMethod extends PaymentMethodService
             {
                 if(array_key_exists('name', $this->paymentService->settings['language'][$lang]))
                 {
-                    $name = $this->paymentService->settings['language'][$lang];
+                    $name = $this->paymentService->settings['language'][$lang]['name'];
                 }
             }
         }

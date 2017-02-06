@@ -93,7 +93,7 @@ class PayPalInstallmentPaymentMethod extends PaymentMethodService
             {
                 if(array_key_exists('name', $this->paymentService->settings['language'][$lang]))
                 {
-                    $name = $this->paymentService->settings['language'][$lang];
+                    $name = $this->paymentService->settings['language'][$lang]['name'];
                 }
             }
         }
