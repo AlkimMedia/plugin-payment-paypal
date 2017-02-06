@@ -159,17 +159,17 @@ class PayPalInstallmentService
 
     public function getFinancingOptions($amount=0)
     {
-        $account = $this->paymentService->loadCurrecntAccountSettings('paypal_installment');
+        $account = $this->paymentService->loadCurrentAccountSettings('paypal_installment');
 
         $financingOptions = [];
         $financingOptions['clientSecret'] = $account['clientSecret'];
         $financingOptions['clientId'] = $account['clientId'];
 
-        $financingOptions['sandbox'] = false;
+        $financingOptions['sandbox'] = true;
 
-        if($account['environment'] == 1)
+        if(array_key_exists('environment', $account) && $account['environment'] == 0)
         {
-            $financingOptions['sandbox'] = true;
+            $financingOptions['sandbox'] = false;
         }
 
         $financingOptions['financingCountryCode'] = 'DE';

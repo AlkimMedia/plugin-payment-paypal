@@ -88,7 +88,7 @@ class PaymentController extends Controller
     /**
      * PayPal redirects to this page if the payment could not be executed or other problems occurred
      */
-    public function checkoutCancel()
+    public function checkoutCancel($mode=PaymentHelper::MODE_PAYPAL)
     {
         // clear the PayPal session values
         $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_PAY_ID, null);
@@ -101,7 +101,7 @@ class PaymentController extends Controller
     /**
      * PayPal redirects to this page if the payment was executed correctly
      */
-    public function checkoutSuccess()
+    public function checkoutSuccess($mode=PaymentHelper::MODE_PAYPAL)
     {
         // Get the PayPal payment data from the request
         $paymentId    = $this->request->get('paymentId');
@@ -119,7 +119,7 @@ class PaymentController extends Controller
         $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_PAYER_ID, $payerId);
 
         // update or create a contact
-        $this->paymentService->handlePayPalCustomer($paymentId);
+        $this->paymentService->handlePayPalCustomer($paymentId, $mode);
 
         // Redirect to the success page. The URL can be entered in the config.json.
         return $this->response->redirectTo('place-order');
