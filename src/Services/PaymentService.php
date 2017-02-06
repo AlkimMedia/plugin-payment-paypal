@@ -202,14 +202,14 @@ class PaymentService
      *
      * @return array
      */
-    public function executePayment()
+    public function executePayment($mode=PaymentHelper::MODE_PAYPAL)
     {
         // Load the mandatory PayPal data from session
         $ppPayId    = $this->sessionStorage->getSessionValue(SessionStorageService::PAYPAL_PAY_ID);
         $ppPayerId  = $this->sessionStorage->getSessionValue(SessionStorageService::PAYPAL_PAYER_ID);
 
         // Set the execute parameters for the PayPal payment
-        $executeParams = $this->getApiContextParams();
+        $executeParams = $this->getApiContextParams($mode);
 
         $executeParams['payId']     = $ppPayId;
         $executeParams['payerId']   = $ppPayerId;
@@ -234,9 +234,9 @@ class PaymentService
     /**
      * @param $paymentId
      */
-    public function handlePayPalCustomer($paymentId)
+    public function handlePayPalCustomer($paymentId, $mode=PaymentHelper::MODE_PAYPAL)
     {
-        $requestParams = $this->getApiContextParams();
+        $requestParams = $this->getApiContextParams($mode);
         $requestParams['paymentId'] = $paymentId;
 
         $response = $this->libCall->call('PayPal::getPaymentDetails', $requestParams);
@@ -443,17 +443,17 @@ class PaymentService
         {
             $settingType = 'paypal_installment';
         }
-        $account = $this->loadCurrecntAccountSettings($settingType);
+        $account = $this->loadCurrentAccountSettings($settingType);
 
         $apiContextParams = [];
         $apiContextParams['clientSecret'] = $account['clientSecret'];
         $apiContextParams['clientId'] = $account['clientId'];
 
-        $apiContextParams['sandbox'] = false;
+        $apiContextParams['sandbox'] = true;
 
-        if($account['environment'] == 1)
+        if(array_key_exists('environment', $account) && $account['environment'] == 0)
         {
-            $apiContextParams['sandbox'] = true;
+            $apiContextParams['sandbox'] = false;
         }
 
         return $apiContextParams;
@@ -472,13 +472,13 @@ class PaymentService
         }
     }
 
-    public function loadCurrecntAccountSettings($settingsType='paypal')
+    public function loadCurrentAccountSettings($settingsType='paypal')
     {
         $account = [];
         $accountId = 0;
         if(is_array($this->settings) && count($this->settings) > 0)
         {
-            $accountName = $this->settings['account'];
+            $accountId = $this->settings['account'];
         }
         else
         {
@@ -488,7 +488,7 @@ class PaymentService
 
         if($accountId > 0)
         {
-            $result = $this->accountService->getAccount($accountId);
+            $result = $this->accountService->getAccount((int)$accountId);
             $account = $result[$accountId];
         }
 

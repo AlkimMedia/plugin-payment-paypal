@@ -17,7 +17,7 @@ class Account extends Model
 {
     public $id = 0;
     public $name = '';
-    public $value = array();
+    public $value = [];
     public $createdAt = '';
     public $updatedAt = '';
 

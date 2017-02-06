@@ -146,8 +146,8 @@ class PaymentHelper
             case self::MODE_PAYPAL_PLUS:
             case self::MODE_PAYPAL_INSTALLMENT:
             case self::MODE_PAYPAL:
-                $urls['success'] = $domain.'/payment/payPal/checkoutSuccess';
-                $urls['cancel'] = $domain.'/payment/payPal/checkoutCancel';
+                $urls['success'] = $domain.'/payment/payPal/checkoutSuccess/'.$mode;
+                $urls['cancel'] = $domain.'/payment/payPal/checkoutCancel/'.$mode;
                 break;
             case self::MODE_PAYPALEXPRESS:
                 $urls['success'] = $domain.'/payment/payPal/expressCheckoutSuccess';

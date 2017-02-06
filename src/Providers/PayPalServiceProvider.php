@@ -157,8 +157,24 @@ class PayPalServiceProvider extends ServiceProvider
                     $event->getMop() == $paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALEXPRESS) ||
                     $event->getMop() == $paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALINSTALLMENT) )
                 {
+                    switch ($event->getMop())
+                    {
+                        case $paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALINSTALLMENT):
+                            $mode = PaymentHelper::MODE_PAYPAL_INSTALLMENT;
+                            break;
+                        case $paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALPLUS):
+                            $mode = PaymentHelper::MODE_PAYPAL_PLUS;
+                            break;
+                        case $paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALEXPRESS):
+                            $mode = PaymentHelper::MODE_PAYPALEXPRESS;
+                            break;
+                        default:
+                            $mode = PaymentHelper::MODE_PAYPAL;
+                            break;
+                    }
+
                     // Execute the payment
-                    $payPalPaymentData = $paymentService->executePayment();
+                    $payPalPaymentData = $paymentService->executePayment($mode);
 
                     // Check whether the PayPal payment has been executed successfully
                     if($paymentService->getReturnType() != 'errorCode')
