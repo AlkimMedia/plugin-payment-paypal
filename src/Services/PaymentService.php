@@ -202,14 +202,14 @@ class PaymentService
      *
      * @return array
      */
-    public function executePayment()
+    public function executePayment($mode=PaymentHelper::MODE_PAYPAL)
     {
         // Load the mandatory PayPal data from session
         $ppPayId    = $this->sessionStorage->getSessionValue(SessionStorageService::PAYPAL_PAY_ID);
         $ppPayerId  = $this->sessionStorage->getSessionValue(SessionStorageService::PAYPAL_PAYER_ID);
 
         // Set the execute parameters for the PayPal payment
-        $executeParams = $this->getApiContextParams();
+        $executeParams = $this->getApiContextParams($mode);
 
         $executeParams['payId']     = $ppPayId;
         $executeParams['payerId']   = $ppPayerId;
