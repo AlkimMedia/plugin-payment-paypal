@@ -164,10 +164,10 @@ class PaymentHelper
     /**
      * Create a payment in plentymarkets from the paypal execution response data
      *
-     * @param $paypalPaymentData
+     * @param mixed $paypalPaymentData
      * @return Payment
      */
-    public function createPlentyPayment(array $paypalPaymentData)
+    public function createPlentyPayment($paypalPaymentData)
     {
         $paymentData = [];
 
