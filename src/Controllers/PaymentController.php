@@ -93,6 +93,7 @@ class PaymentController extends Controller
         // clear the PayPal session values
         $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_PAY_ID, null);
         $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_PAYER_ID, null);
+        $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_INSTALLMENT_CHECK, null);
 
         // Redirects to the cancellation page. The URL can be entered in the config.json.
         return $this->response->redirectTo($this->config->get('PayPal.cancelUrl'));
@@ -123,6 +124,31 @@ class PaymentController extends Controller
 
         // Redirect to the success page. The URL can be entered in the config.json.
         return $this->response->redirectTo('place-order');
+    }
+
+    public function prepareInstallment()
+    {
+        // Get the PayPal payment data from the request
+        $paymentId    = $this->request->get('paymentId');
+        $payerId      = $this->request->get('PayerID');
+
+        // Get the PayPal Pay ID from the session
+        $ppPayId    = $this->sessionStorage->getSessionValue(SessionStorageService::PAYPAL_PAY_ID);
+
+        // Check whether the Pay ID from the session is equal to the given Pay ID by PayPal
+        if($paymentId != $ppPayId)
+        {
+            return $this->checkoutCancel();
+        }
+
+        $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_PAYER_ID, $payerId);
+        $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_INSTALLMENT_CHECK, 1);
+
+        // update or create a contact
+        $this->paymentService->handlePayPalCustomer($paymentId, PaymentHelper::MODE_PAYPAL_INSTALLMENT);
+
+        // Redirect to the success page. The URL can be entered in the config.json.
+        return $this->response->redirectTo('checkout');
     }
 
     /**

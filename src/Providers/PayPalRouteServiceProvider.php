@@ -52,5 +52,6 @@ class PayPalRouteServiceProvider extends RouteServiceProvider
          * Routes for the PayPal Installment
          */
         $router->get('payment/payPalInstallment/financingOptions/{amount}', 'PayPal\Controllers\PaymentController@calculateFinancingOptions');
+        $router->get('payment/payPalInstallment/prepareInstallment', 'PayPal\Controllers\PaymentController@prepareInstallment');
     }
 }

@@ -1,0 +1,16 @@
+<hr>
+<dt v-if="showProperty( 'basket.order_total_gross' )">
+    <strong>Finanzierungskosten</strong>
+</dt><!--
+--><dd v-if="showProperty( 'basket.order_total_gross' )">
+    {% set finanzingCosts = 10.00 %}
+    <strong>${ finanzingCosts | currency }</strong>
+</dd>
+
+<dt v-if="showProperty( 'basket.order_total_gross' )">
+    <strong>Gesamtbetrag ( mit Finanzierungskosten)</strong>
+</dt><!--
+--><dd v-if="showProperty( 'basket.order_total_gross' )">
+    {% set totalCostsIncludeFinancing = 500.00 %}
+    <strong>${ totalCostsIncludeFinancing | currency }</strong>
+</dd>

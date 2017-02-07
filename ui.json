@@ -9,13 +9,13 @@
       "entryPoint": "index.html?action=permissions"
     },
     {
-      "label": "PayPal",
+      "label": "PayPal / PayPal Plus",
       "menu": "settings/orders/paypal",
       "urlKey": "settings-paypal",
       "entryPoint": "index.html?action=settings_paypal"
     },
     {
-      "label": "PayPal Ratenkauf",
+      "label": "Ratenzahlung powerd by PayPal",
       "menu": "settings/orders/paypal",
       "urlKey": "settings-paypal-installment",
       "entryPoint": "index.html?action=settings_paypal_installment"
