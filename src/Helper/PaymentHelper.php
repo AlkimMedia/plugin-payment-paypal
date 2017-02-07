@@ -179,10 +179,10 @@ class PaymentHelper
 
         $payment->mopId             = (int)$this->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPAL);
         $payment->transactionType   = Payment::TRANSACTION_TYPE_BOOKED_POSTING;
-        $payment->status            = $this->mapStatus($paymentData['status']);
-        $payment->currency          = $paymentData['currency'];
-        $payment->amount            = $paymentData['amount'];
-        $payment->receivedAt        = $paymentData['entryDate'];
+        $payment->status            = $this->mapStatus($paypalPaymentData['state']);
+        $payment->currency          = $paypalPaymentData['transactions'][0]['amount']['currency'];
+        $payment->amount            = $paypalPaymentData['transactions'][0]['amount']['total'];
+        $payment->receivedAt        = $paypalPaymentData['create_time'];
 
         if(isset($paymentData['type']))
         {
@@ -204,12 +204,12 @@ class PaymentHelper
         /**
          * Add payment property with type booking text
          */
-        $paymentProperty[] = $this->getPaymentProperty(PaymentProperty::TYPE_BOOKING_TEXT, 'TransactionID: '.(string)$paymentData['saleId']);
+        $paymentProperty[] = $this->getPaymentProperty(PaymentProperty::TYPE_BOOKING_TEXT, 'TransactionID: '.(string)$paypalPaymentData['cart']);
 
         /**
          * Add payment property with type transactionId
          */
-        $paymentProperty[] = $this->getPaymentProperty(PaymentProperty::TYPE_TRANSACTION_ID, $paymentData['saleId']);
+        $paymentProperty[] = $this->getPaymentProperty(PaymentProperty::TYPE_TRANSACTION_ID, $paypalPaymentData['cart']);
 
         /**
          * Add payment property with type origin
@@ -220,6 +220,17 @@ class PaymentHelper
          * Add payment property with type account of the receiver
          */
         $paymentProperty[] = $this->getPaymentProperty(PaymentProperty::TYPE_ACCOUNT_OF_RECEIVER, 'PAY-473493948'); //TODO IBAN BIC empfänger property
+
+        /**
+         * TODO Add the following properties
+         *
+         * // Gebühr
+         *  $paypalPaymentData['transactions'][0]['related_resources'][0]['sale']['transaction_fee']['value']
+         *  $paypalPaymentData['transactions'][0]['related_resources'][0]['sale']['transaction_fee']['currency']
+         *
+         * // Invoice number
+         *  $paypalPaymentData['transactions'][0]['invoice_number']
+         */
 
         $payment->property = $paymentProperty;
 
