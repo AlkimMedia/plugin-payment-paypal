@@ -167,10 +167,10 @@ class PaymentHelper
     /**
      * Create a payment in plentymarkets from the paypal execution response data
      *
-     * @param mixed $paypalPaymentData
+     * @param array $paypalPaymentData
      * @return Payment
      */
-    public function createPlentyPayment($paypalPaymentData)
+    public function createPlentyPayment(array $paypalPaymentData)
     {
         $paymentData = [];
 
@@ -179,7 +179,7 @@ class PaymentHelper
 
         $payment->mopId             = (int)$this->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPAL);
         $payment->transactionType   = Payment::TRANSACTION_TYPE_BOOKED_POSTING;
-        $payment->status            = $this->mapStatus($paypalPaymentData['state']);
+        $payment->status            = $this->mapStatus((STRING)$paypalPaymentData['state']);
         $payment->currency          = $paypalPaymentData['transactions'][0]['amount']['currency'];
         $payment->amount            = $paypalPaymentData['transactions'][0]['amount']['total'];
         $payment->receivedAt        = $paypalPaymentData['create_time'];
