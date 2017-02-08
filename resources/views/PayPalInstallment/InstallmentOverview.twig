@@ -4,43 +4,38 @@
     <div class="modal-dialog modal-md" role="document">
         <div class="modal-content">
             <div class="modal-body">
-                <div class="cmp cmp-checkout-sidebar">
-                    <h4>Ratenzahlung powered by PayPal überprüfen</h4>
+                <div class="cmp cmp-totals">
+                    <h2>Ratenzahlung powered by PayPal überprüfen</h2>
                     <hr>
-                    <table>
-                        <tr>
-                            <th>Warenwert (Brutto)</th>
-                            <td>{{ basketItemAmount }}</td>
-                        </tr>
-                        <tr>
-                            <th>Versandkosten (Brutto)</th>
-                            <td>{{ basketShippingAmount }}</td>
-                        </tr>
-                        <tr>
-                            <th>Gesamtsumme (Netto)</th>
-                            <td>{{ basketAmountNet }}</td>
-                        </tr>
-                        <tr>
-                            <th>Gesamtsumme (Brutto)</th>
-                            <td>{{ basketAmountGro }}</td>
-                        </tr>
-                        <tr>
-                            <th>Finanzierungskosten</th>
-                            <td>{{ financingCosts }}</td>
-                        </tr>
-                        <tr>
-                            <th>Gesamtbetrag ( mit Finanzierungskosten)</th>
-                            <td><strong>{{ totalCostsIncludeFinancing }}</strong></td>
-                        </tr>
-                    </table>
+                    <h3>Summe</h3>
+                    <div>
+                       <dl>
+                           <dt>Warenwert (Brutto)</dt>
+                           <dd>{{ basketItemAmount|localizedcurrency(currency) }}</dd>
+                           <dt>Versandkosten (Brutto)</dt>
+                           <dd>{{ basketShippingAmount|localizedcurrency(currency) }}</dd>
+                           <hr>
+                           <dt>Gesamtsumme (Netto)</dt>
+                           <dd>{{ basketAmountNet|localizedcurrency(currency) }}</dd>
+                           <dt>Gesamtsumme (Brutto)</dt>
+                           <dd>{{ basketAmountGro|localizedcurrency(currency) }}</dd>
+                           <hr>
+                           <dt>Finanzierungskosten</dt>
+                           <dd>{{ financingCosts|localizedcurrency(currency) }}</dd>
+                           <dt>Gesamtbetrag ( mit Finanzierungskosten)</dt>
+                           <dd>{{ totalCostsIncludeFinancing|localizedcurrency(currency) }}</dd>
+                       </dl>
+                    </div>
                 </div>
+            </div>
+            <div class="modal-footer">
                 <a href="/payment/payPal/checkoutCancel/installment">
-                    <button class="btn btn-error btn-block" :disabled="waiting || waitingForInput">
-                        <i class="fa fa-cancel" aria-hidden="true"></i>Abbruch
+                    <button class="btn btn-error pull-left" :disabled="waiting || waitingForInput">
+                        <i class="fa fa-cancel" aria-hidden="true"></i>Kauf abbrechen
                     </button>
                 </a>
                 <a href="/payment/payPal/checkoutSuccess/installment?paymentId={{ paymentId }}&PayerID={{ payerId }}">
-                    <button class="btn btn-primary btn-block" :disabled="waiting || waitingForInput">
+                    <button class="btn btn-primary pull-right" :disabled="waiting || waitingForInput">
                         <i class="fa fa-arrow-right" aria-hidden="true"></i> {{ trans("PluginCeres::Template.orderBuyNow") }}
                     </button>
                 </a>
@@ -54,3 +49,16 @@
         $("#modalPayPalInstallmentCheck").modal("show");
     });
 </script>
+
+<style>
+#modalPayPalInstallmentCheck dt
+{
+    width: 65%;
+}
+#modalPayPalInstallmentCheck dd
+{
+    text-align: right;
+    width: 25%;
+}
+
+</style>

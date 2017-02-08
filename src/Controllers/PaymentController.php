@@ -144,8 +144,9 @@ class PaymentController extends Controller
         $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_PAYER_ID, $payerId);
         $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_INSTALLMENT_CHECK, 1);
 
-        // update or create a contact
-        $this->paymentService->handlePayPalCustomer($paymentId, PaymentHelper::MODE_PAYPAL_INSTALLMENT);
+        // Get the offered finacing costs
+        $creditFinancingOffered = $this->paymentService->getFinancingCosts($paymentId, PaymentHelper::MODE_PAYPAL_INSTALLMENT);
+        $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_INSTALLMENT_COSTS, $creditFinancingOffered);
 
         // Redirect to the success page. The URL can be entered in the config.json.
         return $this->response->redirectTo('checkout');

@@ -236,13 +236,41 @@ class PaymentService
      */
     public function handlePayPalCustomer($paymentId, $mode=PaymentHelper::MODE_PAYPAL)
     {
+        $response = $this->getPaymentDetails($paymentId, $mode);
+
+        // update or create a contact
+        $this->contactService->handlePayPalContact($response['payer']);
+    }
+
+    /**
+     * @param $paymentId
+     * @param string $mode
+     * @return mixed|null
+     */
+    public function getFinancingCosts($paymentId, $mode=PaymentHelper::MODE_PAYPAL_INSTALLMENT)
+    {
+        $response = $this->getPaymentDetails($paymentId, $mode);
+
+        if(is_array($response) && array_key_exists('credit_financing_offered', $response))
+        {
+            return $response['credit_financing_offered'];
+        }
+        return null;
+    }
+
+    /**
+     * @param $paymentId
+     * @param string $mode
+     * @return array
+     */
+    private function getPaymentDetails($paymentId, $mode=PaymentHelper::MODE_PAYPAL)
+    {
         $requestParams = $this->getApiContextParams($mode);
         $requestParams['paymentId'] = $paymentId;
 
         $response = $this->libCall->call('PayPal::getPaymentDetails', $requestParams);
 
-        // update or create a contact
-        $this->contactService->handlePayPalContact($response['payer']);
+        return $response;
     }
 
     /**
