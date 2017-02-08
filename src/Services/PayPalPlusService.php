@@ -118,7 +118,7 @@ class PayPalPlusService
                         'description'   => $this->frontendPaymentMethodRepositoryContract->getPaymentMethodDescription($paymentMethod, 'de')
                     ];
 
-                    $changeCase[] = 'case "'.$this->frontendPaymentMethodRepositoryContract->getPaymentMethodName($paymentMethod, 'de').'": $.post("payment/payPalPlus/changePaymentMethod/", { "paymentMethod" : "'.$paymentMethod->id.'" } ); break;';
+                    $changeCase[] = 'case "'.$this->frontendPaymentMethodRepositoryContract->getPaymentMethodName($paymentMethod, 'de').'": $.post("/payment/payPalPlus/changePaymentMethod/", { "paymentMethod" : "'.$paymentMethod->id.'" } ); break;';
                 }
             }
 
@@ -145,7 +145,7 @@ class PayPalPlusService
                                             {
                                                 '.implode("\n",$changeCase).'
                                                 default:
-                                                    $.post("payment/payPalPlus/changePaymentMethod/", { "paymentMethod" : "'.$this->paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALPLUS).'" } );
+                                                    $.post("/payment/payPalPlus/changePaymentMethod/", { "paymentMethod" : "'.$this->paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALPLUS).'" } );
                                                     break;
                                             }
                                         },';
