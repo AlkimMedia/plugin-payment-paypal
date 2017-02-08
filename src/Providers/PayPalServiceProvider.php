@@ -180,7 +180,7 @@ class PayPalServiceProvider extends ServiceProvider
                     if($paymentService->getReturnType() != 'errorCode')
                     {
                         // Create a plentymarkets payment from the paypal execution params
-                        $plentyPayment = $paymentHelper->createPlentyPayment($payPalPaymentData);
+                        $plentyPayment = $paymentHelper->createPlentyPayment((array)$payPalPaymentData);
 
                         if($plentyPayment instanceof Payment)
                         {
