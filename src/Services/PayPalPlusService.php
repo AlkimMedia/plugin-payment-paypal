@@ -112,9 +112,9 @@ class PayPalPlusService
                         continue;
                     }
                     $thirdPartyPaymentMethods[] = [
-                        'redirectUrl'   => 'https://master.plentymarkets.com/io/checkout/',
+                        'redirectUrl'   => '/checkout/',
                         'methodName'    => $this->frontendPaymentMethodRepositoryContract->getPaymentMethodName($paymentMethod, 'de'),
-                        'imageUrl'      => 'https://master.plentymarkets.com/'.$this->frontendPaymentMethodRepositoryContract->getPaymentMethodIcon($paymentMethod, 'de'),
+                        'imageUrl'      => '/'.$this->frontendPaymentMethodRepositoryContract->getPaymentMethodIcon($paymentMethod, 'de'),
                         'description'   => $this->frontendPaymentMethodRepositoryContract->getPaymentMethodDescription($paymentMethod, 'de')
                     ];
 

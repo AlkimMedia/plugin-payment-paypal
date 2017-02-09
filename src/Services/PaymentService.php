@@ -285,7 +285,7 @@ class PaymentService
 
         if($preparePaymentResult == 'errorCode')
         {
-            return 'http://master.plentymarkets.com/basket';
+            return '/basket';
         }
         elseif($preparePaymentResult == 'redirectUrl')
         {
