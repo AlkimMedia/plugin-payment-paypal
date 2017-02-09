@@ -60,29 +60,35 @@ class SettingsService extends DatabaseBaseService
                 foreach ($setting as $store => $values)
                 {
                     $id = 0;
-                    $store = str_replace('PID_', '', $store);
+                    $store = (int)str_replace('PID_', '', $store);
 
-                    $existValue = $this->getValues(Settings::class, ['name', 'webstore'], [$mode, $store], ['=','=']);
-                    if(isset($existValue) && is_array($existValue))
+                    if($store > 0)
                     {
-                        if($existValue[0] instanceof Settings)
+                        $existValue = $this->getValues(Settings::class, ['name', 'webstore'], [$mode, $store], ['=','=']);
+                        if(isset($existValue) && is_array($existValue))
                         {
-                            $id = $existValue[0]->id;
+                            if($existValue[0] instanceof Settings)
+                            {
+                                $id = $existValue[0]->id;
+                            }
+                        }
+
+                        /** @var Settings $settingModel */
+                        $settingModel = pluginApp(Settings::class);
+                        if($id > 0)
+                        {
+                            $settingModel->id = $id;
+                        }
+                        $settingModel->webstore = $store;
+                        $settingModel->name = $mode;
+                        $settingModel->value = $values;
+                        $settingModel->updatedAt = date('Y-m-d H:i:s');
+
+                        if($settingModel instanceof Settings)
+                        {
+                            $this->setValue($settingModel);
                         }
                     }
-
-                    /** @var Settings $settingModel */
-                    $settingModel = pluginApp(Settings::class);
-                    if($id > 0)
-                    {
-                        $settingModel->id = $id;
-                    }
-                    $settingModel->webstore = $store;
-                    $settingModel->name = $mode;
-                    $settingModel->value = $values;
-                    $settingModel->updatedAt = date('Y-m-d H:i:s');
-
-                    $this->setValue($settingModel);
                 }
             }
             return 1;
