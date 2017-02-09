@@ -85,7 +85,7 @@ class SettingsService extends DatabaseBaseService
                     $this->setValue($settingModel);
                 }
             }
-            return true;
+            return 1;
         }
     }
 

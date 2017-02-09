@@ -67,7 +67,7 @@ class AccountService extends DatabaseBaseService
             $accountModel->value = $newAccount;
             return $this->setValue($accountModel);
         }
-        return false;
+        return null;
     }
 
     public function updateAccount($updatedAccount)
@@ -87,9 +87,9 @@ class AccountService extends DatabaseBaseService
                     }
                 }
             }
-            return true;
+            return 1;
         }
-        return false;
+        return null;
     }
 
     public function deleteAccount($accountId)
@@ -102,6 +102,6 @@ class AccountService extends DatabaseBaseService
 
             return $this->deleteValue($accountModel);
         }
-        return false;
+        return null;
     }
 }
