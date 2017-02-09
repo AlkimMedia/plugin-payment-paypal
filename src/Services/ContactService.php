@@ -97,21 +97,21 @@ class ContactService
         /** @var Country $country */
         $country = $countryContract->getCountryByIso($ppShippingAddress['country_code'], 'isoCode2');
 
-        $address->setAttribute('name2', $name[0]);
-        $address->setAttribute('name3', $name[1]);
-        $address->setAttribute('address1', $street[0]);
-        $address->setAttribute('address2', $street[1]);
-        $address->setAttribute('town', $ppShippingAddress['city']);
-        $address->setAttribute('postalCode', $ppShippingAddress['postal_code']);
-        $address->setAttribute('countryId', $country->id);
+        $address->name2 = $name[0];
+        $address->name3 = $name[1];
+        $address->address1 = $street[0];
+        $address->address2 = $street[1];
+        $address->town = $ppShippingAddress['city'];
+        $address->postalCode = $ppShippingAddress['postal_code'];
+        $address->countryId = $country->id;
 
         $addressOptions = [];
 
         /** @var AddressOption $addressOption */
         $addressOption = pluginApp(\Plenty\Modules\Account\Address\Models\AddressOption::class);
 
-        $addressOption->setAttribute('typeId', AddressOption::TYPE_EMAIL);
-        $addressOption->setAttribute('value', $email);
+        $addressOption->typeId = AddressOption::TYPE_EMAIL;
+        $addressOption->value = $email;
 
         $addressOptions[] = $addressOption->toArray();
 

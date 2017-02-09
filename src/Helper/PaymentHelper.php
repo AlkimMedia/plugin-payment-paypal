@@ -191,7 +191,7 @@ class PaymentHelper
 
         if(isset($paymentData['parentId']))
         {
-            $payment->parentId = $paymentData['parentId'];
+            $payment->parent = $paymentData['parentId'];
         }
 
         if(isset($paymentData['unaccountable']))
