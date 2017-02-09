@@ -2,8 +2,8 @@
 
 namespace PayPal\Methods;
 
-use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
-use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
+use PayPal\Services\PaymentService;
+use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodService;
 
 /**
@@ -13,26 +13,27 @@ use Plenty\Modules\Payment\Method\Contracts\PaymentMethodService;
 class PayPalExpressPaymentMethod extends PaymentMethodService
 {
     /**
-     * @var BasketRepositoryContract
+     * @var Checkout
      */
-    private $basketRepo;
+    private $checkout;
 
     /**
-     * @var ContactRepositoryContract
+     * @var PaymentService
      */
-    private $contactRepo;
+    private $paymentService;
 
     /**
      * PayPalExpressPaymentMethod constructor.
      *
-     * @param BasketRepositoryContract $basketRepo
-     * @param ContactRepositoryContract $contactRepo
+     * @param Checkout $checkout
+     * @param PaymentService $paymentService
      */
-    public function __construct(BasketRepositoryContract $basketRepo,
-                                ContactRepositoryContract $contactRepo)
+    public function __construct(Checkout                    $checkout,
+                                PaymentService              $paymentService)
     {
-        $this->basketRepo = $basketRepo;
-        $this->contactRepo = $contactRepo;
+        $this->checkout         = $checkout;
+        $this->paymentService   = $paymentService;
+        $this->paymentService->loadCurrentSettings('paypal');
     }
 
     /**
@@ -42,6 +43,17 @@ class PayPalExpressPaymentMethod extends PaymentMethodService
      */
     public function isActive():bool
     {
+        /**
+         * Check the allowed shipping countries
+         */
+        if(array_key_exists('shippingCountries', $this->paymentService->settings))
+        {
+            $shippingCountries = $this->paymentService->settings['shippingCountries'];
+            if(is_array($shippingCountries) && in_array($this->checkout->getShippingCountryId(), $shippingCountries))
+            {
+                return true;
+            }
+        }
         return false;
     }
 }
