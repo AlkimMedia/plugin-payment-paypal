@@ -74,14 +74,17 @@ class AccountService extends DatabaseBaseService
     {
         if(is_array($updatedAccount) && count($updatedAccount) > 0)
         {
-            foreach ($updatedAccount as $accountId => $accountData)
+            foreach ($updatedAccount as $accountData)
             {
-                $account = $this->getValue(Account::class, $accountId);
-                if($account instanceof Account)
+                if(array_key_exists('id', $accountData))
                 {
-                    $account->value = $accountData;
-                    $account->updatedAt = date('Y-m-d H:i:s');
-                    $this->setValue($account);
+                    $account = $this->getValue(Account::class, $accountData['id']);
+                    if($account instanceof Account)
+                    {
+                        $account->value = $accountData;
+                        $account->updatedAt = date('Y-m-d H:i:s');
+                        $this->setValue($account);
+                    }
                 }
             }
             return true;
