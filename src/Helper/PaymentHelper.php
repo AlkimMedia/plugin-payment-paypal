@@ -232,7 +232,7 @@ class PaymentHelper
          *  $paypalPaymentData['transactions'][0]['invoice_number']
          */
 
-        $payment->property = $paymentProperty;
+        $payment->properties = $paymentProperty;
 
         $payment = $this->paymentRepository->createPayment($payment);
 
