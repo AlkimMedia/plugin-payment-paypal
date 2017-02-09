@@ -3,7 +3,7 @@
 use PayPal\Api\Webhook;
 use PayPal\Api\WebhookEventType;
 
-$result = false;
+require_once __DIR__.'/PayPalHelper.php';
 
 $apiContext = PayPalHelper::getApiContext(  SdkRestApi::getParam('clientId', true),
                                             SdkRestApi::getParam('clientSecret', true),
@@ -35,12 +35,16 @@ if($notificationUrl)
 
     try
     {
-        $result = $webhook->create($apiContext);
+        $webhook = $webhook->create($apiContext);
+    }
+    catch (PayPal\Exception\PPConnectionException $ex)
+    {
+        return json_decode($ex->getData());
     }
     catch (Exception $e)
     {
-
+        return json_decode($e->getData());
     }
 }
 
-return $result;
+return $webhook->toArray();
