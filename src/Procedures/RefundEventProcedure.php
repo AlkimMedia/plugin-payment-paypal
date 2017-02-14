@@ -45,7 +45,7 @@ class RefundEventProcedure
                 OR $payment->mopId == $paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALEXPRESS))
                 {
                     // the paypal transactionsId is mandatory for the paypal refund
-                    $properties = $payment->property;
+                    $properties = $payment->properties;
 
                     if(is_array($properties))
                     {
