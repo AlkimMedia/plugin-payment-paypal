@@ -7,7 +7,7 @@
     "pluginIcon": "icon_plugin_xs.png",
     "price": 0.00,
     "description": "The official PayPal plugin for plentymarkets",
-    "shortDescription":{ "de":"Das ofizielle PayPal Plugin für plentymarkets.", "en":"The official PayPal plugin for plentymarkets"},
+    "shortDescription":{ "de":"Das offizielle PayPal-Plugin für plentymarkets", "en":"The official PayPal plugin for plentymarkets"},
     "categories":["3519"],
     "keywords": ["paypal", "official", "plentymarkets", "payment"],
     "author": "plentymarkets GmbH",
