@@ -13,7 +13,7 @@
   "account": "Account",
   "accounts": "Accounts",
   "activeAccount": "Active account",
-  "addNewPayPalAccount": "Add a new PayPal account",
+  "addNewPayPalAccount": "Add PayPal account",
   "addAccount": "Add account",
   "close": "Close",
   "email": "Email",
@@ -60,6 +60,6 @@
   "successDeleteAccount": "Account deleted.",
   "selectAll": "Select All",
   "languageSettings": "Language Setting",
-  "payPalInstallment": "Installment",
+  "payPalInstallment": "Activate calculation",
   "payPalModeLabel": "payPalModeLabel"
 }

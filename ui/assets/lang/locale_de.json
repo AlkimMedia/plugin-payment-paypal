@@ -13,7 +13,7 @@
   "account": "Konto",
   "accounts": "Konten",
   "activeAccount": "Aktives Konto",
-  "addNewPayPalAccount": "Ein neues PayPal-Konto hinzufügen",
+  "addNewPayPalAccount": "PayPal-Konto hinzufügen",
   "addAccount": "Konto hinzufügen",
   "close": "Schließen",
   "email": "E-Mail",
@@ -60,6 +60,6 @@
   "successDeleteAccount": "Konto gelöscht.",
   "selectAll": "Alle auswählen",
   "languageSettings": "Spracheinstellungen",
-  "payPalInstallment": "Ratenkauf",
+  "payPalInstallment": "Berechnung aktivieren",
   "payPalModeLabel": "Spezifische Bewerbung"
 }
