@@ -80,11 +80,27 @@ class NotificationService
         {
             return (string)$response['id'].'_'.(string)$response['url'];
         }
+        else
+        {
+            $this->deleteWebhooks();
+
+            $response = $this->libCall->call('PayPal::createWebhook', $params);
+
+            if(is_array($response) && !empty($response['id']))
+            {
+                return (string)$response['id'].'_'.(string)$response['url'];
+            }
+        }
 
         $this   ->getLogger('NotificationService_createWebhook')
                 ->error(json_encode($response));
 
         return false;
+    }
+
+    public function deleteWebhooks()
+    {
+        $this->libCall->call('PayPal::deleteWebhook', $this->paymentService->getApiContextParams());
     }
 
     /**
@@ -124,7 +140,7 @@ class NotificationService
      */
     public function listWebhooks()
     {
-        return $this->libCall->call('PayPal::listAvailableWebhooks');
+        return $this->libCall->call('PayPal::listAvailableWebhooks', $this->paymentService->getApiContextParams());
     }
 
 }
