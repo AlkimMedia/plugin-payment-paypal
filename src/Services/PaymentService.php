@@ -384,10 +384,10 @@ class PaymentService
         $payPalRequestParams = $this->getApiContextParams($mode);
 
         // Set the PayPal Web Profile ID
-        $webProfilId = $this->config->get('PayPal.webProfileID');
-        if(isset($webProfilId) && strlen($webProfilId) > 0 )
+        $webProfileId = $this->config->get('PayPal.webProfileID');
+        if(isset($webProfileId) && strlen($webProfileId) > 0 )
         {
-            $payPalRequestParams['webProfileId'] = $webProfilId;
+            $payPalRequestParams['webProfileId'] = $webProfileId;
         }
 
         /** @var Basket $basket */
@@ -402,17 +402,19 @@ class PaymentService
         /** @var BasketItem $basketItem */
         foreach($basket->basketItems as $basketItem)
         {
+            $payPalBasketItem['itemId'] = $basketItem->itemId;
+            $payPalBasketItem['quantity'] = $basketItem->quantity;
+            $payPalBasketItem['price'] = $basketItem->price;
+
             /** @var \Plenty\Modules\Item\Item\Models\Item $item */
             $item = $itemContract->show($basketItem->itemId);
-
-            $basketItem = $basketItem->getAttributes();
 
             /** @var \Plenty\Modules\Item\Item\Models\ItemText $itemText */
             $itemText = $item->texts;
 
-            $basketItem['name'] = $itemText->first()->name1;
+            $payPalBasketItem['name'] = $itemText->first()->name1;
 
-            $payPalRequestParams['basketItems'][] = $basketItem;
+            $payPalRequestParams['basketItems'][] = $payPalBasketItem;
         }
 
         /**

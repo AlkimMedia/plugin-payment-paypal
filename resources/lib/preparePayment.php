@@ -65,11 +65,53 @@ if(is_array($address) && count($address) > 0)
     $itemList->setShippingAddress($shippingAddress);
 }
 
+$couponAmount = $basket['couponDiscount'];
+$subtotal = $basket['itemSum'];
+
+if($subtotal != round($basket['itemSum'], 2))
+{
+    $differArticleAmount =  round(($basket['itemSum'] - $subtotal), 2);
+
+    if($differArticleAmount < 0)
+    {
+        // gutschein
+        $couponAmount += $differArticleAmount;
+    }
+    else
+    {
+        $pppItem = new Item();
+        $pppItem->setName('Rundungsdifferenzartikel'); // i18n
+        $pppItem->setCurrency($basket['currency']);
+        $pppItem->setQuantity(1);
+        $pppItem->setPrice($differArticleAmount);
+
+        $itemList->addItem($pppItem);
+
+        //add the item amount to pppSubtotal
+        $subtotal += $differArticleAmount;
+    }
+}
+
 /** @var Details $details */
 $details = new Details();
 $details->
     setShipping($basket['shippingAmount'])->
-    setSubtotal($basket['itemSum']);
+    setSubtotal($subtotal);
+
+if($couponAmount)
+{
+    //Nachkommastellenrundungsterrorfix, differenz zwischen plenty und paypal:
+    $couponFixedAmount = round(($couponAmount), 2);
+    $pppTotalAmount = floatval($details->getShipping()) + floatval($details->getSubtotal()) + $couponFixedAmount;
+    $totalAmountDiff = $basket['basketAmount'] - $pppTotalAmount;
+
+    if($totalAmountDiff)
+    {
+        $couponFixedAmount += $totalAmountDiff;
+    }
+
+    $details->setShippingDiscount($couponFixedAmount);
+}
 
 /** @var Amount $amount */
 $amount = new Amount();

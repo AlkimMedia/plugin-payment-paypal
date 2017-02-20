@@ -10,6 +10,7 @@ namespace PayPal\Controllers;
 
 use PayPal\Services\Database\AccountService;
 use PayPal\Services\Database\SettingsService;
+use PayPal\Services\NotificationService;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
 
@@ -26,15 +27,23 @@ class SettingsController extends Controller
     private $accountService;
 
     /**
+     * @var NotificationService
+     */
+    private $notificationService;
+
+    /**
      * SettingsController constructor.
      * @param SettingsService $settingsService
      * @param AccountService $accountService
+     * @param NotificationService $notificationService
      */
-    public function __construct(    SettingsService $settingsService,
-                                    AccountService $accountService)
+    public function __construct(SettingsService $settingsService,
+                                AccountService $accountService,
+                                NotificationService $notificationService)
     {
         $this->settingsService = $settingsService;
         $this->accountService = $accountService;
+        $this->notificationService = $notificationService;
     }
 
     /**
@@ -43,6 +52,11 @@ class SettingsController extends Controller
     public function createAccount(Request $request)
     {
         $newAccount = $request->get('account');
+
+        $webhook = $this->notificationService->createWebhook();
+
+        $newAccount['webhook'] = $webhook;
+
         if($newAccount)
         {
             if($this->accountService->createAccount($newAccount))

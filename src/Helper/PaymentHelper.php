@@ -184,19 +184,19 @@ class PaymentHelper
         $payment->amount            = $paypalPaymentData['transactions'][0]['amount']['total'];
         $payment->receivedAt        = $paypalPaymentData['create_time'];
 
-        if(isset($paymentData['type']))
+        if(isset($paypalPaymentData['type']))
         {
-            $payment->type = $paymentData['type'];
+            $payment->type = $paypalPaymentData['type'];
         }
 
-        if(isset($paymentData['parentId']))
+        if(isset($paypalPaymentData['parentId']))
         {
-            $payment->parent = $paymentData['parentId'];
+            $payment->parent = $paypalPaymentData['parentId'];
         }
 
-        if(isset($paymentData['unaccountable']))
+        if(isset($paypalPaymentData['unaccountable']))
         {
-            $payment->unaccountable = $paymentData['unaccountable'];
+            $payment->unaccountable = $paypalPaymentData['unaccountable'];
         }
 
         $paymentProperty = [];
@@ -255,6 +255,34 @@ class PaymentHelper
         $paymentProperty->value = $value;
 
         return $paymentProperty;
+    }
+
+    /**
+     * @param $saleId
+     * @param $state
+     */
+    public function updatePayment($saleId, $state)
+    {
+        /** @var array $payments */
+        $payments = $this->paymentRepository->getPaymentsByPropertyTypeAndValue(PaymentProperty::TYPE_TRANSACTION_ID, $saleId);
+
+        $state = $this->mapStatus((STRING)$state);
+
+        /** @var Payment $payment */
+        foreach($payments as $payment)
+        {
+            if($payment->status != $state)
+            {
+                $payment->status = $state;
+
+                if($state == Payment::STATUS_APPROVED || $state == Payment::STATUS_CAPTURED)
+                {
+                    $payment->unaccountable = 0;
+                }
+
+                $this->paymentRepository->updatePayment($payment);
+            }
+        }
     }
 
     /**
