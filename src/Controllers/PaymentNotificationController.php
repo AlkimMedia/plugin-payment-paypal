@@ -55,7 +55,7 @@ class PaymentNotificationController extends Controller
      */
     public function handleNotification()
     {
-        $headers = $this->request->getHeaders();
+//        $headers = $this->request->header();
 
         $body = $this->request->getContent();
 
@@ -69,9 +69,9 @@ class PaymentNotificationController extends Controller
 //                ->setReferenceValue('body')
 //                ->info($body);
 
-        $validity = $this->notificationService->validateNotification($headers, $body, $this->request->get('id'));
+//        $validity = $this->notificationService->validateNotification($headers, $body, $this->request->get('id'));
 
-        if($validity)
+        if(false)
         {
             $eventType = $this->request->get('event_type');
 
