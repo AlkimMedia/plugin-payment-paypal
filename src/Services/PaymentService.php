@@ -2,7 +2,9 @@
 
 namespace PayPal\Services;
 
+use PayPal\Services\Database\AccountService;
 use Plenty\Modules\Basket\Models\BasketItem;
+use Plenty\Modules\Frontend\Services\SystemService;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Payment\Models\Payment;
@@ -13,7 +15,7 @@ use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 
 use PayPal\Helper\PaymentHelper;
 use PayPal\Services\SessionStorageService;
-use PayPal\Services\SettingsService;
+use PayPal\Services\Database\SettingsService;
 use PayPal\Services\ContactService;
 
 /**
@@ -67,6 +69,26 @@ class PaymentService
     private $contactService;
 
     /**
+     * @var SystemService
+     */
+    private $systemService;
+
+    /**
+     * @var SettingsService
+     */
+    private $settingsService;
+
+    /**
+     * @var AccountService
+     */
+    private $accountService;
+
+    /**
+     * @var array
+     */
+    public $settings = [];
+
+    /**
      * PaymentService constructor.
      *
      * @param PaymentMethodRepositoryContract $paymentMethodRepository
@@ -76,6 +98,8 @@ class PaymentService
      * @param LibraryCallContract $libCall
      * @param AddressRepositoryContract $addressRepo
      * @param SessionStorageService $sessionStorage
+     * @param SystemService $systemService
+     * @param SettingsService $settingsService
      */
     public function __construct(  PaymentMethodRepositoryContract $paymentMethodRepository,
                                   PaymentRepositoryContract $paymentRepository,
@@ -84,7 +108,10 @@ class PaymentService
                                   LibraryCallContract $libCall,
                                   AddressRepositoryContract $addressRepo,
                                   SessionStorageService $sessionStorage,
-                                  ContactService $contactService)
+                                  ContactService $contactService,
+                                  SystemService $systemService,
+                                  SettingsService $settingsService,
+                                  AccountService  $accountService)
     {
         $this->paymentMethodRepository    = $paymentMethodRepository;
         $this->paymentRepository          = $paymentRepository;
@@ -94,6 +121,9 @@ class PaymentService
         $this->config                     = $config;
         $this->sessionStorage             = $sessionStorage;
         $this->contactService             = $contactService;
+        $this->systemService              = $systemService;
+        $this->settingsService            = $settingsService;
+        $this->accountService             = $accountService;
     }
 
     /**
@@ -111,7 +141,7 @@ class PaymentService
      *
      * @param Basket $basket
      * @param string $mode
-     * @return string
+     * @return string|array
      */
     public function getPaymentContent(Basket $basket, $mode = ''):string
     {
@@ -161,7 +191,7 @@ class PaymentService
         if(is_null($paymentContent) OR !strlen($paymentContent))
         {
             $this->returnType = 'errorCode';
-            return 'An unknown error occured, please try again.';
+            return json_encode($preparePaymentResult);
         }
 
         return $paymentContent;
@@ -172,14 +202,14 @@ class PaymentService
      *
      * @return array
      */
-    public function executePayment()
+    public function executePayment($mode=PaymentHelper::MODE_PAYPAL)
     {
         // Load the mandatory PayPal data from session
         $ppPayId    = $this->sessionStorage->getSessionValue(SessionStorageService::PAYPAL_PAY_ID);
         $ppPayerId  = $this->sessionStorage->getSessionValue(SessionStorageService::PAYPAL_PAYER_ID);
 
         // Set the execute parameters for the PayPal payment
-        $executeParams = $this->getApiContextParams();
+        $executeParams = $this->getApiContextParams($mode);
 
         $executeParams['payId']     = $ppPayId;
         $executeParams['payerId']   = $ppPayerId;
@@ -194,14 +224,53 @@ class PaymentService
             return $executeResponse['error'].': '.$executeResponse['error_msg'];
         }
 
-        // update or create a contact
-        $this->contactService->handlePayPalContact($executeResponse['payerInfo']);
-
         // Clear the session parameters
         $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_PAY_ID, null);
         $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_PAYER_ID, null);
 
         return $executeResponse;
+    }
+
+    /**
+     * @param $paymentId
+     */
+    public function handlePayPalCustomer($paymentId, $mode=PaymentHelper::MODE_PAYPAL)
+    {
+        $response = $this->getPaymentDetails($paymentId, $mode);
+
+        // update or create a contact
+        $this->contactService->handlePayPalContact($response['payer']);
+    }
+
+    /**
+     * @param $paymentId
+     * @param string $mode
+     * @return mixed|null
+     */
+    public function getFinancingCosts($paymentId, $mode=PaymentHelper::MODE_PAYPAL_INSTALLMENT)
+    {
+        $response = $this->getPaymentDetails($paymentId, $mode);
+
+        if(is_array($response) && array_key_exists('credit_financing_offered', $response))
+        {
+            return $response['credit_financing_offered'];
+        }
+        return null;
+    }
+
+    /**
+     * @param $paymentId
+     * @param string $mode
+     * @return array
+     */
+    private function getPaymentDetails($paymentId, $mode=PaymentHelper::MODE_PAYPAL)
+    {
+        $requestParams = $this->getApiContextParams($mode);
+        $requestParams['paymentId'] = $paymentId;
+
+        $response = $this->libCall->call('PayPal::getPaymentDetails', $requestParams);
+
+        return $response;
     }
 
     /**
@@ -216,7 +285,7 @@ class PaymentService
 
         if($preparePaymentResult == 'errorCode')
         {
-            return 'http://master.plentymarkets.com/basket';
+            return '/basket';
         }
         elseif($preparePaymentResult == 'redirectUrl')
         {
@@ -278,11 +347,8 @@ class PaymentService
             throw new \Exception($webProfileResult['error_msg']);
         }
 
-        /** @var SettingsService $settingsService */
-        $settingsService = pluginApp(SettingsService::class);
-
         // save the webProfile
-        $settingsService->setSettingsValue(SettingsService::WEB_PROFILE, $webProfileResult);
+//        $settingsService->setSettingsValue(SettingsService::WEB_PROFILE, $webProfileResult);
 
         return $webProfileResult;
     }
@@ -313,15 +379,15 @@ class PaymentService
      * @param String $mode
      * @return array
      */
-    private function getPaypalParams(Basket $basket = null, $mode)
+    public function getPaypalParams(Basket $basket = null, $mode=PaymentHelper::MODE_PAYPAL)
     {
-        $payPalRequestParams = $this->getApiContextParams();
+        $payPalRequestParams = $this->getApiContextParams($mode);
 
         // Set the PayPal Web Profile ID
-        $webProfilId = $this->config->get('PayPal.webProfileID');
-        if(isset($webProfilId) && strlen($webProfilId) > 0 )
+        $webProfileId = $this->config->get('PayPal.webProfileID');
+        if(isset($webProfileId) && strlen($webProfileId) > 0 )
         {
-            $payPalRequestParams['webProfileId'] = $webProfilId;
+            $payPalRequestParams['webProfileId'] = $webProfileId;
         }
 
         /** @var Basket $basket */
@@ -336,41 +402,50 @@ class PaymentService
         /** @var BasketItem $basketItem */
         foreach($basket->basketItems as $basketItem)
         {
+            $payPalBasketItem['itemId'] = $basketItem->itemId;
+            $payPalBasketItem['quantity'] = $basketItem->quantity;
+            $payPalBasketItem['price'] = $basketItem->price;
+
             /** @var \Plenty\Modules\Item\Item\Models\Item $item */
             $item = $itemContract->show($basketItem->itemId);
-
-            $basketItem = $basketItem->getAttributes();
 
             /** @var \Plenty\Modules\Item\Item\Models\ItemText $itemText */
             $itemText = $item->texts;
 
-            $basketItem['name'] = $itemText->first()->name1;
+            $payPalBasketItem['name'] = $itemText->first()->name1;
 
-            $payPalRequestParams['basketItems'][] = $basketItem;
+            $payPalRequestParams['basketItems'][] = $payPalBasketItem;
         }
 
-        // Read the shipping address ID from the session
-        $shippingAddressId = $this->sessionStorage->getSessionValue(SessionStorageService::DELIVERY_ADDRESS_ID);
-
-        if(!is_null($shippingAddressId))
+        /**
+         * Don't send the address to paypal when using paypal plus during the first request
+         * The Shipping address will be set during update payment
+         */
+        if($mode != PaymentHelper::MODE_PAYPAL_PLUS && $mode != PaymentHelper::MODE_PAYPALEXPRESS)
         {
-            if($shippingAddressId == -99)
-            {
-                $shippingAddressId = $this->sessionStorage->getSessionValue(SessionStorageService::BILLING_ADDRESS_ID);
-            }
+            // Read the shipping address ID from the session
+            $shippingAddressId = $basket->customerShippingAddressId;
 
             if(!is_null($shippingAddressId))
             {
-                $shippingAddress = $this->addressRepo->findAddressById($shippingAddressId);
+                if($shippingAddressId == -99)
+                {
+                    $shippingAddressId = $basket->customerInvoiceAddressId;
+                }
 
-                /** declarce the variable as array */
-                $payPalRequestParams['shippingAddress'] = [];
-                $payPalRequestParams['shippingAddress']['town']           = $shippingAddress->town;
-                $payPalRequestParams['shippingAddress']['postalCode']     = $shippingAddress->postalCode;
-                $payPalRequestParams['shippingAddress']['firstname']      = $shippingAddress->firstName;
-                $payPalRequestParams['shippingAddress']['lastname']       = $shippingAddress->lastName;
-                $payPalRequestParams['shippingAddress']['street']         = $shippingAddress->street;
-                $payPalRequestParams['shippingAddress']['houseNumber']    = $shippingAddress->houseNumber;
+                if(!is_null($shippingAddressId))
+                {
+                    $shippingAddress = $this->addressRepo->findAddressById($shippingAddressId);
+
+                    /** declarce the variable as array */
+                    $payPalRequestParams['shippingAddress'] = [];
+                    $payPalRequestParams['shippingAddress']['town']           = $shippingAddress->town;
+                    $payPalRequestParams['shippingAddress']['postalCode']     = $shippingAddress->postalCode;
+                    $payPalRequestParams['shippingAddress']['firstname']      = $shippingAddress->firstName;
+                    $payPalRequestParams['shippingAddress']['lastname']       = $shippingAddress->lastName;
+                    $payPalRequestParams['shippingAddress']['street']         = $shippingAddress->street;
+                    $payPalRequestParams['shippingAddress']['houseNumber']    = $shippingAddress->houseNumber;
+                }
             }
         }
 
@@ -391,19 +466,62 @@ class PaymentService
     /**
      * @return array
      */
-    private function getApiContextParams()
+    public function getApiContextParams($mode=PaymentHelper::MODE_PAYPAL)
     {
-        $apiContextParams = [];
-        $apiContextParams['clientSecret'] = $this->config->get('PayPal.clientSecret');
-        $apiContextParams['clientId'] = $this->config->get('PayPal.clientId');
-
-        $apiContextParams['sandbox'] = false;
-
-        if($this->config->get('PayPal.environment') == 1)
+        $settingType = 'paypal';
+        if($mode == PaymentHelper::MODE_PAYPAL_INSTALLMENT)
         {
-            $apiContextParams['sandbox'] = true;
+            $settingType = 'paypal_installment';
+        }
+        $account = $this->loadCurrentAccountSettings($settingType);
+
+        $apiContextParams = [];
+        $apiContextParams['clientSecret'] = $account['clientSecret'];
+        $apiContextParams['clientId'] = $account['clientId'];
+
+        $apiContextParams['sandbox'] = true;
+
+        if(array_key_exists('environment', $account) && $account['environment'] == 0)
+        {
+            $apiContextParams['sandbox'] = false;
         }
 
         return $apiContextParams;
+    }
+
+    /**
+     * @param $settingsType
+     * @return array|null
+     */
+    public function loadCurrentSettings($settingsType='paypal')
+    {
+        $setting = $this->settingsService->loadSetting($this->systemService->getPlentyId(), $settingsType);
+        if(is_array($setting) && count($setting) > 0)
+        {
+            $this->settings = $setting;
+        }
+    }
+
+    public function loadCurrentAccountSettings($settingsType='paypal')
+    {
+        $account = [];
+        $accountId = 0;
+        if(is_array($this->settings) && count($this->settings) > 0)
+        {
+            $accountId = $this->settings['account'];
+        }
+        else
+        {
+            $this->loadCurrentSettings($settingsType);
+            $accountId = $this->settings['account'];
+        }
+
+        if($accountId > 0)
+        {
+            $result = $this->accountService->getAccount((int)$accountId);
+            $account = $result[$accountId];
+        }
+
+        return $account;
     }
 }

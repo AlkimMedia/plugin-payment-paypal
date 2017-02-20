@@ -1,0 +1,57 @@
+<div class="modal-body text-md-center">
+    <div class="container-fluid">
+        <div class="offset-md-4 col-md-4">
+            <img class="img-fluid" src="{{ plugin_path('PayPal') }}/images/buttons/installment/VerticalLockup/FullColor/pp_credit-german_v_rgb.png" />
+        </div>
+        <div class="offset-md-1 col-md-10">
+            <h3>Zahlen Sie bequem und einfach in monatlichen Raten</h3>
+            <p>
+                Ihre Ratenzahlung und den passenden Finanzierungsplan können Sie im Rahmen des Bestellprozesses auswählen.<br>
+                Ihr Antrag erfolgt komplett online und wird in wenigen Schritten hier im Shop abgeschlossen.
+            </p>
+            <h3>Nettodarlehensbetrag: {{ basketAmount|number_format(2, ',', '.') }} €</h3>
+        </div>
+
+        <div class="offset-md-1 col-md-10">
+            <div class="row">
+                {% set i = 1 %}
+                {% for financingPlan in financingOptions %}
+                    <div class="col-md-6">
+                        <div style="border: 2px solid black; margin: 5px">
+                            <h3>Plan {{ i }}</h3>
+                            <table>
+                                <tr>
+                                    <td>{{ financingPlan.credit_financing.term }} monatliche Raten in Höhe von je</td>
+                                    <td>{{ financingPlan.monthly_payment.value }}€</td>
+                                </tr>
+                                <tr>
+                                    <td>fester Sollzinssatz:</td>
+                                    <td>{{ financingPlan.credit_financing.nominal_rate|number_format(2, ',', '.') }}%</td>
+                                </tr>
+                                <tr>
+                                    <td>effektiver Jahreszins:</td>
+                                    <td>{{ financingPlan.credit_financing.apr|number_format(2, ',', '.') }}%</td>
+                                </tr>
+                                <tr>
+                                    <td>Zinsbetrag:</td>
+                                    <td>{{ financingPlan.total_interest.value|number_format(2, ',', '.') }}€</td>
+                                </tr>
+                                <tr>
+                                    <td>Gesamtbetrag:</td>
+                                    <td>{{ financingPlan.total_cost.value|number_format(2, ',', '.') }}€</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    {% set i = i + 1 %}
+                {% endfor %}
+            </div>
+        </div>
+        <div class="offset-md-3 col-md-6">
+            <p>
+                * Zugleich repräsentatives Beispiel gem. § 6a PAngV<br>
+                Darlehensgeber: {{ merchantName }}, {{ merchantAddress }}
+            </p>
+        </div>
+    </div>
+</div>

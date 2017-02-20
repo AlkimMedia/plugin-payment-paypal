@@ -8,7 +8,9 @@
 
 namespace PayPal\Controllers;
 
-use PayPal\Services\SettingsService;
+use PayPal\Services\Database\AccountService;
+use PayPal\Services\Database\SettingsService;
+use PayPal\Services\NotificationService;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
 
@@ -20,12 +22,28 @@ class SettingsController extends Controller
     private $settingsService;
 
     /**
+     * @var AccountService
+     */
+    private $accountService;
+
+    /**
+     * @var NotificationService
+     */
+    private $notificationService;
+
+    /**
      * SettingsController constructor.
      * @param SettingsService $settingsService
+     * @param AccountService $accountService
+     * @param NotificationService $notificationService
      */
-    public function __construct(SettingsService $settingsService)
+    public function __construct(SettingsService $settingsService,
+                                AccountService $accountService,
+                                NotificationService $notificationService)
     {
         $this->settingsService = $settingsService;
+        $this->accountService = $accountService;
+        $this->notificationService = $notificationService;
     }
 
     /**
@@ -34,29 +52,34 @@ class SettingsController extends Controller
     public function createAccount(Request $request)
     {
         $newAccount = $request->get('account');
+
+        $webhook = $this->notificationService->createWebhook();
+
+        $newAccount['webhook'] = $webhook;
+
         if($newAccount)
         {
-            $accounts = [];
-            $accounts = json_decode($this->settingsService->getSettingsValue(SettingsService::ACCOUNTS), true);
-            $accounts[$newAccount['email']] = $newAccount;
-            $this->settingsService->setSettingsValue(SettingsService::ACCOUNTS, $accounts);
-
-            $this->loadAccounts();
+            if($this->accountService->createAccount($newAccount))
+            {
+                $this->loadAccounts();
+            }
         }
     }
 
     public function loadAccounts()
     {
-        echo $this->settingsService->getSettingsValue(SettingsService::ACCOUNTS);
+        return json_encode($this->accountService->getAccounts());
     }
 
     /**
-     * @param Request $request
+     * @param int $accountId
      */
-    public function loadAccount(Request $request)
+    public function loadAccount($accountId)
     {
-        $accounts = json_decode($this->settingsService->getSettingsValue(SettingsService::ACCOUNTS), true);
-        echo $accounts[$request->get('accountId')];
+        if($accountId && $accountId > 0)
+        {
+            return $this->accountService->getAccount($accountId);
+        }
     }
 
     /**
@@ -64,17 +87,9 @@ class SettingsController extends Controller
      */
     public function updateAccount(Request $request)
     {
-        $updatedAccount = $request->get('accountId');
+        $updatedAccount = $request->get('account');
 
-        $accounts = [];
-        if($updatedAccount)
-        {
-            $accounts = json_decode($this->settingsService->getSettingsValue(SettingsService::ACCOUNTS), true);
-            $accounts = array_merge($accounts, $updatedAccount);
-            $this->settingsService->setSettingsValue(SettingsService::ACCOUNTS, $accounts);
-        }
-
-        echo "true";
+        return $this->accountService->updateAccount($updatedAccount);
     }
 
     /**
@@ -85,12 +100,8 @@ class SettingsController extends Controller
         $accountId = $request->get('accountId');
         if($accountId)
         {
-            $accounts = json_decode($this->settingsService->getSettingsValue(SettingsService::ACCOUNTS), true);
-            if(array_key_exists($accountId, $accounts))
+            if($this->accountService->deleteAccount($accountId))
             {
-                unset($accounts[$accountId]);
-                $this->settingsService->setSettingsValue(SettingsService::ACCOUNTS, $accounts);
-
                 $this->loadAccounts();
             }
         }
@@ -101,14 +112,27 @@ class SettingsController extends Controller
      */
     public function saveSettings(Request $request)
     {
-        $this->settingsService->setSettingsValue(SettingsService::SETTINGS, $request->get('settings'));
+        if($request->get('PayPalMode') == 'paypal' || $request->get('PayPalMode') == 'paypal_installment')
+        {
+            return $this->settingsService->saveSettings($request->get('PayPalMode'), $request->get('settings'));
+        }
     }
 
     /**
      * @return bool|mixed
      */
-    public function loadSettings()
+    public function loadSettings($settingType)
     {
-        echo $this->settingsService->getSettingsValue(SettingsService::SETTINGS);
+        return $this->settingsService->loadSettings($settingType);
+    }
+
+    /**
+     * Load the settings for one webshop
+     *
+     * @param $webstore
+     */
+    public function loadSetting($webstore, $mode)
+    {
+        return $this->settingsService->loadSetting($webstore, $mode);
     }
 }

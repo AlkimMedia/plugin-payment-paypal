@@ -2,10 +2,11 @@
 
 namespace PayPal\Methods;
 
-use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
+use PayPal\Services\PaymentService;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodService;
 use Plenty\Plugin\ConfigRepository;
+use Plenty\Modules\Frontend\Contracts\Checkout;
 
 /**
  * Class PayPalPaymentMethod
@@ -19,9 +20,9 @@ class PayPalPaymentMethod extends PaymentMethodService
     private $basketRepo;
 
     /**
-     * @var ContactRepositoryContract
+     * @var Checkout
      */
-    private $contactRepo;
+    private $checkout;
 
     /**
      * @var ConfigRepository
@@ -29,19 +30,28 @@ class PayPalPaymentMethod extends PaymentMethodService
     private $configRepo;
 
     /**
+     * @var PaymentService
+     */
+    private $paymentService;
+
+    /**
      * PayPalExpressPaymentMethod constructor.
      *
      * @param BasketRepositoryContract $basketRepo
-     * @param ContactRepositoryContract $contactRepo
      * @param ConfigRepository $configRepo
+     * @param Checkout $checkout
+     * @param PaymentService $paymentService
      */
     public function __construct(BasketRepositoryContract    $basketRepo,
-                                ContactRepositoryContract   $contactRepo,
-                                ConfigRepository            $configRepo)
+                                ConfigRepository            $configRepo,
+                                Checkout                    $checkout,
+                                PaymentService              $paymentService)
     {
-        $this->basketRepo     = $basketRepo;
-        $this->contactRepo    = $contactRepo;
-        $this->configRepo     = $configRepo;
+        $this->basketRepo       = $basketRepo;
+        $this->configRepo       = $configRepo;
+        $this->checkout         = $checkout;
+        $this->paymentService   = $paymentService;
+        $this->paymentService->loadCurrentSettings('paypal');
     }
 
     /**
@@ -51,7 +61,21 @@ class PayPalPaymentMethod extends PaymentMethodService
      */
     public function isActive()
     {
-        return true;
+        /**
+         * Check the allowed shipping countries
+         */
+        if(!array_key_exists('payPalPlus',$this->paymentService->settings) || (array_key_exists('payPalPlus',$this->paymentService->settings) && $this->paymentService->settings['payPalPlus'] == 0) )
+        {
+            if(array_key_exists('shippingCountries', $this->paymentService->settings))
+            {
+                $shippingCountries = $this->paymentService->settings['shippingCountries'];
+                if(is_array($shippingCountries) && in_array($this->checkout->getShippingCountryId(), $shippingCountries))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -61,7 +85,18 @@ class PayPalPaymentMethod extends PaymentMethodService
      */
     public function getName()
     {
-        $name = $this->configRepo->get('PayPal.name');
+        $name = '';
+        $lang = 'de';
+        if(array_key_exists('language', $this->paymentService->settings))
+        {
+            if(array_key_exists($lang, $this->paymentService->settings['language']))
+            {
+                if(array_key_exists('name', $this->paymentService->settings['language'][$lang]))
+                {
+                    $name = $this->paymentService->settings['language'][$lang]['name'];
+                }
+            }
+        }
 
         if(!strlen($name))
         {
@@ -78,15 +113,35 @@ class PayPalPaymentMethod extends PaymentMethodService
      */
     public function getFee()
     {
-        $fee = $this->configRepo->get('PayPal.fee');
+        $fee = 0;
+        $basket = $this->basketRepo->load();
+        $basketAmount = $basket->basketAmount;
 
-        if(strlen($fee))
+        $shippingCountryId = $this->checkout->getShippingCountryId();
+        if(array_key_exists('markup', $this->paymentService->settings) && array_key_exists('webstore', $this->paymentService->settings['markup']))
         {
-            $fee = str_replace(',', '.', $fee);
-        }
-        else
-        {
-            $fee = 0;
+            if($shippingCountryId && $shippingCountryId != 1)
+            {
+                if(array_key_exists('flatForeign', $this->paymentService->settings['markup']['webstore']))
+                {
+                    $fee += $this->paymentService->settings['markup']['webstore']['flatForeign'];
+                }
+                if(array_key_exists('percentageForeign', $this->paymentService->settings['markup']['webstore']))
+                {
+                    $fee += $basketAmount / 100 * $this->paymentService->settings['markup']['webstore']['percentageForeign'];
+                }
+            }
+            else
+            {
+                if(array_key_exists('flatDomestic', $this->paymentService->settings['markup']['webstore']))
+                {
+                    $fee += $this->paymentService->settings['markup']['webstore']['flatDomestic'];
+                }
+                if(array_key_exists('percentageDomestic', $this->paymentService->settings['markup']['webstore']))
+                {
+                    $fee += $basketAmount / 100 * $this->paymentService->settings['markup']['webstore']['percentageDomestic'];
+                }
+            }
         }
 
         return (float)$fee;
@@ -99,6 +154,21 @@ class PayPalPaymentMethod extends PaymentMethodService
      */
     public function getIcon()
     {
+        $lang = 'de';
+        if( array_key_exists('language', $this->paymentService->settings) &&
+            array_key_exists($lang, $this->paymentService->settings['language']) &&
+            array_key_exists('logo', $this->paymentService->settings['language'][$lang]))
+        {
+            switch ($this->paymentService->settings['language'][$lang]['logo'])
+            {
+                case 0:
+                    break;
+                case 1:
+                    break;
+                case 2:
+                    break;
+            }
+        }
         $icon = 'layout/plugins/production/paypal/images/logos/de-pp-logo.png';
 
         return $icon;

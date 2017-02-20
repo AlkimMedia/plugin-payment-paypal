@@ -2,8 +2,6 @@
 
 namespace PayPal\Methods;
 
-use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
-use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodService;
 
 /**
@@ -12,29 +10,6 @@ use Plenty\Modules\Payment\Method\Contracts\PaymentMethodService;
  */
 class PayPalExpressPaymentMethod extends PaymentMethodService
 {
-    /**
-     * @var BasketRepositoryContract
-     */
-    private $basketRepo;
-
-    /**
-     * @var ContactRepositoryContract
-     */
-    private $contactRepo;
-
-    /**
-     * PayPalExpressPaymentMethod constructor.
-     *
-     * @param BasketRepositoryContract $basketRepo
-     * @param ContactRepositoryContract $contactRepo
-     */
-    public function __construct(BasketRepositoryContract $basketRepo,
-                                ContactRepositoryContract $contactRepo)
-    {
-        $this->basketRepo = $basketRepo;
-        $this->contactRepo = $contactRepo;
-    }
-
     /**
      * Check whether PayPal Express is active
      *

@@ -11,92 +11,157 @@ use PayPal\Api\ShippingAddress;
 
 require_once __DIR__.'/PayPalHelper.php';
 
-    /** @var \Paypal\Rest\ApiContext $apiContext */
-    $apiContext = PayPalHelper::getApiContext(  SdkRestApi::getParam('clientId', true),
-                                                SdkRestApi::getParam('clientSecret', true),
-                                                SdkRestApi::getParam('sandbox', true));
+/** @var \Paypal\Rest\ApiContext $apiContext */
+$apiContext = PayPalHelper::getApiContext(  SdkRestApi::getParam('clientId', true),
+                                            SdkRestApi::getParam('clientSecret', true),
+                                            SdkRestApi::getParam('sandbox', true));
 
-    $mode = SdkRestApi::getParam('mode', false);
+$mode = SdkRestApi::getParam('mode', false);
 
-    /** @var Payer $payer */
-    $payer = new Payer();
-    $payer->setPaymentMethod('paypal');
+/** @var Payer $payer */
+$payer = new Payer();
+$payer->setPaymentMethod('paypal');
 
-    $basket         = SdkRestApi::getParam('basket');
-    $basketItems    = SdkRestApi::getParam('basketItems');
+$fundingInstrumentType = SdkRestApi::getParam('fundingInstrumentType', false);
+if($fundingInstrumentType && strlen($fundingInstrumentType) > 0)
+{
+    $payer->setExternalSelectedFundingInstrumentType($fundingInstrumentType);
+}
 
-    /** @var ItemList $itemList */
-    $itemList = new ItemList();
+$basket         = SdkRestApi::getParam('basket');
+$basketItems    = SdkRestApi::getParam('basketItems');
 
-    foreach($basketItems as $basketItem)
+/** @var ItemList $itemList */
+$itemList = new ItemList();
+
+foreach($basketItems as $basketItem)
+{
+    /** @var Item $item */
+    $item = new Item();
+    $item->
+        setName($basketItem['name'])->
+        setCurrency($basket['currency'])->
+        setQuantity((int)$basketItem['quantity'])->
+        setSku($basketItem['itemId'])->
+        setPrice(number_format($basketItem['price'], 2));
+
+    $itemList->addItem($item);
+}
+
+$address = SdkRestApi::getParam('shippingAddress');
+$country = SdkRestApi::getParam('country');
+if(is_array($address) && count($address) > 0)
+{
+    /** @var ShippingAddress $shippingAddress */
+    $shippingAddress = new ShippingAddress();
+    $shippingAddress->
+        setCity($address['town'])->
+        setCountryCode($country['isoCode2'])->
+        setPostalCode($address['postalCode'])->
+        setRecipientName($address['firstname'] . ' ' . $address['lastname'])->
+        setLine1($address['street'] . ' ' . $address['houseNumber'])->
+        setPreferredAddress(true);
+
+    $itemList->setShippingAddress($shippingAddress);
+}
+
+$couponAmount = $basket['couponDiscount'];
+$subtotal = $basket['itemSum'];
+
+if($subtotal != round($basket['itemSum'], 2))
+{
+    $differArticleAmount =  round(($basket['itemSum'] - $subtotal), 2);
+
+    if($differArticleAmount < 0)
     {
-      /** @var Item $item */
-      $item = new Item();
-      $item ->setName($basketItem['name'])
-            ->setCurrency($basket['currency'])
-            ->setQuantity((int)$basketItem['quantity'])
-            ->setSku($basketItem['itemId'])
-            ->setPrice(number_format($basketItem['price'], 2));
+        // gutschein
+        $couponAmount += $differArticleAmount;
+    }
+    else
+    {
+        $pppItem = new Item();
+        $pppItem->setName('Rundungsdifferenzartikel'); // i18n
+        $pppItem->setCurrency($basket['currency']);
+        $pppItem->setQuantity(1);
+        $pppItem->setPrice($differArticleAmount);
 
-      $itemList->addItem($item);
+        $itemList->addItem($pppItem);
+
+        //add the item amount to pppSubtotal
+        $subtotal += $differArticleAmount;
+    }
+}
+
+/** @var Details $details */
+$details = new Details();
+$details->
+    setShipping($basket['shippingAmount'])->
+    setSubtotal($subtotal);
+
+if($couponAmount)
+{
+    //Nachkommastellenrundungsterrorfix, differenz zwischen plenty und paypal:
+    $couponFixedAmount = round(($couponAmount), 2);
+    $pppTotalAmount = floatval($details->getShipping()) + floatval($details->getSubtotal()) + $couponFixedAmount;
+    $totalAmountDiff = $basket['basketAmount'] - $pppTotalAmount;
+
+    if($totalAmountDiff)
+    {
+        $couponFixedAmount += $totalAmountDiff;
     }
 
-    $address = SdkRestApi::getParam('shippingAddress');
-    $country = SdkRestApi::getParam('country');
+    $details->setShippingDiscount($couponFixedAmount);
+}
 
-    if($mode != 'paypalexpress')
-    {
-        /** @var ShippingAddress $shippingAddress */
-        $shippingAddress = new ShippingAddress();
-        $shippingAddress->setCity($address['town'])
-            ->setCountryCode($country['isoCode2'])
-            ->setPostalCode($address['postalCode'])
-            ->setRecipientName($address['firstname'] . ' ' . $address['lastname'])
-            ->setLine1($address['street'] . ' ' . $address['houseNumber'])
-            ->setPreferredAddress(true);
+/** @var Amount $amount */
+$amount = new Amount();
+$amount->
+    setCurrency($basket['currency'])->
+    setTotal($basket['basketAmount'])->
+    setDetails($details);
 
-        $itemList->setShippingAddress($shippingAddress);
-    }
+/** @var Transaction $transaction */
+$transaction = new Transaction();
+$transaction->
+    setAmount($amount)->
+    setItemList($itemList)->
+    setDescription('payment description')->
+    setInvoiceNumber(uniqid());
 
-    /** @var Details $details */
-    $details = new Details();
-    $details->setShipping($basket['shippingAmount'])
-            ->setSubtotal($basket['itemSum']);
+$urls = SdkRestApi::getParam('urls');
 
-    /** @var Amount $amount */
-    $amount = new Amount();
-    $amount ->setCurrency($basket['currency'])
-            ->setTotal($basket['basketAmount'])
-            ->setDetails($details);
+/** @var RedirectUrls $redirectUrls */
+$redirectUrls = new RedirectUrls();
+$redirectUrls->
+    setReturnUrl($urls['success'])->
+    setCancelUrl($urls['cancel']);
 
-    /** @var Transaction $transaction */
-    $transaction = new Transaction();
-    $transaction->setAmount($amount)
-                ->setItemList($itemList)
-                ->setDescription('payment description')
-                ->setInvoiceNumber(uniqid());
+/** @var Payment $payment */
+$payment = new Payment();
+$payment->
+    setIntent('sale')->
+    setPayer($payer)->
+    setRedirectUrls($redirectUrls)->
+    setTransactions(array($transaction));
 
-    $urls = SdkRestApi::getParam('urls');
+$webProfileId = SdkRestApi::getParam('webProfileId');
 
-    /** @var RedirectUrls $redirectUrls */
-    $redirectUrls = new RedirectUrls();
-    $redirectUrls ->setReturnUrl($urls['success'])
-                  ->setCancelUrl($urls['cancel']);
+if(!is_null($webProfileId))
+{
+    $payment->setExperienceProfileId($webProfileId);
+}
 
-    /** @var Payment $payment */
-    $payment = new Payment();
-    $payment->setIntent('sale')
-            ->setPayer($payer)
-            ->setRedirectUrls($redirectUrls)
-            ->setTransactions(array($transaction));
-
-    $webProfileId = SdkRestApi::getParam('webProfileId');
-
-    if(!is_null($webProfileId))
-    {
-        $payment->setExperienceProfileId($webProfileId);
-    }
-
+try
+{
     $payment->create($apiContext);
+}
+catch (PayPal\Exception\PPConnectionException $ex)
+{
+    return json_decode($ex->getData());
+}
+catch (Exception $e)
+{
+    return json_decode($e->getData());
+}
 
-    return $payment->toArray();
+return $payment->toArray();

@@ -3,16 +3,16 @@
   "namespace": "PlentyPayPal",
   "menuEntries": [
     {
-      "label": "Grundeinstellungen",
+      "label": "Kontoeinstellungen",
       "menu": "settings/orders/paypal",
-      "urlKey": "settings",
-      "entryPoint": "index.html?action=settings"
+      "urlKey": "accounts",
+      "entryPoint": "index.html?action=permissions"
     },
     {
-      "label": "Händlereinstellungen",
+      "label": "PayPal / PayPal Plus",
       "menu": "settings/orders/paypal",
-      "urlKey": "merchant-settings",
-      "entryPoint": "index.html?action=permissions"
+      "urlKey": "settings-paypal",
+      "entryPoint": "index.html?action=settings_paypal"
     }
   ]
 }

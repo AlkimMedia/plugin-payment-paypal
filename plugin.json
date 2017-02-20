@@ -2,27 +2,29 @@
     "name": "PayPal",
     "namespace": "PayPal",
     "type": "payment",
-    "version": "1.0.0",
-    "licences": "",
-    "pluginIcon": "",
-    "price": "0",
+    "version": "0.7.0",
+    "licences": "AGPL-3.0",
+    "pluginIcon": "icon_plugin_xs.png",
+    "price": 0.00,
     "description": "The official PayPal plugin for plentymarkets",
-    "shortDescription": "The official PayPal plugin for plentymarkets",
+    "shortDescription":{ "de":"Das offizielle PayPal-Plugin für plentymarkets", "en":"The official PayPal plugin for plentymarkets"},
+    "categories":["3519"],
     "keywords": ["paypal", "official", "plentymarkets", "payment"],
     "author": "plentymarkets GmbH",
-    "authorIcon": "",
-    "email": "payment@plentymarkets.eu",
-    "phone": "",
+    "authorIcon": "icon_author_xs.png",
     "serviceProvider": "PayPal\\Providers\\PayPalServiceProvider",
     "containers": [],
-    "dataProviders": [{"key":"PayPal\\Providers\\PayPalExpressButtonDataProvider", "name":"PayPal Express Button", "description": "PayPal Express Button"}],
     "javaScriptFiles": [],
     "require": [],
     "dependencies":{
-      "paypal/rest-api-sdk-php":"*"
+        "paypal/rest-api-sdk-php":"*"
     },
     "runOnBuild": [
         "PayPal\\Migrations\\CreatePaymentMethod",
-        "PayPal\\Migrations\\CreateSettingsTable"
+        "PayPal\\Migrations\\CreatePayPalTables"
+    ],
+    "dataProviders": [
+        {"key":"PayPal\\Providers\\DataProvider\\PayPalExpressButtonDataProvider", "name":"PayPal Express Button", "description": "PayPal Express Button"},
+        {"key":"PayPal\\Providers\\DataProvider\\PayPalPlusPaymentWallDataProvider", "name":"PayPal Plus Wall", "description": "To Show the PayPal Plus Wall"}
     ]
 }

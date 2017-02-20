@@ -6,15 +6,17 @@ $apiContext = PayPalHelper::getApiContext(  SdkRestApi::getParam('clientId', tru
                                             SdkRestApi::getParam('clientSecret', true),
                                             SdkRestApi::getParam('sandbox', true));
 
-$result = false;
-
 try
 {
     $result = WebhookEventType::availableEventTypes($apiContext);
 }
+catch (PayPal\Exception\PPConnectionException $ex)
+{
+    return json_decode($ex->getData());
+}
 catch (Exception $e)
 {
-    $result = false;
+    return json_decode($e->getData());
 }
 
 return $result;

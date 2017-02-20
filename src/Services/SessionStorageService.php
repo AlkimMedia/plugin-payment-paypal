@@ -14,6 +14,8 @@ class SessionStorageService
     const BILLING_ADDRESS_ID    = "billingAddressId";
     const PAYPAL_PAY_ID         = "payPalPayId";
     const PAYPAL_PAYER_ID       = "payPalPayerId";
+    const PAYPAL_INSTALLMENT_CHECK = "checkPayPalInstallmentCosts";
+    const PAYPAL_INSTALLMENT_COSTS = "offeredFinancingCosts";
 
     /**
      * @var FrontendSessionStorageFactoryContract

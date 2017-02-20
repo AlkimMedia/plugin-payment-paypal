@@ -20,8 +20,16 @@ use PayPal\Services\SessionStorageService;
  */
 class PaymentHelper
 {
+    const PAYMENTKEY_PAYPAL = 'PAYPAL';
+    const PAYMENTKEY_PAYPALEXPRESS = 'PAYPALEXPRESS';
+    const PAYMENTKEY_PAYPALPLUS = 'PAYPALPLUS';
+    const PAYMENTKEY_PAYPALINSTALLMENT = 'PAYPALINSTALLMENT';
+
     const MODE_PAYPAL = 'paypal';
     const MODE_PAYPALEXPRESS = 'paypalexpress';
+    const MODE_PAYPAL_PLUS = 'plus';
+    const MODE_PAYPAL_INSTALLMENT = 'installment';
+    const MODE_PAYPAL_NOTIFICATION = 'notification';
 
     /**
      * @var PaymentMethodRepositoryContract
@@ -84,47 +92,21 @@ class PaymentHelper
         $this->statusMap                                = array();
     }
 
-    /**
-     * Get the ID of the PayPal payment method
-     *
-     * @return mixed
-     */
-    public function getPayPalMopId()
+    public function getPayPalMopIdByPaymentKey($paymentKey)
     {
-        // List all payment methods for the given plugin
-        $paymentMethods = $this->paymentMethodRepository->allForPlugin('plentyPayPal');
-
-        if( !is_null($paymentMethods) )
+        if(strlen($paymentKey))
         {
-            foreach($paymentMethods as $paymentMethod)
+            // List all payment methods for the given plugin
+            $paymentMethods = $this->paymentMethodRepository->allForPlugin('plentyPayPal');
+
+            if( !is_null($paymentMethods) )
             {
-                if($paymentMethod->paymentKey == 'PAYPAL')
+                foreach($paymentMethods as $paymentMethod)
                 {
-                    return $paymentMethod->id;
-                }
-            }
-        }
-
-        return 'no_paymentmethod_found';
-    }
-
-    /**
-     * Get the ID of the PayPal Express payment method
-     *
-     * @return mixed
-     */
-    public function getPayPalExpressMopId()
-    {
-        // List all payment methods for the given plugin
-        $paymentMethods = $this->paymentMethodRepository->allForPlugin('plentyPayPal');
-
-        if( !is_null($paymentMethods) )
-        {
-            foreach($paymentMethods as $paymentMethod)
-            {
-                if($paymentMethod->paymentKey == 'PAYPALEXPRESS')
-                {
-                    return $paymentMethod->id;
+                    if($paymentMethod->paymentKey == $paymentKey)
+                    {
+                        return $paymentMethod->id;
+                    }
                 }
             }
         }
@@ -152,18 +134,30 @@ class PaymentHelper
         }
 
         $domain = $webstoreConfig->domainSsl;
+        if($domain == 'http://dbmaster.plenty-showcase.de' OR $domain == 'http://dbmaster-beta7.plentymarkets.eu')
+        {
+            $domain = 'http://master.plentymarkets.com';
+        }
 
         $urls = [];
 
         switch($mode)
         {
+            case self::MODE_PAYPAL_PLUS:
             case self::MODE_PAYPAL:
-                $urls['success'] = $domain.'/payPal/checkoutSuccess';
-                $urls['cancel'] = $domain.'/payPal/checkoutCancel';
+                $urls['success'] = $domain.'/payment/payPal/checkoutSuccess/'.$mode;
+                $urls['cancel'] = $domain.'/payment/payPal/checkoutCancel/'.$mode;
+                break;
+            case self::MODE_PAYPAL_INSTALLMENT:
+                $urls['success'] = $domain.'/payment/payPalInstallment/prepareInstallment';
+                $urls['cancel'] = $domain.'/payment/payPal/checkoutCancel/'.$mode;
                 break;
             case self::MODE_PAYPALEXPRESS:
-                $urls['success'] = $domain.'/payPal/expressCheckoutSuccess';
-                $urls['cancel'] = $domain.'/payPal/expressCheckoutCancel';
+                $urls['success'] = $domain.'/payment/payPal/expressCheckoutSuccess';
+                $urls['cancel'] = $domain.'/payment/payPal/expressCheckoutCancel';
+                break;
+            case self::MODE_PAYPAL_NOTIFICATION:
+                $urls[self::MODE_PAYPAL_NOTIFICATION] = $domain.'/payment/payPal/notification';
                 break;
         }
 
@@ -173,32 +167,33 @@ class PaymentHelper
     /**
      * Create a payment in plentymarkets from the paypal execution response data
      *
-     * @param $paymentData['status','currency','amount','entryDate','payId']
+     * @param array $paypalPaymentData
+     * @param array $paymentData
      * @return Payment
      */
-    public function createPlentyPayment(array $paymentData)
+    public function createPlentyPayment(array $paypalPaymentData, $paymentData = [])
     {
         /** @var Payment $payment */
         $payment = pluginApp( \Plenty\Modules\Payment\Models\Payment::class );
 
-        $payment->mopId             = (int)$this->getPayPalMopId();
-        $payment->transactionType   = 2; //Payment::TRANSACTION_TYPE_BOOKED_POSTING;
-        $payment->status            = $this->mapStatus($paymentData['status']);
-        $payment->currency          = $paymentData['currency'];
-        $payment->amount            = $paymentData['amount'];
-        $payment->receivedAt        = $paymentData['entryDate'];
+        $payment->mopId             = (int)$this->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPAL);
+        $payment->transactionType   = Payment::TRANSACTION_TYPE_BOOKED_POSTING;
+        $payment->status            = $this->mapStatus((STRING)$paypalPaymentData['state']);
+        $payment->currency          = $paypalPaymentData['transactions'][0]['amount']['currency'];
+        $payment->amount            = $paypalPaymentData['transactions'][0]['amount']['total'];
+        $payment->receivedAt        = $paypalPaymentData['create_time'];
 
-        if(isset($paymentData['type']))
+        if(!empty($paymentData['type']))
         {
             $payment->type = $paymentData['type'];
         }
 
-        if(isset($paymentData['parentId']))
+        if(!empty($paymentData['parentId']))
         {
-            $payment->parentId = $paymentData['parentId'];
+            $payment->parent = $paymentData['parentId'];
         }
 
-        if(isset($paymentData['unaccountable']))
+        if(!empty($paymentData['unaccountable']))
         {
             $payment->unaccountable = $paymentData['unaccountable'];
         }
@@ -208,19 +203,35 @@ class PaymentHelper
         /**
          * Add payment property with type booking text
          */
-        $paymentProperty[] = $this->getPaymentProperty(3, 'TransactionID: '.(string)$paymentData['saleId']);  //PaymentProperty::TYPE_BOOKING_TEXT
+        $paymentProperty[] = $this->getPaymentProperty(PaymentProperty::TYPE_BOOKING_TEXT, 'TransactionID: '.(string)$paypalPaymentData['transactions'][0]['related_resources'][0]['sale']['id']);
 
         /**
          * Add payment property with type transactionId
          */
-        $paymentProperty[] = $this->getPaymentProperty(1, $paymentData['saleId']);  //PaymentProperty::TYPE_TRANSACTION_ID
+        $paymentProperty[] = $this->getPaymentProperty(PaymentProperty::TYPE_TRANSACTION_ID, $paypalPaymentData['transactions'][0]['related_resources'][0]['sale']['id']);
 
         /**
          * Add payment property with type origin
          */
-        $paymentProperty[] = $this->getPaymentProperty(23, 6);  //PaymentProperty::TYPE_ORIGIN  Payment::ORIGIN_PLUGIN
+        $paymentProperty[] = $this->getPaymentProperty(PaymentProperty::TYPE_ORIGIN, Payment::ORIGIN_PLUGIN);
 
-        $payment->property = $paymentProperty;
+        /**
+         * Add payment property with type account of the receiver
+         */
+        $paymentProperty[] = $this->getPaymentProperty(PaymentProperty::TYPE_ACCOUNT_OF_RECEIVER, $paypalPaymentData['id']); //TODO IBAN BIC empfänger property
+
+        /**
+         * TODO Add the following properties
+         *
+         * // Gebühr
+         *  $paypalPaymentData['transactions'][0]['related_resources'][0]['sale']['transaction_fee']['value']
+         *  $paypalPaymentData['transactions'][0]['related_resources'][0]['sale']['transaction_fee']['currency']
+         *
+         * // Invoice number
+         *  $paypalPaymentData['transactions'][0]['invoice_number']
+         */
+
+        $payment->properties = $paymentProperty;
 
         $payment = $this->paymentRepository->createPayment($payment);
 
@@ -246,6 +257,34 @@ class PaymentHelper
     }
 
     /**
+     * @param $saleId
+     * @param $state
+     */
+    public function updatePayment($saleId, $state)
+    {
+        /** @var array $payments */
+        $payments = $this->paymentRepository->getPaymentsByPropertyTypeAndValue(PaymentProperty::TYPE_TRANSACTION_ID, $saleId);
+
+        $state = $this->mapStatus((STRING)$state);
+
+        /** @var Payment $payment */
+        foreach($payments as $payment)
+        {
+            if($payment->status != $state)
+            {
+                $payment->status = $state;
+
+                if($state == Payment::STATUS_APPROVED || $state == Payment::STATUS_CAPTURED)
+                {
+                    $payment->unaccountable = 0;
+                }
+
+                $this->paymentRepository->updatePayment($payment);
+            }
+        }
+    }
+
+    /**
      * Assign the payment to an order in plentymarkets
      *
      * @param Payment $payment
@@ -263,6 +302,12 @@ class PaymentHelper
             $this->paymentOrderRelationRepo->createOrderRelation($payment, $order);
         }
     }
+
+
+
+    // TODO: assignPlentyPaymentToPlentyContact
+
+
 
     /**
      * Map the PayPal payment status to the plentymarkets payment status

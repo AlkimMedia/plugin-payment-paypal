@@ -1,24 +1,27 @@
 <?php
 
-namespace PayPal\Models;
+namespace PayPal\Models\Database;
 
 use Plenty\Modules\Plugin\DataBase\Contracts\Model;
 
 /**
  * Class Settings
  *
+ * @property int $id
+ * @property int $webstore
  * @property string $name
- * @property string $value
+ * @property array $value
  * @property string $createdAt
  * @property string $updatedAt
  */
 class Settings extends Model
 {
-    public $id          = 0;
-    public $name        = '';
-    public $value       = '';
-    public $createdAt   = '';
-    public $updatedAt   = '';
+    public $id = 0;
+    public $webstore = 0;
+    public $name = '';
+    public $value = array();
+    public $createdAt = '';
+    public $updatedAt = '';
 
     /**
      * @return string

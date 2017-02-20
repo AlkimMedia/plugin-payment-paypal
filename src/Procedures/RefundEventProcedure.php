@@ -41,11 +41,11 @@ class RefundEventProcedure
             /** @var Payment $payment */
             foreach($payments as $payment)
             {
-                if($payment->mopId == $paymentHelper->getPayPalMopId()
-                OR $payment->mopId == $paymentHelper->getPayPalExpressMopId())
+                if($payment->mopId == $paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPAL)
+                OR $payment->mopId == $paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALEXPRESS))
                 {
                     // the paypal transactionsId is mandatory for the paypal refund
-                    $properties = $payment->property;
+                    $properties = $payment->properties;
 
                     if(is_array($properties))
                     {
@@ -79,14 +79,9 @@ class RefundEventProcedure
                         }
                         else
                         {
-                            $paymentData = array(
-                                'status'    => $refundResult['state'],
-                                'currency'  => $refundResult['amount']['currency'],
-                                'amount'    => $refundResult['amount']['total'],
-                                'entryDate' => $refundResult['create_time'],
-                                'saleId'    => $refundResult['id'],
-                                'parentId'  => $payment->id,
-                                'type'      => 'debit');  //Payment::TYPE_DEBIT
+                            $paymentData = [];
+                            $paymentData['parentId'] = $payment->id;
+                            $paymentData['type'] = 'debit';
 
                             // if the refund is pending, set the payment unaccountable
                             if($refundResult['state'] == 'pending')
@@ -94,15 +89,15 @@ class RefundEventProcedure
                                 $paymentData['unaccountable'] = 1;  //1 true 0 false
                             }
 
-                            // create the new debit payment
-                            /** @var Payment $debitPayment */
-                            $debitPayment = $paymentHelper->createPlentyPayment($paymentData);
-
                             // get the sale details of the refunded payment
                             $saleDetails = $paymentService->getSaleDetails($saleId);
 
                             if(!isset($saleDetails['error']))
                             {
+                                // create the new debit payment
+                                /** @var Payment $debitPayment */
+                                $debitPayment = $paymentHelper->createPlentyPayment($saleDetails, $paymentData);
+
                                 // read the payment status of the refunded payment
                                 $payment->status = $paymentHelper->mapStatus($saleDetails['state']);
 
@@ -110,7 +105,7 @@ class RefundEventProcedure
                                 $paymentContract->updatePayment($payment);
                             }
 
-                            if($debitPayment instanceof Payment)
+                            if(isset($debitPayment) && $debitPayment instanceof Payment)
                             {
                                 if($refundResult['state'] == 'completed')
                                 {

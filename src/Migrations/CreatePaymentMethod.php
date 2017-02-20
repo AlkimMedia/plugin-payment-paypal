@@ -44,7 +44,7 @@ class CreatePaymentMethod
     public function run()
     {
         // Check whether the ID of the PayPal payment method has been created
-        if($this->paymentHelper->getPayPalMopId() == 'no_paymentmethod_found')
+        if($this->paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPAL) == 'no_paymentmethod_found')
         {
             $paymentMethodData = array( 'pluginKey' => 'plentyPayPal',
                                         'paymentKey' => 'PAYPAL',
@@ -54,11 +54,31 @@ class CreatePaymentMethod
         }
 
         // Check whether the ID of the PayPal Express payment method has been created
-        if($this->paymentHelper->getPayPalExpressMopId() == 'no_paymentmethod_found')
+        if($this->paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALEXPRESS) == 'no_paymentmethod_found')
         {
             $paymentMethodData = array( 'pluginKey'   => 'plentyPayPal',
                                         'paymentKey'  => 'PAYPALEXPRESS',
                                         'name'        => 'PayPalExpress');
+
+            $this->paymentMethodRepositoryContract->createPaymentMethod($paymentMethodData);
+        }
+
+        // Check whether the ID of the PayPal Express payment method has been created
+        if($this->paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALPLUS) == 'no_paymentmethod_found')
+        {
+            $paymentMethodData = array( 'pluginKey'   => 'plentyPayPal',
+                                        'paymentKey'  => 'PAYPALPLUS',
+                                        'name'        => 'PayPalPlus');
+
+            $this->paymentMethodRepositoryContract->createPaymentMethod($paymentMethodData);
+        }
+
+        // Check whether the ID of the PayPal Express payment method has been created
+        if($this->paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALINSTALLMENT) == 'no_paymentmethod_found')
+        {
+            $paymentMethodData = array( 'pluginKey'   => 'plentyPayPal',
+                                        'paymentKey'  => 'PAYPALINSTALLMENT',
+                                        'name'        => 'PayPalInstallment');
 
             $this->paymentMethodRepositoryContract->createPaymentMethod($paymentMethodData);
         }
