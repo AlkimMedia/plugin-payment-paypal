@@ -168,12 +168,11 @@ class PaymentHelper
      * Create a payment in plentymarkets from the paypal execution response data
      *
      * @param array $paypalPaymentData
+     * @param array $paymentData
      * @return Payment
      */
-    public function createPlentyPayment(array $paypalPaymentData)
+    public function createPlentyPayment(array $paypalPaymentData, $paymentData = [])
     {
-        $paymentData = [];
-
         /** @var Payment $payment */
         $payment = pluginApp( \Plenty\Modules\Payment\Models\Payment::class );
 
@@ -184,19 +183,19 @@ class PaymentHelper
         $payment->amount            = $paypalPaymentData['transactions'][0]['amount']['total'];
         $payment->receivedAt        = $paypalPaymentData['create_time'];
 
-        if(isset($paypalPaymentData['type']))
+        if(!empty($paymentData['type']))
         {
-            $payment->type = $paypalPaymentData['type'];
+            $payment->type = $paymentData['type'];
         }
 
-        if(isset($paypalPaymentData['parentId']))
+        if(!empty($paymentData['parentId']))
         {
-            $payment->parent = $paypalPaymentData['parentId'];
+            $payment->parent = $paymentData['parentId'];
         }
 
-        if(isset($paypalPaymentData['unaccountable']))
+        if(!empty($paymentData['unaccountable']))
         {
-            $payment->unaccountable = $paypalPaymentData['unaccountable'];
+            $payment->unaccountable = $paymentData['unaccountable'];
         }
 
         $paymentProperty = [];
@@ -204,12 +203,12 @@ class PaymentHelper
         /**
          * Add payment property with type booking text
          */
-        $paymentProperty[] = $this->getPaymentProperty(PaymentProperty::TYPE_BOOKING_TEXT, 'TransactionID: '.(string)$paypalPaymentData['cart']);
+        $paymentProperty[] = $this->getPaymentProperty(PaymentProperty::TYPE_BOOKING_TEXT, 'TransactionID: '.(string)$paypalPaymentData['transactions'][0]['related_resources'][0]['sale']['id']);
 
         /**
          * Add payment property with type transactionId
          */
-        $paymentProperty[] = $this->getPaymentProperty(PaymentProperty::TYPE_TRANSACTION_ID, $paypalPaymentData['cart']);
+        $paymentProperty[] = $this->getPaymentProperty(PaymentProperty::TYPE_TRANSACTION_ID, $paypalPaymentData['transactions'][0]['related_resources'][0]['sale']['id']);
 
         /**
          * Add payment property with type origin
@@ -219,7 +218,7 @@ class PaymentHelper
         /**
          * Add payment property with type account of the receiver
          */
-        $paymentProperty[] = $this->getPaymentProperty(PaymentProperty::TYPE_ACCOUNT_OF_RECEIVER, 'PAY-473493948'); //TODO IBAN BIC empfänger property
+        $paymentProperty[] = $this->getPaymentProperty(PaymentProperty::TYPE_ACCOUNT_OF_RECEIVER, $paypalPaymentData['id']); //TODO IBAN BIC empfänger property
 
         /**
          * TODO Add the following properties
