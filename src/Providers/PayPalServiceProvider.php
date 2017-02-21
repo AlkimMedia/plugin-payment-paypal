@@ -94,13 +94,13 @@ class PayPalServiceProvider extends ServiceProvider
             ]);
 
         // Register the PayPal payment method in the payment method container
-//        $payContainer->register('plentyPayPal::'.PaymentHelper::PAYMENTKEY_PAYPALINSTALLMENT, PayPalInstallmentPaymentMethod::class,
-//            [   AfterBasketChanged::class,
-//                AfterBasketItemAdd::class,
-//                AfterBasketCreate::class,
-//                FrontendLanguageChanged::class,
-//                FrontendShippingCountryChanged::class
-//            ]);
+        $payContainer->register('plentyPayPal::'.PaymentHelper::PAYMENTKEY_PAYPALINSTALLMENT, PayPalInstallmentPaymentMethod::class,
+            [   AfterBasketChanged::class,
+                AfterBasketItemAdd::class,
+                AfterBasketCreate::class,
+                FrontendLanguageChanged::class,
+                FrontendShippingCountryChanged::class
+            ]);
 
         // Register PayPal Refund Event Procedure
         $eventProceduresService->registerProcedure(
