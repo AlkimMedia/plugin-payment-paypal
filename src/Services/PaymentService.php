@@ -362,7 +362,10 @@ class PaymentService
      */
     public function getSaleDetails($saleId)
     {
-        $saleDetailsResult = $this->libCall->call('PayPal::getSaleDetails', ['saleId' => $saleId]);
+        $params = $this->getApiContextParams();
+        $params['saleId'] = $saleId;
+
+        $saleDetailsResult = $this->libCall->call('PayPal::getSaleDetails', $params);
 
         if(is_array($saleDetailsResult) && $saleDetailsResult['error'])
         {
