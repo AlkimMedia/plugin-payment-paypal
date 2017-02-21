@@ -1,168 +1,161 @@
-# PayPal – Bargeldloses Bezahlen in plentymarkets Online-Shops
+# PayPal&nbsp;– Cashless payment in plentymarkets online shops
 
-Mit dem plentymarkets PayPal Plugin binden Sie **PayPal** und **PayPal PLUS** in Ihren Webshop ein.
+With the plentymarkets PayPal plugin, incorporate **PayPal** and **PayPal PLUS** in your online store.
 
-## PayPal-Konto eröffnen
+## Open a PayPal account
 
-Bevor Sie die Zahlungsarten in plentymarkets einrichten können, ist die [Eröffnung eines Geschäftskontos bei PayPal](https://www.paypal.com/de/webapps/mpp/merchant) erforderlich. Sie erhalten dann Informationen sowie Zugangsdaten, die Sie für die Einrichtung in plentymarkets benötigen.
+You need to [open a business account with PayPal](https://www.paypal.com/de/webapps/mpp/merchant) before you can set up the payment method in plentymarkets. You will then receive information and access data, which you will need for setting up the function in plentymarkets.
 
-## PayPal in plentymarkets einrichten
+## Setting up PayPal in plentymarkets
 
-Bevor Sie die Funktionen des PayPal-Plugins nutzen können, müssen Sie zuerst Ihr PayPal-Konto mit Ihrem plentymarkets System verbinden.
+Before using the full functionality of the plugin, you first have to connect your PayPal account with your plentymarkets system.
 
-##### PayPal-Konto hinzufügen:
-  
-1. Öffnen Sie das Menü **Einstellungen » Aufträge » PayPal » Kontoeinstellungen**.
-2. Klicken Sie auf **PayPal-Konto hinzufügen**.
-3. Geben Sie eine E-Mail-Adresse ein.  
-	→ Diese E-Mail-Adresse ist gleichzeitig der Name des Kontos.
-4. Geben Sie die Mandanten-ID ein.
-5. Geben Sie das Mandanten-Geheimwort ein.
-6. Klicken Sie auf **Hinzufügen**.  
-	→ Das PayPal-Konto wird hinzugefügt und in der Übersicht angezeigt.
+##### Add a PayPal account   
+1. Go to **Settings&nbsp;» Orders&nbsp;» PayPal&nbsp;» Account settings**. 
+2. Click on **Add PayPal account**. 
+3. Enter an email address. This address also serves as the name of the account. 
+4. Enter the client ID. 
+5. Enter the client secret. 
+6. Click on **Add**.  
+→ The PayPal account will be added and displayed in the list.
 
-Nach dem Hinzufügen nehmen Sie weitere Einstellungen für das Konto vor.
+Carry out further settings for the account.
 
-##### PayPal-Konto verwalten
- 
-1. Öffnen Sie das Menü **Einstellungen » Aufträge » PayPal » Kontoeinstellungen**.
-2. Klicken Sie auf das PayPal-Konto, das Sie konfigurieren möchten.  
-	→ Das PayPal-Konto wird geöffnet.
-3. Nehmen Sie die Einstellungen vor. Beachten Sie dazu die Erläuterungen in Tabelle 1.
-4. **Speichern** Sie die Einstellungen.
+##### Managing your PayPal account  
+1. Go to **Settings&nbsp;» Orders&nbsp;» PayPal&nbsp;» Account settings**. 
+2. Click on the PayPal account you want to configure. → The PayPal account will open. 
+3. Carry out the settings. Pay attention to the information given in table 1. 
+4. **Save** the settings.
 
 <table>
-<caption>Tab. 1: PayPal-Kontoeinstellungen vornehmen</caption>
+<caption>Table 1: Carrying out the PayPal account settings</caption>
 	<thead>
 		<th>
-			Einstellung
+			Setting
 		</th>
 		<th>
-			Erläuterung
+			Explanation
 		</th>
 	</thead>
 	<tbody>
 		<tr>
 			<td>
-				<b>Mandanten-Einstellungen</b>
+				<b>Client settings</b>
 			</td>
-			<td><b>Konto:</b> Die eingegebene E-Mail-Adresse, die gleichzeitig als Name des Kontos fungiert. Diese Angabe kann nicht mehr geändert werden.<br /> <b>Mandanten-ID:</b> Ihre PayPal-ID.<br /><b>Mandanten-Geheimwort:</b> Ihr PayPal-Geheimwort.<br /><strong><i>Hinweis:</strong></i> Diese Angaben können nicht mehr geändert werden.
+			<td><b>Account</b> Die email address serving as the account name. This information cannot be altered.<br /> <b>Client ID</b> Your PayPal ID.<br /><b>Client secret</b> Your PayPal secret.<br /><strong><i>Note:</i></strong> This information cannot be changed.
 			</td>
 		</tr>
 		<tr>
 			<td>
-				<b>Umgebung</b>
+				<b>Environment</b>
 			</td>
 			<td>			
-<b>Testumgebung</b> oder <b>Live-Umgebung</b> wählen.<br />
-<strong><i>Wichtig:</i></strong> Da die eingegebenen Daten nicht mehr änderbar sind, werden zwei Konten für Testumgebung und Live-Umgebung benötigt.<br />
-<b>Testumgebung</b>: Testnutzer und Testdaten in der <strong><a href="https://developer.paypal.com/developer/accounts/" target="_blank">PayPal Sandbox</a></strong> hinterlegen. Die Testumgebung ist für Kunden nicht zugänglich.<br />
-<b>Live-Umgebung</b>: Auf diese Umgebung wechseln, um das eingestellte PayPal-Konto für die Zahlung verfügbar zu machen.<br >
+Choose between <b>Test environment</b> and <b>Live environment</b>.<br /> <strong><i>Important</i></strong>: Since all information concerning accounts cannot be altered, two accounts are needed; one for the test environment, one for the live environment.<br /> <b>Test environment</b>: Provide test user and test data in the <strong><a href="https://developer.paypal.com/developer/accounts/" target="_blank">PayPal Sandbox</a></strong>. The test environment is inaccessible for customers.<br /> <b>Live environment</b>: Switch to this environment to make the connected PayPal account available for payments.<br />
 			</td>
 		</tr>
 		<tr>
 			<td>
-				<b>Logo-URL</b>
+				<b>Logo URL</b>
 			</td>
 			<td>
-			Eine https-URL, die zum Logo-Bild führt. Gültige Dateiformate sind .gif, .jpg oder .png. Die Maximalgröße beträgt 190 Pixel in der Breite und 60 Pixel in der Höhe. PayPal schneidet größere Bilder ab. PayPal platziert das Logo ganz oben in der Warenkorbübersicht.
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<b>Warenkorbumrandung</b>
-			</td>
-			<td>
-				Der hexadezimale HTML-Code der Haupterkennungsfarbe des Shops. Diese Farbe verläuft in einem Rahmen um die Warenkorbübersicht in der Benutzeroberfläche der Kaufabwicklung stufenlos zu weiß.
+			A HTTPS URL that leads to the logo. Valid file formats are .gif, .jpg or .png. The image may not exceed a maximum size of 190 pixels in width and 60 pixels in height. PayPal cuts off images that are larger. PayPal places thelogo at the very top of the shopping cart overview.
 			</td>
 		</tr>
 		<tr>
 			<td>
-				<b>Zeitpunkt PayPal-Zahlungseinzug</b>
+				<b>Shopping cart border</b>
 			</td>
 			<td>
-				<strong>Sale (sofortiger Zahlungseinzug)</strong> – Zahlung direkt nach Abschluss der Bestellung einziehen.
+				The hexadecimal HTML code of the main colour of the shop. The colour fades to white in a frame around the shopping cart overview in the PayPal checkout user interface.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<b>Time of PayPal payment collection</b>
+			</td>
+			<td>
+				<strong>Sale (immediate debit)</strong>&nbsp;= Collect payment immediately after the order has been completed.
 			</td>
 		</tr>
 	</tbody>
 </table>
 
-## Zahlungsarten verwalten
+## Managing payment methods
 
-In diesem Abschnitt erfahren Sie, wie Sie die verschiedenen von PayPal angebotenen Zahlungsarten in Ihrem Webshop anbieten.
+Discover how to offer the payment methods offered by PayPal in your online store.
 
-### PayPal PLUS aktivieren
+### Activating PayPal PLUS
 
-Nachdem Sie das PayPal-Plugin installiert und Ihr Konto eingerichtet haben, ist PayPal ohne weitere Einstellungen als Zahlungsart verfügbar. Diese Zahlungsart erscheint in der Kaufabwicklung je nach Priorität neben den anderen aktivierten Zahlungsarten.<br />Gehen Sie wie im Folgenden beschrieben vor, um PayPal PLUS zu aktivieren. Die PayPal PLUS Wall gibt Ihren Kunden die Möglichkeit, ihren Einkauf mit Deutschlands beliebtesten Zahlungsarten PayPal, Lastschrift, Kreditkarte sowie Kauf auf Rechnung zu bezahlen – sogar ohne ein PayPal-Konto. 
+After installing the PayPal plugin and connecting your account, PayPal is automatically available as payment method. This payment method appears in the checkout among the other payment methods according to its priority.<br />Proceed as described below to activate properties. The PayPal PLUS Wall offers Germany's most used payment methods: PayPal, Debit, Credit card as well as purchase by invoice&nbsp;– even without a PayPal account. 
 
-##### PayPal PLUS aktivieren:
+##### Activating PayPal PLUS
 
-1. Öffnen Sie das Menü **Einstellungen » Aufträge » PayPal » PayPal / PayPal PLUS**.
-2. Wählen Sie einen Mandanten.
-3. Nehmen Sie die Einstellungen vor. Beachten Sie dazu die Erläuterungen in Tabelle 2.
-4. **Speichern** Sie die Einstellungen.
+1. Go to **Settings&nbsp;» Orders&nbsp;» PayPal&nbsp;» PayPal PLUS**. 
+2. Select a Client (store). 
+3. Carry out the settings. Pay attention to the information given in table 2. 
+4. **Save** the settings.
 
 <table>
-<caption>Tab. 2: PayPal-PLUS-Einstellungen vornehmen</caption>
+<caption>Table 2: Configuring PayPal PLUS</caption>
 	<thead>
 		<th>
-			Einstellung
+			Setting
 		</th>
 		<th>
-			Erläuterung
+			Explanation
 		</th>
 	</thead>
 	<tbody>
 		<tr>
-		<td class="th" align=CENTER colspan="2">Allgemein</td>
+		<td class="th" align=CENTER colspan="2">General</td>
 		</tr>
 		<tr>
 			<td>
-				<b>Aktives Konto</b>
+				<b>Active account</b>
 			</td>
-			<td>Das PayPal-Konto, für das die Einstellungen gelten. Dieses Konto muss für jeden in der linken Spalte verfügbaren Mandanten einzeln eingestellt werden. Es ist möglich, ein Konto bei mehreren Mandanten als aktives Konto zu wählen.</td>
+			<td>The PayPal account for which the settings apply. Every client on the left has to be connected with an account. It is possible to use one account for several clients.</td>
 		</tr>
 		<tr>
 			<td>
-				<b>Priorität</b>
+				<b>Priority</b>
 			</td>
-			<td>Bestimmt, an welcher Stelle PayPal in der Kaufabwicklung steht, wenn PayPal PLUS nicht verwendet wird.</td>
+			<td>Determines the place of PayPal in the checkout as long as PayPal PLUS is not active.</td>
 		</tr>
 		<tr>
-		<td class="th" align=CENTER colspan="2">Pay Pal PLUS</td>
-		</tr>
-		<tr>
-			<td>
-				<b>Aktivieren</b>
-			</td>
-			<td>
-				PayPal PLUS Wall in der Kaufabwicklung aktivieren. Mindestens einen Container <a href="#10."><strong>verknüpfen</strong></a>, um die PayPal PLUS Wall zu nutzen. 			</td>
-		</tr>
-		<tr>
-		<td class="th" align=CENTER colspan="2">Spracheinstellungen</td>
+		<td class="th" align=CENTER colspan="2">PayPal Plus</td>
 		</tr>
 		<tr>
 			<td>
-				<b>Sprache</b>
+				<b>Activate</b>
 			</td>
 			<td>
-				Sprachpakete für alle Sprachen hinterlegen, in denen der Shop zugänglich ist. Stellt ein Kunde den Webshop auf eine andere Sprache um, greift PayPal auf diese Sprachpakete zu.
-			</td>
+				Activate the PayPal PLUS Wall in the checkout. <a href="#10."><strong>Connect</strong></a> at least one container to use the PayPal PLUS Wall. 			</td>
+		</tr>
+		<tr>
+		<td class="th" align=CENTER colspan="2">Language settings</td>
 		</tr>
 		<tr>
 			<td>
-				<b>Infoseite</b>
+				<b>Language</b>
 			</td>
 			<td>
-				Als <a href="https://www.plentymarkets.eu/handbuch/payment/bankdaten-verwalten/#2-2"><strong>Information zur Zahlungsart</strong></a> eine Kategorieseite vom Typ <strong>Content</strong> anlegen oder die URL einer Webseite eingeben.
+				Set up language packages for all the languages the shop is available in. PayPal uses these packages when a customer changes the language of the online store.
 			</td>
 		</tr>
 		<tr>
 			<td>
-				<b>Anzeigename</b>
+				<b>Info page</b>
 			</td>
 			<td>
-				Die Bezeichnung, die in der Übersicht der Zahlungsarten in der Kaufabwicklung für die Zahlung mit PayPal angezeigt wird.
+				Select a category page of the type <strong>content</strong> or enter the URL of a website to provide information about the payment method.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<b>Display name</b>
+			</td>
+			<td>
+				The description for the PayPal payment method in the checkout.
 			</td>
 		</tr>
 		<tr>
@@ -170,83 +163,78 @@ Nachdem Sie das PayPal-Plugin installiert und Ihr Konto eingerichtet haben, ist 
 				<b>Logo</b>
 			</td>
 			<td>
-			Eine https-URL, die zum Logo-Bild führt. Gültige Dateiformate sind .gif, .jpg oder .png. Die Maximalgröße beträgt 190 Pixel in der Breite und 60 Pixel in der Höhe. PayPal schneidet größere Bilder ab. PayPal platziert das Logo ganz oben in der Warenkorbübersicht.
+			A HTTPS URL that leads to the logo. Valid file formats are .gif, .jpg or .png. The image may not exceed a maximum size of 190 pixels in width and 60 pixels in height. PayPal cuts off images that are larger. PayPal places thelogo at the very top of the shopping cart overview.
 			</td>
 		</tr>
 		<tr>
-		<td class="th" align=CENTER colspan="2">Weitere Einstellungen</td>
+		<td class="th" align=CENTER colspan="2">Additional settings</td>
 		</tr>
 		<tr>
 			<td>
-				<b>Lieferländer</b>
+				<b>Countries of delivery</b>
 			</td>
 			<td>
-				Nur für die hier eingestellten Lieferländer ist die Zahlungsart PayPal freigegeben.
+				The PayPal payment method is active only for the countries in this list.
 			</td>
 		</tr>
 		<tr>
 			<td>
-				<b>Aufpreis Webshop</b>
+				<b>Surcharges</b>
 			</td>
 			<td>
-Wenn bei der Zahlung mit PayPal zusätzliche Kosten berechnet werden, den Prozentwert oder Pauschalwert gemäß der Vertragskonditionen eingeben.<br />
-     
-<strong>Inland (Pauschal):</strong> Pauschalen Wert eingeben, der bei Aufträgen berücksichtigt wird, bei denen das Systemland gewählt wurde. Diese Kosten werden im Bestellvorgang bei der Wahl der Zahlungsart zum Auftrag addiert. Der Betrag fließt in die Gesamtsumme des Auftrags ein und wird nicht einzeln ausgewiesen.<br />
+If the payment with PayPal results in additional costs, enter the percentage value or flat rate value. The choice depends on the conditions of your contract.Flat rate<br /> <strong>Domestic (surcharge)</strong>: Enter a flat rate. The value that is entered will be taken into consideration for those orders that correspond to the system country. Once the customer has selected the payment method, these costs will be added to the particular order in the order process. The amount will be added to the total in the order and will not be displayed individually.<br />
 
-<strong>Inland (Prozentual):</strong> Prozentualen Wert eingeben, der bei Aufträgen berücksichtigt wird, bei denen das Systemland gewählt wurde.<br />
-   
-<strong>Ausland (Pauschal):</strong> Pauschalen Wert eingeben, der bei Aufträgen berücksichtigt wird, bei denen nicht das Systemland gewählt wurde. Diese Kosten werden im Bestellvorgang bei der Wahl der Zahlungsart zum Auftrag addiert. Der Betrag fließt in die Gesamtsumme des Auftrags ein und wird nicht einzeln ausgewiesen.<br />
+Percentage <strong>Domestic (surcharge)</strong>: Enter a percentage value. The value that is entered will be taken into consideration for those orders that correspond to the system country.Flat rate<br /> <strong>Foreign countries (surcharge)</strong>: Enter a flat rate. The value that is entered will be taken into consideration for those orders that correspond to a foreign country. Once the customer has selected the payment method, these costs will be added to the particular order in the order process. The amount will be added to the total in the order and will not be displayed individually.<br />
 
-<strong>Ausland (Prozentual):</strong> Prozentualen Wert eingeben, der bei Aufträgen berücksichtigt wird, bei denen nicht das Systemland gewählt wurde.<br />
+Percentage <strong>Foreign countries (surcharge)</strong>: Enter a percentage value. The value that is entered will be taken into consideration for those orders that correspond to a foreign country.<br />
 
-<strong><i>Wichtig:</i></strong> Nicht in beide Felder (Pauschal und Prozentual) einen Wert eingeben.
+<strong><i>Important:</i></strong> Do not enter a value into both fields (Percentage and Flat rate).
 		</tr>
 	</tbody>
 </table>
 
-## Template-Container verknüpfen
+## Linking template containers
 
-Für die Zahlungsart PayPal PLUS und für den Express-Kauf-Button stehen Ihnen verschiedene Möglichkeiten zur Verfügung, um sie in ihren Shop einzubinden.
-Hierfür sind in den Templates in plentymarkets an relevanten Stellen Container hinterlegt, die zur Individualisierung mit Inhalt gefüllt werden.
+You have multiple options to integrate PayPal PLUS and the PayPal Express Checkout button in your online store. For this purpose, the plentymarkets system offers containers at relevant places which can be filled with content to meet your needs.
 
-##### PayPal PLUS Wall verknüpfen
+##### Linking the PayPal PLUS Wall
 
-1. Klicken Sie auf **Start » Plugins**.
-2. Wechseln Sie in das Tab **Content**. 
-3. Wählen Sie den Bereich PayPal Plus Wall.
-4. Wählen Sie einen, mehrere oder ALLE Container, in denen die PayPal PLUS Wall genutzt werden soll. Beachten Sie dazu die Erläuterungen in Tabelle 3.  
-	→ Die Verknüpfung zu den Containern ist hergestellt.
+1. Click on **Start&nbsp;» Plugins**. 
+2. Click on the **Content** tab. 
+3. Select the area PayPal PLUS Wall. 
+4. Select one, several or all containers which shall use the PayPal PLUS Wall. Pay attention to the information given in table 3.  
+→ The content is linked to the container.
 
 <table>
-<caption>Tab. 3: Container verknüpfen</caption>
+<caption>Table 3: Linking containers</caption>
 	<thead>
 		<th>
-			Verknüpfung
+			Link
 		</th>
 		<th>
-			Erläuterung
+			Explanation
 		</th>
 	</thead>
 	<tbody>
 		<tr>
-		<td class="th" align=CENTER colspan="2">Allgemein</td>
+		<td class="th" align=CENTER colspan="2">General</td>
 		</tr>
 		<tr>
 			<td>
-				<b>PayPal Express Button</b>
+				<b>PayPal Express Checkout button</b>
 			</td>
-			<td>Optional: Der Express-Kauf-Button ist universell hinterlegbar, z.B. auf der Artikelseite (Single item) oder neben dem Warenkorb (Shopping cart). Er gibt dem Kunden die Möglichkeit, den Artikel oder den Inhalt des gesamten Warenkorbs sofort zu kaufen, ohne den Umweg über die Kaufabwicklung zu machen. Hierbei wird er direkt zur Zahlung weitergeleitet. Die Lieferadresse wird von PayPal bereitgestellt.</td>
+			<td>Optional: Link the PayPal Express Checkout button where it is needed, e.g. on the item page (Single item) or next to the shopping cart. In clicking this button, the customer can purchase the item or the content of the shopping cart at once, without going through the regular checkout. In this case, he will be forwarded to the PayPal payment process. The shipping address is provided by PayPal.</td>
 		</tr>
 		<tr>
 		<tr>
-		<td class="th" align=CENTER colspan="2">Pay Pal PLUS</td>
+		<td class="th" align=CENTER colspan="2">PayPal Plus</td>
 		</tr>
 		<tr>
 			<td>
 				<b>PayPal PLUS Wall</b>
 			</td>
 			<td>
-				Durch die Verknüpfung im Container <strong>Checkout: Override payment method</strong> ersetzt die PayPal PLUS Wall alle vorher eingestellten Zahlungsarten. Jene Zahlungsarten, die zusätzlich zu den standardmäßig in der Wall angebotenen Zahlungsarten PayPal, Lastschrift, Kreditkarte sowie Kauf auf Rechnung eingestellt sind, werden in der Wall unter diesen gemäß ihrer Priorität angezeigt. <a id="10." name="10."></a>
+				A link to the container <strong>Checkout: Override payment method</strong> replaces all previous payment methods with the PayPal PLUS Wall. Any payment methods offered in addition to those inside the Wall&nbsp;– PayPal, Debit, Credit card and purchase by invoice&nbsp;– will be displayed below these four inside the wall in order of their priority. <a id="10." name="10."></a>
 			</td>
 		</tr>
 		
