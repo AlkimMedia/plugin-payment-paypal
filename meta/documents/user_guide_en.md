@@ -1,8 +1,8 @@
-# PayPal&nbsp;– Cashless payment in plentymarkets online shops
+# PayPal&nbsp;– Cashless payment in plentymarkets online stores
 
 With the plentymarkets PayPal plugin, incorporate **PayPal** and **PayPal PLUS** in your online store.
 
-## Open a PayPal account
+## Opening a PayPal account
 
 You need to [open a business account with PayPal](https://www.paypal.com/de/webapps/mpp/merchant) before you can set up the payment method in plentymarkets. You will then receive information and access data, which you will need for setting up the function in plentymarkets.
 
@@ -10,20 +10,19 @@ You need to [open a business account with PayPal](https://www.paypal.com/de/weba
 
 Before using the full functionality of the plugin, you first have to connect your PayPal account with your plentymarkets system.
 
-##### Add a PayPal account   
+##### Adding a PayPal account:   
 1. Go to **Settings&nbsp;» Orders&nbsp;» PayPal&nbsp;» Account settings**. 
 2. Click on **Add PayPal account**. 
 3. Enter an email address. This address also serves as the name of the account. 
 4. Enter the client ID. 
 5. Enter the client secret. 
-6. Click on **Add**.  
-→ The PayPal account will be added and displayed in the list.
+6. Click on **Add**.<br /> → The PayPal account will be added and displayed in the list.
 
 Carry out further settings for the account.
 
-##### Managing your PayPal account  
+##### Managing your PayPal account:
 1. Go to **Settings&nbsp;» Orders&nbsp;» PayPal&nbsp;» Account settings**. 
-2. Click on the PayPal account you want to configure. → The PayPal account will open. 
+2. Click on the PayPal account you want to configure.<br />→ The PayPal account will open. 
 3. Carry out the settings. Pay attention to the information given in table 1. 
 4. **Save** the settings.
 
@@ -42,7 +41,7 @@ Carry out further settings for the account.
 			<td>
 				<b>Client settings</b>
 			</td>
-			<td><b>Account</b> Die email address serving as the account name. This information cannot be altered.<br /> <b>Client ID</b> Your PayPal ID.<br /><b>Client secret</b> Your PayPal secret.<br /><strong><i>Note:</i></strong> This information cannot be changed.
+			<td><b>Account:</b> The email address serving as the account name.<br /> <b>Client ID:</b> Your PayPal ID.<br /><b>Client secret</b> Your PayPal secret.<br /><strong><i>Note:</i></strong> This information cannot be changed.
 			</td>
 		</tr>
 		<tr>
@@ -50,7 +49,7 @@ Carry out further settings for the account.
 				<b>Environment</b>
 			</td>
 			<td>			
-Choose between <b>Test environment</b> and <b>Live environment</b>.<br /> <strong><i>Important</i></strong>: Since all information concerning accounts cannot be altered, two accounts are needed; one for the test environment, one for the live environment.<br /> <b>Test environment</b>: Provide test user and test data in the <strong><a href="https://developer.paypal.com/developer/accounts/" target="_blank">PayPal Sandbox</a></strong>. The test environment is inaccessible for customers.<br /> <b>Live environment</b>: Switch to this environment to make the connected PayPal account available for payments.<br />
+Choose between <b>Test environment</b> and <b>Live environment</b>.<br /> <strong><i>Important</i></strong>: Since all information concerning accounts cannot be altered, two accounts are needed; one for the test environment, one for the live environment.<br /> <b>Test environment:</b> Provide test user and test data in the <strong><a href="https://developer.paypal.com/developer/accounts/" target="_blank">PayPal Sandbox</a></strong>. The test environment is inaccessible for customers.<br /> <b>Live environment:</b> Switch to this environment to make the connected PayPal account available for payments.
 			</td>
 		</tr>
 		<tr>
@@ -74,7 +73,7 @@ Choose between <b>Test environment</b> and <b>Live environment</b>.<br /> <stron
 				<b>Time of PayPal payment collection</b>
 			</td>
 			<td>
-				<strong>Sale (immediate debit)</strong>&nbsp;= Collect payment immediately after the order has been completed.
+				<strong>Sale (immediate debit):</strong> Collect payment immediately after the order has been completed.
 			</td>
 		</tr>
 	</tbody>
@@ -88,7 +87,7 @@ Discover how to offer the payment methods offered by PayPal in your online store
 
 After installing the PayPal plugin and connecting your account, PayPal is automatically available as payment method. This payment method appears in the checkout among the other payment methods according to its priority.<br />Proceed as described below to activate properties. The PayPal PLUS Wall offers Germany's most used payment methods: PayPal, Debit, Credit card as well as purchase by invoice&nbsp;– even without a PayPal account. 
 
-##### Activating PayPal PLUS
+##### Activating PayPal PLUS:
 
 1. Go to **Settings&nbsp;» Orders&nbsp;» PayPal&nbsp;» PayPal PLUS**. 
 2. Select a Client (store). 
@@ -182,9 +181,13 @@ After installing the PayPal plugin and connecting your account, PayPal is automa
 				<b>Surcharges</b>
 			</td>
 			<td>
-If the payment with PayPal results in additional costs, enter the percentage value or flat rate value. The choice depends on the conditions of your contract.Flat rate<br /> <strong>Domestic (surcharge)</strong>: Enter a flat rate. The value that is entered will be taken into consideration for those orders that correspond to the system country. Once the customer has selected the payment method, these costs will be added to the particular order in the order process. The amount will be added to the total in the order and will not be displayed individually.<br />
+If the payment with PayPal results in additional costs, enter the percentage value or flat rate value. The choice depends on the conditions of your contract.<br />
 
-Percentage <strong>Domestic (surcharge)</strong>: Enter a percentage value. The value that is entered will be taken into consideration for those orders that correspond to the system country.Flat rate<br /> <strong>Foreign countries (surcharge)</strong>: Enter a flat rate. The value that is entered will be taken into consideration for those orders that correspond to a foreign country. Once the customer has selected the payment method, these costs will be added to the particular order in the order process. The amount will be added to the total in the order and will not be displayed individually.<br />
+Flat rate <strong>Domestic (surcharge)</strong>: Enter a flat rate. The value that is entered will be taken into consideration for those orders that correspond to the system country. Once the customer has selected the payment method, these costs will be added to the particular order in the order process. The amount will be added to the total in the order and will not be displayed individually.<br />
+
+Percentage <strong>Domestic (surcharge)</strong>: Enter a percentage value. The value that is entered will be taken into consideration for those orders that correspond to the system country.<br />
+
+Flat rate <strong>Foreign countries (surcharge)</strong>: Enter a flat rate. The value that is entered will be taken into consideration for those orders that correspond to a foreign country. Once the customer has selected the payment method, these costs will be added to the particular order in the order process. The amount will be added to the total in the order and will not be displayed individually.<br />
 
 Percentage <strong>Foreign countries (surcharge)</strong>: Enter a percentage value. The value that is entered will be taken into consideration for those orders that correspond to a foreign country.<br />
 
@@ -197,13 +200,12 @@ Percentage <strong>Foreign countries (surcharge)</strong>: Enter a percentage va
 
 You have multiple options to integrate PayPal PLUS and the PayPal Express Checkout button in your online store. For this purpose, the plentymarkets system offers containers at relevant places which can be filled with content to meet your needs.
 
-##### Linking the PayPal PLUS Wall
+##### Linking the PayPal PLUS Wall:
 
 1. Click on **Start&nbsp;» Plugins**. 
 2. Click on the **Content** tab. 
 3. Select the area PayPal PLUS Wall. 
-4. Select one, several or all containers which shall use the PayPal PLUS Wall. Pay attention to the information given in table 3.  
-→ The content is linked to the container.
+4. Select one, several or all containers which shall use the PayPal PLUS Wall. Pay attention to the information given in table 3.<br /> → The content is linked to the container.
 
 <table>
 <caption>Table 3: Linking containers</caption>
@@ -223,7 +225,7 @@ You have multiple options to integrate PayPal PLUS and the PayPal Express Checko
 			<td>
 				<b>PayPal Express Checkout button</b>
 			</td>
-			<td>Optional: Link the PayPal Express Checkout button where it is needed, e.g. on the item page (Single item) or next to the shopping cart. In clicking this button, the customer can purchase the item or the content of the shopping cart at once, without going through the regular checkout. In this case, he will be forwarded to the PayPal payment process. The shipping address is provided by PayPal.</td>
+			<td>Optional: Link the PayPal Express Checkout button where it is needed, e.g. on the item page (Single item) or next to the shopping cart. In clicking this button, the customer can purchase the item or the content of the shopping cart at once, without going through the regular checkout. In this case, the customer will be forwarded to the PayPal payment process. The shipping address is provided by PayPal.</td>
 		</tr>
 		<tr>
 		<tr>
@@ -237,6 +239,9 @@ You have multiple options to integrate PayPal PLUS and the PayPal Express Checko
 				A link to the container <strong>Checkout: Override payment method</strong> replaces all previous payment methods with the PayPal PLUS Wall. Any payment methods offered in addition to those inside the Wall&nbsp;– PayPal, Debit, Credit card and purchase by invoice&nbsp;– will be displayed below these four inside the wall in order of their priority. <a id="10." name="10."></a>
 			</td>
 		</tr>
-		
 	</tbody>
 </table>
+
+## License
+
+This project is licensed under the GNU AFFERO GENERAL PUBLIC LICENSE. – find further information in the [LICENSE.md](https://github.com/plentymarkets/plugin-payment-paypal/blob/master/LICENSE.md).
