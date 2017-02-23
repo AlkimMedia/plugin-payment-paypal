@@ -3,7 +3,7 @@
     "namespace": "PayPal",
     "type": "payment",
     "version": "0.7.0",
-    "licences": "AGPL-3.0",
+    "license": "AGPL-3.0",
     "pluginIcon": "icon_plugin_xs.png",
     "price": 0.00,
     "description": "The official PayPal plugin for plentymarkets",
