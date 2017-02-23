@@ -1,4 +1,4 @@
-# PayPal – Bargeldloses Bezahlen in plentymarkets Online-Shops
+# PayPal&nbsp;– Bargeldloses Bezahlen in plentymarkets Webshops
 
 Mit dem plentymarkets PayPal Plugin binden Sie **PayPal** und **PayPal PLUS** in Ihren Webshop ein.
 
@@ -12,22 +12,19 @@ Bevor Sie die Funktionen des PayPal-Plugins nutzen können, müssen Sie zuerst I
 
 ##### PayPal-Konto hinzufügen:
   
-1. Öffnen Sie das Menü **Einstellungen » Aufträge » PayPal » Kontoeinstellungen**.
+1. Öffnen Sie das Menü **Einstellungen&nbsp;» Aufträge&nbsp;» PayPal&nbsp;» Kontoeinstellungen**.
 2. Klicken Sie auf **PayPal-Konto hinzufügen**.
-3. Geben Sie eine E-Mail-Adresse ein.  
-	→ Diese E-Mail-Adresse ist gleichzeitig der Name des Kontos.
+3. Geben Sie eine E-Mail-Adresse ein.<br /> → Diese E-Mail-Adresse ist gleichzeitig der Name des Kontos.
 4. Geben Sie die Mandanten-ID ein.
 5. Geben Sie das Mandanten-Geheimwort ein.
-6. Klicken Sie auf **Hinzufügen**.  
-	→ Das PayPal-Konto wird hinzugefügt und in der Übersicht angezeigt.
+6. Klicken Sie auf **Hinzufügen**.<br /> → Das PayPal-Konto wird hinzugefügt und in der Übersicht angezeigt.
 
 Nach dem Hinzufügen nehmen Sie weitere Einstellungen für das Konto vor.
 
-##### PayPal-Konto verwalten
+##### PayPal-Konto verwalten:
  
-1. Öffnen Sie das Menü **Einstellungen » Aufträge » PayPal » Kontoeinstellungen**.
-2. Klicken Sie auf das PayPal-Konto, das Sie konfigurieren möchten.  
-	→ Das PayPal-Konto wird geöffnet.
+1. Öffnen Sie das Menü **Einstellungen&nbsp;» Aufträge&nbsp;» PayPal&nbsp;» Kontoeinstellungen**.
+2. Klicken Sie auf das PayPal-Konto, das Sie konfigurieren möchten.<br /> → Das PayPal-Konto wird geöffnet.
 3. Nehmen Sie die Einstellungen vor. Beachten Sie dazu die Erläuterungen in Tabelle 1.
 4. **Speichern** Sie die Einstellungen.
 
@@ -46,7 +43,7 @@ Nach dem Hinzufügen nehmen Sie weitere Einstellungen für das Konto vor.
 			<td>
 				<b>Mandanten-Einstellungen</b>
 			</td>
-			<td><b>Konto:</b> Die eingegebene E-Mail-Adresse, die gleichzeitig als Name des Kontos fungiert. Diese Angabe kann nicht mehr geändert werden.<br /> <b>Mandanten-ID:</b> Ihre PayPal-ID.<br /><b>Mandanten-Geheimwort:</b> Ihr PayPal-Geheimwort.<br /><strong><i>Hinweis:</strong></i> Diese Angaben können nicht mehr geändert werden.
+			<td><b>Konto:</b> Die eingegebene E-Mail-Adresse, die gleichzeitig als Name des Kontos fungiert.<br /> <b>Mandanten-ID:</b> Ihre PayPal-ID.<br /><b>Mandanten-Geheimwort:</b> Ihr PayPal-Geheimwort.<br /><strong><i>Hinweis:</strong></i> Diese Angaben können nicht mehr geändert werden.
 			</td>
 		</tr>
 		<tr>
@@ -57,7 +54,7 @@ Nach dem Hinzufügen nehmen Sie weitere Einstellungen für das Konto vor.
 <b>Testumgebung</b> oder <b>Live-Umgebung</b> wählen.<br />
 <strong><i>Wichtig:</i></strong> Da die eingegebenen Daten nicht mehr änderbar sind, werden zwei Konten für Testumgebung und Live-Umgebung benötigt.<br />
 <b>Testumgebung</b>: Testnutzer und Testdaten in der <strong><a href="https://developer.paypal.com/developer/accounts/" target="_blank">PayPal Sandbox</a></strong> hinterlegen. Die Testumgebung ist für Kunden nicht zugänglich.<br />
-<b>Live-Umgebung</b>: Auf diese Umgebung wechseln, um das eingestellte PayPal-Konto für die Zahlung verfügbar zu machen.<br >
+<b>Live-Umgebung</b>: Auf diese Umgebung wechseln, um das eingestellte PayPal-Konto für die Zahlung verfügbar zu machen.
 			</td>
 		</tr>
 		<tr>
@@ -81,7 +78,7 @@ Nach dem Hinzufügen nehmen Sie weitere Einstellungen für das Konto vor.
 				<b>Zeitpunkt PayPal-Zahlungseinzug</b>
 			</td>
 			<td>
-				<strong>Sale (sofortiger Zahlungseinzug)</strong> – Zahlung direkt nach Abschluss der Bestellung einziehen.
+				<strong>Sale (sofortiger Zahlungseinzug):</strong> Zahlung direkt nach Abschluss der Bestellung einziehen.
 			</td>
 		</tr>
 	</tbody>
@@ -93,11 +90,11 @@ In diesem Abschnitt erfahren Sie, wie Sie die verschiedenen von PayPal angeboten
 
 ### PayPal PLUS aktivieren
 
-Nachdem Sie das PayPal-Plugin installiert und Ihr Konto eingerichtet haben, ist PayPal ohne weitere Einstellungen als Zahlungsart verfügbar. Diese Zahlungsart erscheint in der Kaufabwicklung je nach Priorität neben den anderen aktivierten Zahlungsarten.<br />Gehen Sie wie im Folgenden beschrieben vor, um PayPal PLUS zu aktivieren. Die PayPal PLUS Wall gibt Ihren Kunden die Möglichkeit, ihren Einkauf mit Deutschlands beliebtesten Zahlungsarten PayPal, Lastschrift, Kreditkarte sowie Kauf auf Rechnung zu bezahlen – sogar ohne ein PayPal-Konto. 
+Nachdem Sie das PayPal-Plugin installiert und Ihr Konto eingerichtet haben, ist PayPal ohne weitere Einstellungen als Zahlungsart verfügbar. Diese Zahlungsart erscheint in der Kaufabwicklung je nach Priorität neben den anderen aktivierten Zahlungsarten.<br />Gehen Sie wie im Folgenden beschrieben vor, um PayPal PLUS zu aktivieren. Die PayPal PLUS Wall gibt Ihren Kunden die Möglichkeit, ihren Einkauf mit Deutschlands beliebtesten Zahlungsarten PayPal, Lastschrift, Kreditkarte sowie Kauf auf Rechnung zu bezahlen&nbsp;– sogar ohne ein PayPal-Konto. 
 
 ##### PayPal PLUS aktivieren:
 
-1. Öffnen Sie das Menü **Einstellungen » Aufträge » PayPal » PayPal / PayPal PLUS**.
+1. Öffnen Sie das Menü **Einstellungen&nbsp;» Aufträge&nbsp;» PayPal&nbsp;» PayPal / PayPal PLUS**.
 2. Wählen Sie einen Mandanten.
 3. Nehmen Sie die Einstellungen vor. Beachten Sie dazu die Erläuterungen in Tabelle 2.
 4. **Speichern** Sie die Einstellungen.
@@ -129,14 +126,15 @@ Nachdem Sie das PayPal-Plugin installiert und Ihr Konto eingerichtet haben, ist 
 			<td>Bestimmt, an welcher Stelle PayPal in der Kaufabwicklung steht, wenn PayPal PLUS nicht verwendet wird.</td>
 		</tr>
 		<tr>
-		<td class="th" align=CENTER colspan="2">Pay Pal PLUS</td>
+		<td class="th" align=CENTER colspan="2">PayPal PLUS</td>
 		</tr>
 		<tr>
 			<td>
 				<b>Aktivieren</b>
 			</td>
 			<td>
-				PayPal PLUS Wall in der Kaufabwicklung aktivieren. Mindestens einen Container <a href="#10."><strong>verknüpfen</strong></a>, um die PayPal PLUS Wall zu nutzen. 			</td>
+				PayPal PLUS Wall in der Kaufabwicklung aktivieren. Mindestens einen Container <a href="#10."><strong>verknüpfen</strong></a>, um die PayPal PLUS Wall zu nutzen.
+            </td>
 		</tr>
 		<tr>
 		<td class="th" align=CENTER colspan="2">Spracheinstellungen</td>
@@ -209,13 +207,12 @@ Wenn bei der Zahlung mit PayPal zusätzliche Kosten berechnet werden, den Prozen
 Für die Zahlungsart PayPal PLUS und für den Express-Kauf-Button stehen Ihnen verschiedene Möglichkeiten zur Verfügung, um sie in ihren Shop einzubinden.
 Hierfür sind in den Templates in plentymarkets an relevanten Stellen Container hinterlegt, die zur Individualisierung mit Inhalt gefüllt werden.
 
-##### PayPal PLUS Wall verknüpfen
+##### PayPal PLUS Wall verknüpfen:
 
 1. Klicken Sie auf **Start » Plugins**.
 2. Wechseln Sie in das Tab **Content**. 
 3. Wählen Sie den Bereich PayPal Plus Wall.
-4. Wählen Sie einen, mehrere oder ALLE Container, in denen die PayPal PLUS Wall genutzt werden soll. Beachten Sie dazu die Erläuterungen in Tabelle 3.  
-	→ Die Verknüpfung zu den Containern ist hergestellt.
+4. Wählen Sie einen, mehrere oder ALLE Container, in denen die PayPal PLUS Wall genutzt werden soll. Beachten Sie dazu die Erläuterungen in Tabelle 3.<br /> → Die Verknüpfung zu den Containern ist hergestellt.
 
 <table>
 <caption>Tab. 3: Container verknüpfen</caption>
@@ -239,7 +236,7 @@ Hierfür sind in den Templates in plentymarkets an relevanten Stellen Container 
 		</tr>
 		<tr>
 		<tr>
-		<td class="th" align=CENTER colspan="2">Pay Pal PLUS</td>
+		<td class="th" align=CENTER colspan="2">PayPal PLUS</td>
 		</tr>
 		<tr>
 			<td>
@@ -249,6 +246,9 @@ Hierfür sind in den Templates in plentymarkets an relevanten Stellen Container 
 				Durch die Verknüpfung im Container <strong>Checkout: Override payment method</strong> ersetzt die PayPal PLUS Wall alle vorher eingestellten Zahlungsarten. Jene Zahlungsarten, die zusätzlich zu den standardmäßig in der Wall angebotenen Zahlungsarten PayPal, Lastschrift, Kreditkarte sowie Kauf auf Rechnung eingestellt sind, werden in der Wall unter diesen gemäß ihrer Priorität angezeigt. <a id="10." name="10."></a>
 			</td>
 		</tr>
-		
 	</tbody>
 </table>
+
+## Lizenz
+
+Das gesamte Projekt unterliegt der GNU AFFERO GENERAL PUBLIC LICENSE – weitere Informationen finden Sie in der [LICENSE.md](https://github.com/plentymarkets/plugin-payment-paypal/blob/master/LICENSE.md).
