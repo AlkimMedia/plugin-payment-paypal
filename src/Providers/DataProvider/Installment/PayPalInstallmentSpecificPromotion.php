@@ -53,7 +53,24 @@ class PayPalInstallmentSpecificPromotion
             {
                 if(is_array($financingOptions['financing_options'][0]) && is_array(($financingOptions['financing_options'][0]['qualifying_financing_options'])))
                 {
-                    $qualifyingFinancingOptions = $financingOptions['financing_options'][0]['qualifying_financing_options'][0];
+                    /*
+                     * Choose a very high value to check if lower values exist
+                     */
+                    $lowestAPR = 1000000;
+                    /*
+                     * Use the first financing option as fallback
+                     */
+                    $actFinancingOption = $financingOptions['financing_options'][0]['qualifying_financing_options'][0];
+                    foreach ($financingOptions['financing_options'][0]['qualifying_financing_options'] as $qualifying_financing_option)
+                    {
+                        if($qualifying_financing_option['monthly_percentage_rate'] > 0 && $qualifying_financing_option['monthly_percentage_rate'] < $lowestAPR)
+                        {
+                            $lowestAPR = $qualifying_financing_option['monthly_percentage_rate'];
+                            $actFinancingOption = $qualifying_financing_option;
+                        }
+                    }
+
+                    $qualifyingFinancingOptions = $actFinancingOption;
                 }
             }
         }

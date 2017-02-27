@@ -18,11 +18,11 @@
                 {% for financingPlan in financingOptions %}
                     <div class="col-md-6">
                         <div style="border: 2px solid black; margin: 5px">
-                            <h3>Plan {{ i }}</h3>
-                            <table>
+                            <h3>Plan {{ i }} {% if financingPlan.star == true %}*{% endif %}</h3>
+                            <table style="width:99%">
                                 <tr>
                                     <td>{{ financingPlan.credit_financing.term }} monatliche Raten in Höhe von je</td>
-                                    <td>{{ financingPlan.monthly_payment.value }}€</td>
+                                    <td>{{ financingPlan.monthly_payment.value|number_format(2, ',', '.') }}€</td>
                                 </tr>
                                 <tr>
                                     <td>fester Sollzinssatz:</td>

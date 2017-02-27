@@ -7,10 +7,10 @@
     {% else %}
         {% if financingOptions is not empty %}
             {% if financingOptions.credit_financing.apr == '0.00' %}
-                <h4 style="text-align: center">Finanzierung ab {{ financingOptions.monthly_payment.value }} € im Monat mit</h4>
+                <h4 style="text-align: center">Finanzierung ab {{ financingOptions.monthly_payment.value|number_format(2, ',', '.') }} € im Monat mit</h4>
                 <img class="img-fluid" src="{{ plugin_path('PayPal') }}/images/buttons/installment/HorizontalLockup/FullColor/pp_credit-german_h_rgb.png" />
             {% else %}
-                <b style="font-weight: bold; text-align: left">Finanzierung ab {{ financingOptions.monthly_payment.value }} € in {{ financingOptions.credit_financing.term }} monatlichen Raten<br>mit Ratenzahlung Powered by PayPal</b><br>
+                <b style="font-weight: bold; text-align: left">Finanzierung ab {{ financingOptions.monthly_payment.value|number_format(2, ',', '.') }} € in {{ financingOptions.credit_financing.term }} monatlichen Raten<br>mit Ratenzahlung Powered by PayPal</b><br>
                 Repräsentatives Beispiel gem. § 6a PAngV:
                 <div class="paypal-installment-specific-promotion-financing-option">
                     <table>
@@ -32,7 +32,7 @@
                         </tr>
                         <tr>
                             <td>{{ financingOptions.credit_financing.term }} monatliche Raten in Höhe von je</td>
-                            <td>{{ financingOptions.monthly_payment.value }} €</td>
+                            <td>{{ financingOptions.monthly_payment.value|number_format(2, ',', '.') }} €</td>
                         </tr>
                     </table>
                 </div>
@@ -47,10 +47,11 @@
 
     {% if amount < 99.99 or amount > 5000 %}
     {% else %}
-        <a href="#" data-toggle="modal" data-target="#installmentSpecificPromotionModal">Informationen zu Möglichen Raten</a>
-
+        <div style="text-align: center">
+            <a href="#" data-toggle="modal" data-target="#installmentSpecificPromotionModal">Informationen zu möglichen Raten</a>
+        </div>
         <!-- Modal -->
-        <div class="modal fade" id="installmentSpecificPromotionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal fade in" id="installmentSpecificPromotionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content" style="border: 2px solid #009CDE; border-radius: 10px; padding-top: 30px; padding-bottom: 30px;">
                     <div class="modal-body">Loading ...</div>
