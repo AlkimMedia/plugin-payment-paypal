@@ -2,30 +2,35 @@
 
 namespace PayPal\Providers\DataProvider\Installment;
 
-
 use PayPal\Helper\PaymentHelper;
-use PayPal\Services\SessionStorageService;
-use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
-use Plenty\Modules\Basket\Models\Basket;
+use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
+use Plenty\Modules\Payment\Models\PaymentProperty;
 use Plenty\Plugin\Templates\Twig;
+use Plenty\Modules\Order\Models\Order;
 
 class PayPalInstallmentFinancingCosts
 {
+    /**
+     * @param Twig $twig
+     * @param PaymentHelper $paymentHelper
+     * @param Order $order
+     * @param PaymentRepositoryContract $paymentRepositoryContract
+     * @return string
+     */
     public function call(   Twig $twig,
-                            BasketRepositoryContract $basketRepositoryContract,
                             PaymentHelper $paymentHelper,
-                            SessionStorageService $sessionStorageService
-    )
+                            Order $order,
+                            PaymentRepositoryContract $paymentRepositoryContract)
     {
-        $creditFinacingOffered = $sessionStorageService->getSessionValue(SessionStorageService::PAYPAL_INSTALLMENT_COSTS);
-        if( is_array($creditFinacingOffered)
-        )
+        $payments = $paymentRepositoryContract->getPaymentsByOrderId($order->id);
+
+        $payment = $payments[0];
+
+        $creditFinancing = json_decode($paymentHelper->getPaymentPropertyValue($payment, PaymentProperty::TYPE_PAYMENT_TEXT), true);
+
+        if(!empty($creditFinancing) && is_array($creditFinancing))
         {
-            $params = [];
-            $params['financingCosts'] = $creditFinacingOffered['total_interest']['value'];
-            $params['totalCostsIncludeFinancing'] = $creditFinacingOffered['total_cost']['value'];
-            $params['currency'] = $creditFinacingOffered['total_cost']['currency'];
-            return $twig->render('PayPal::PayPalInstallment.FinancingCosts', $params);
+            return $twig->render('PayPal::PayPalInstallment.FinancingCosts', $creditFinancing);
         }
 
         return '';

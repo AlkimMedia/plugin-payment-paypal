@@ -202,7 +202,7 @@ class PaymentService
      *
      * @return array
      */
-    public function executePayment($mode=PaymentHelper::MODE_PAYPAL)
+    public function executePayment($mode = PaymentHelper::MODE_PAYPAL)
     {
         // Load the mandatory PayPal data from session
         $ppPayId    = $this->sessionStorage->getSessionValue(SessionStorageService::PAYPAL_PAY_ID);
@@ -222,6 +222,17 @@ class PaymentService
         {
             $this->returnType = 'errorCode';
             return $executeResponse['error'].': '.$executeResponse['error_msg'];
+        }
+
+        if($mode == PaymentHelper::MODE_PAYPAL_INSTALLMENT)
+        {
+            $financingCosts = $this->sessionStorage->getSessionValue(SessionStorageService::PAYPAL_INSTALLMENT_COSTS);
+
+            if(is_array($financingCosts) && !empty($financingCosts))
+            {
+                $executeResponse[SessionStorageService::PAYPAL_INSTALLMENT_COSTS] = $financingCosts;
+                $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_INSTALLMENT_COSTS, null);
+            }
         }
 
         // Clear the session parameters
@@ -294,6 +305,7 @@ class PaymentService
     }
 
     /**
+     * @param int $saleId
      * @param array $paymentData
      * @return array
      */
