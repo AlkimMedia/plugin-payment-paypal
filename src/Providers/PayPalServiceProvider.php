@@ -10,14 +10,18 @@ use Plenty\Modules\EventProcedures\Services\Entries\ProcedureEntry;
 use Plenty\Modules\EventProcedures\Services\EventProceduresService;
 use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
 use Plenty\Modules\Frontend\Events\FrontendShippingCountryChanged;
+use Plenty\Modules\Order\Models\Order;
+use Plenty\Modules\Order\Pdf\Events\OrderPdfGenerationEvent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodContainer;
 use Plenty\Modules\Payment\Models\Payment;
+use Plenty\Modules\Payment\Models\PaymentProperty;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
 use Plenty\Modules\Basket\Events\BasketItem\AfterBasketItemAdd;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketCreate;
+use Plenty\Modules\Document\Models\Document;
 
 use Plenty\Plugin\Events\Dispatcher;
 use Plenty\Plugin\ServiceProvider;
@@ -195,6 +199,57 @@ class PayPalServiceProvider extends ServiceProvider
                     {
                         $event->setType('error');
                         $event->setValue('The PayPal-Payment could not be executed!');
+                    }
+                }
+            });
+
+        // Listen for the document generation event
+        $eventDispatcher->listen(OrderPdfGenerationEvent::class,
+            function (OrderPdfGenerationEvent $event) use ( $paymentHelper)
+            {
+                /** @var Order $order */
+                $order = $event->getOrder();
+                $docType = $event->getDocType();
+
+                if($docType == Document::INVOICE)
+                {
+                    /** @var \Plenty\Modules\Payment\Contracts\PaymentRepositoryContract $paymentContract */
+                    $paymentContract = pluginApp(\Plenty\Modules\Payment\Contracts\PaymentRepositoryContract::class);
+
+                    $payments = $paymentContract->getPaymentsByOrderId($order->id);
+
+                    if(!is_null($payments) && is_array($payments))
+                    {
+                        switch($order->methodOfPaymentId)
+                        {
+                            case $paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALINSTALLMENT):
+
+                                /** @var \Plenty\Modules\Payment\Models\Payment $payment */
+                                $payment = $payments[0];
+
+                                $creditFinancing = json_decode($paymentHelper->getPaymentPropertyValue($payment, PaymentProperty::TYPE_PAYMENT_TEXT), true);
+
+                                if(!empty($creditFinancing) && is_array($creditFinancing))
+                                {
+                                    /** @var \Plenty\Modules\Order\Pdf\Models\OrderPdfGeneration $orderPdfGenerationModel */
+                                    $orderPdfGenerationModel = pluginApp(\Plenty\Modules\Order\Pdf\Models\OrderPdfGeneration::class);
+
+                                    $sums = [];
+                                    $sums['Finanzierungskosten'] = $creditFinancing['financingCosts'];
+                                    $sums['Gesamtbetrag (mit Finanzierungskosten)'] = $creditFinancing['totalCostsIncludeFinancing'];
+
+                                    $orderPdfGenerationModel->language = 'de';
+                                    $orderPdfGenerationModel->sums = $sums;
+
+                                    $event->addOrderPdfGeneration($orderPdfGenerationModel);
+                                }
+
+                                break;
+
+                            case $paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALPLUS):
+
+                                break;
+                        }
                     }
                 }
             });
