@@ -19,18 +19,22 @@ class PayPalInstallmentFinancingCosts
      */
     public function call(   Twig $twig,
                             PaymentHelper $paymentHelper,
-                            Order $order,
-                            PaymentRepositoryContract $paymentRepositoryContract)
+                            PaymentRepositoryContract $paymentRepositoryContract,
+                            $arg)
     {
-        $payments = $paymentRepositoryContract->getPaymentsByOrderId($order->id);
-
-        $payment = $payments[0];
-
-        $creditFinancing = json_decode($paymentHelper->getPaymentPropertyValue($payment, PaymentProperty::TYPE_PAYMENT_TEXT), true);
-
-        if(!empty($creditFinancing) && is_array($creditFinancing))
+        $order = $arg[0];
+        if ($order instanceof Order)
         {
-            return $twig->render('PayPal::PayPalInstallment.FinancingCosts', $creditFinancing);
+            $payments = $paymentRepositoryContract->getPaymentsByOrderId($order->id);
+
+            $payment = $payments[0];
+
+            $creditFinancing = json_decode($paymentHelper->getPaymentPropertyValue($payment, PaymentProperty::TYPE_PAYMENT_TEXT), true);
+
+            if(!empty($creditFinancing) && is_array($creditFinancing))
+            {
+                return $twig->render('PayPal::PayPalInstallment.FinancingCosts', $creditFinancing);
+            }
         }
 
         return '';
