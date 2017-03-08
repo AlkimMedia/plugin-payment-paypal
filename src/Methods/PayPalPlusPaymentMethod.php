@@ -109,44 +109,14 @@ class PayPalPlusPaymentMethod extends PaymentMethodService
     }
 
     /**
-     * Get additional costs for PayPal. Additional costs can be entered in the config.json.
+     * Get additional costs for PayPal.
+     * PayPal did not allow additional costs
      *
      * @return float
      */
     public function getFee()
     {
-        $fee = 0;
-        $basket = $this->basketRepo->load();
-        $basketAmount = $basket->basketAmount;
-
-        $shippingCountryId = $this->checkout->getShippingCountryId();
-        if(array_key_exists('markup', $this->paymentService->settings) && array_key_exists('webstore', $this->paymentService->settings['markup']))
-        {
-            if($shippingCountryId && $shippingCountryId != 1)
-            {
-                if(array_key_exists('flatForeign', $this->paymentService->settings['markup']['webstore']))
-                {
-                    $fee += $this->paymentService->settings['markup']['webstore']['flatForeign'];
-                }
-                if(array_key_exists('percentageForeign', $this->paymentService->settings['markup']['webstore']))
-                {
-                    $fee += $basketAmount / 100 * $this->paymentService->settings['markup']['webstore']['percentageForeign'];
-                }
-            }
-            else
-            {
-                if(array_key_exists('flatDomestic', $this->paymentService->settings['markup']['webstore']))
-                {
-                    $fee += $this->paymentService->settings['markup']['webstore']['flatDomestic'];
-                }
-                if(array_key_exists('percentageDomestic', $this->paymentService->settings['markup']['webstore']))
-                {
-                    $fee += $basketAmount / 100 * $this->paymentService->settings['markup']['webstore']['percentageDomestic'];
-                }
-            }
-        }
-
-        return (float)$fee;
+        return 0.00;
     }
 
     /**
