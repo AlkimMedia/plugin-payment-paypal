@@ -24,6 +24,7 @@
         "PayPal\\Migrations\\CreatePayPalTables"
     ],
     "dataProviders": [
+        {"key":"PayPal\\Providers\\DataProvider\\PayPalScriptsDataProvider", "name":"PayPal Scripts", "description": "Different Scripts for the PayPal Payment Methods"},
         {"key":"PayPal\\Providers\\DataProvider\\PayPalExpressButtonDataProvider", "name":"PayPal Express Button", "description": "PayPal Express Button"},
         {"key":"PayPal\\Providers\\DataProvider\\PayPalPlusPaymentWallDataProvider", "name":"PayPal Plus Wall", "description": "To Show the PayPal Plus Wall"},
 

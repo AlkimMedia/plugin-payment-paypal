@@ -1,0 +1,14 @@
+<script type="text/javascript">
+    document.addEventListener("afterPaymentMethodChanged", function(e)
+    {
+        console.log("afterPaymentMethodChanged:", e.detail);
+        if(e.detail == {{ installmentPaymentMethodId }} )
+        {
+            $("#checkoutButtonPayPalInstallment").text("{{ trans("PayPal::PayPal.installmentButton") }}");
+        }
+        else
+        {
+            $("#checkoutButtonPayPalInstallment").text("{{ trans("Ceres::Template.orderBuyNow") }}");
+        }
+    });
+</script>
