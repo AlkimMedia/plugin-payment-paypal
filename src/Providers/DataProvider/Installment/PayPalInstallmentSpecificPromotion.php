@@ -17,6 +17,14 @@ use Plenty\Plugin\Templates\Twig;
 
 class PayPalInstallmentSpecificPromotion
 {
+    /**
+     * @param Twig $twig
+     * @param BasketRepositoryContract $basketRepositoryContract
+     * @param PayPalInstallmentService $payPalInstallmentService
+     * @param PaymentService $paymentService
+     * @param $arg
+     * @return string
+     */
     public function call(   Twig $twig,
                             BasketRepositoryContract $basketRepositoryContract,
                             PayPalInstallmentService $payPalInstallmentService,

@@ -8,7 +8,15 @@ use Plenty\Plugin\Templates\Twig;
 
 class PayPalInstallmentPrepareButton
 {
-    public function call(Twig $twig, PaymentHelper $paymentHelper, Checkout $checkout)
+    /**
+     * @param Twig $twig
+     * @param PaymentHelper $paymentHelper
+     * @param Checkout $checkout
+     * @return string
+     */
+    public function call(   Twig $twig,
+                            PaymentHelper $paymentHelper,
+                            Checkout $checkout)
     {
         $installmentSelected = false;
         if($checkout->getPaymentMethodId() == $paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALINSTALLMENT))
