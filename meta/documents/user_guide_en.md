@@ -176,23 +176,6 @@ After installing the PayPal plugin and connecting your account, PayPal is automa
 				The PayPal payment method is active only for the countries in this list.
 			</td>
 		</tr>
-		<tr>
-			<td>
-				<b>Surcharges</b>
-			</td>
-			<td>
-If the payment with PayPal results in additional costs, enter the percentage value or flat rate value. The choice depends on the conditions of your contract.<br />
-
-Flat rate <strong>Domestic (surcharge)</strong>: Enter a flat rate. The value that is entered will be taken into consideration for those orders that correspond to the system country. Once the customer has selected the payment method, these costs will be added to the particular order in the order process. The amount will be added to the total in the order and will not be displayed individually.<br />
-
-Percentage <strong>Domestic (surcharge)</strong>: Enter a percentage value. The value that is entered will be taken into consideration for those orders that correspond to the system country.<br />
-
-Flat rate <strong>Foreign countries (surcharge)</strong>: Enter a flat rate. The value that is entered will be taken into consideration for those orders that correspond to a foreign country. Once the customer has selected the payment method, these costs will be added to the particular order in the order process. The amount will be added to the total in the order and will not be displayed individually.<br />
-
-Percentage <strong>Foreign countries (surcharge)</strong>: Enter a percentage value. The value that is entered will be taken into consideration for those orders that correspond to a foreign country.<br />
-
-<strong><i>Important:</i></strong> Do not enter a value into both fields (Percentage and Flat rate).
-		</tr>
 	</tbody>
 </table>
 

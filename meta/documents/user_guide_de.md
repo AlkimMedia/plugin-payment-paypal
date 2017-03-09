@@ -182,23 +182,6 @@ Nachdem Sie das PayPal-Plugin installiert und Ihr Konto eingerichtet haben, ist 
 				Nur für die hier eingestellten Lieferländer ist die Zahlungsart PayPal freigegeben.
 			</td>
 		</tr>
-		<tr>
-			<td>
-				<b>Aufpreis Webshop</b>
-			</td>
-			<td>
-Wenn bei der Zahlung mit PayPal zusätzliche Kosten berechnet werden, den Prozentwert oder Pauschalwert gemäß der Vertragskonditionen eingeben.<br />
-     
-<strong>Inland (Pauschal):</strong> Pauschalen Wert eingeben, der bei Aufträgen berücksichtigt wird, bei denen das Systemland gewählt wurde. Diese Kosten werden im Bestellvorgang bei der Wahl der Zahlungsart zum Auftrag addiert. Der Betrag fließt in die Gesamtsumme des Auftrags ein und wird nicht einzeln ausgewiesen.<br />
-
-<strong>Inland (Prozentual):</strong> Prozentualen Wert eingeben, der bei Aufträgen berücksichtigt wird, bei denen das Systemland gewählt wurde.<br />
-   
-<strong>Ausland (Pauschal):</strong> Pauschalen Wert eingeben, der bei Aufträgen berücksichtigt wird, bei denen nicht das Systemland gewählt wurde. Diese Kosten werden im Bestellvorgang bei der Wahl der Zahlungsart zum Auftrag addiert. Der Betrag fließt in die Gesamtsumme des Auftrags ein und wird nicht einzeln ausgewiesen.<br />
-
-<strong>Ausland (Prozentual):</strong> Prozentualen Wert eingeben, der bei Aufträgen berücksichtigt wird, bei denen nicht das Systemland gewählt wurde.<br />
-
-<strong><i>Wichtig:</i></strong> Nicht in beide Felder (Pauschal und Prozentual) einen Wert eingeben.
-		</tr>
 	</tbody>
 </table>
 
