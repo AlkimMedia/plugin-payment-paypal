@@ -8,7 +8,6 @@
 
 namespace PayPal\Services;
 
-
 use PayPal\Api\Payment;
 use PayPal\Helper\PaymentHelper;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
@@ -62,6 +61,7 @@ class PayPalPlusService
      * @param SessionStorageService $sessionStorage
      * @param AddressRepositoryContract $addressRepo
      * @param FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepositoryContract
+     * @param PaymentHelper $paymentHelper
      */
     public function __construct(    PaymentService $paymentService,
                                     LibraryCallContract $libraryCallContract,
@@ -69,7 +69,7 @@ class PayPalPlusService
                                     AddressRepositoryContract $addressRepo,
                                     FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepositoryContract,
                                     PaymentHelper $paymentHelper
-                                    )
+    )
     {
         $this->paymentService = $paymentService;
         $this->libraryCallContract = $libraryCallContract;
@@ -90,7 +90,14 @@ class PayPalPlusService
          */
         $language = 'de_DE';
         $country = 'DE';
+
+        $account = $this->paymentService->loadCurrentAccountSettings('installment');
         $mode = 'sandbox';
+
+        if(array_key_exists('environment', $account) && $account['environment'] == 0)
+        {
+            $mode = 'live';
+        }
 
         $content = '';
         $approvalUrl = $this->paymentService->getPaymentContent($basket, PaymentHelper::MODE_PAYPAL_PLUS);
@@ -104,6 +111,12 @@ class PayPalPlusService
             $changeCase = [];
             if(is_array($currentPaymentMethods) && count($currentPaymentMethods) > 0)
             {
+                /** @var \Plenty\Modules\Helper\Services\WebstoreHelper $webstoreHelper */
+                $webstoreHelper = pluginApp(\Plenty\Modules\Helper\Services\WebstoreHelper::class);
+                /** @var \Plenty\Modules\System\Models\WebstoreConfiguration $webstoreConfig */
+                $webstoreConfig = $webstoreHelper->getCurrentWebstoreConfiguration();
+                $domain = $webstoreConfig->domainSsl;
+
                 /** @var PaymentMethod $paymentMethod */
                 foreach ($currentPaymentMethods as $paymentMethod)
                 {
@@ -112,10 +125,10 @@ class PayPalPlusService
                         continue;
                     }
                     $thirdPartyPaymentMethods[] = [
-                        'redirectUrl'   => '/checkout/',
+                        'redirectUrl'   => $domain.'/checkout/',
                         'methodName'    => $this->frontendPaymentMethodRepositoryContract->getPaymentMethodName($paymentMethod, 'de'),
-                        'imageUrl'      => '/'.$this->frontendPaymentMethodRepositoryContract->getPaymentMethodIcon($paymentMethod, 'de'),
-                        'description'   => $this->frontendPaymentMethodRepositoryContract->getPaymentMethodDescription($paymentMethod, 'de')
+                        'imageUrl'      => $domain.'/'.$this->frontendPaymentMethodRepositoryContract->getPaymentMethodIcon($paymentMethod, 'de'),
+                        'description'   => (string)$this->frontendPaymentMethodRepositoryContract->getPaymentMethodDescription($paymentMethod, 'de')
                     ];
 
                     $changeCase[] = 'case "'.$this->frontendPaymentMethodRepositoryContract->getPaymentMethodName($paymentMethod, 'de').'": $.post("/payment/payPalPlus/changePaymentMethod/", { "paymentMethod" : "'.$paymentMethod->id.'" } ); break;';
@@ -258,4 +271,4 @@ class PayPalPlusService
     {
         $this->returnType = $returnType;
     }
-    }
+}
