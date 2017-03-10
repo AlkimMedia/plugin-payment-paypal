@@ -126,12 +126,12 @@ class PayPalPlusService
                     }
                     $thirdPartyPaymentMethods[] = [
                         'redirectUrl'   => $domain.'/checkout/',
-                        'methodName'    => $this->frontendPaymentMethodRepositoryContract->getPaymentMethodName($paymentMethod, 'de'),
+                        'methodName'    => substr($this->frontendPaymentMethodRepositoryContract->getPaymentMethodName($paymentMethod, 'de'),0,25),
                         'imageUrl'      => $domain.'/'.$this->frontendPaymentMethodRepositoryContract->getPaymentMethodIcon($paymentMethod, 'de'),
-                        'description'   => (string)$this->frontendPaymentMethodRepositoryContract->getPaymentMethodDescription($paymentMethod, 'de')
+                        'description'   => (string)($this->frontendPaymentMethodRepositoryContract->getPaymentMethodName($paymentMethod, 'de').' '.$this->frontendPaymentMethodRepositoryContract->getPaymentMethodDescription($paymentMethod, 'de'))
                     ];
 
-                    $changeCase[] = 'case "'.$this->frontendPaymentMethodRepositoryContract->getPaymentMethodName($paymentMethod, 'de').'": $.post("/payment/payPalPlus/changePaymentMethod/", { "paymentMethod" : "'.$paymentMethod->id.'" } ); break;';
+                    $changeCase[] = 'case "'.substr($this->frontendPaymentMethodRepositoryContract->getPaymentMethodName($paymentMethod, 'de'), 0, 25).'": $.post("/payment/payPalPlus/changePaymentMethod/", { "paymentMethod" : "'.$paymentMethod->id.'" } ); break;';
                 }
             }
 
