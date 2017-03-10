@@ -198,7 +198,6 @@ class PaymentController extends Controller
      * Change the payment method in the basket when user select a none paypal plus method
      *
      * @param $paymentMethod
-     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function changePaymentMethod(Checkout $checkout, Request $request)
     {
@@ -206,9 +205,6 @@ class PaymentController extends Controller
         if(isset($paymentMethod) && $paymentMethod > 0)
         {
             $checkout->setPaymentMethodId($paymentMethod);
-
-            // TODO change to setter
-            $this->sessionStorage->setSessionValue('MethodOfPaymentID', $paymentMethod);
         }
     }
 
