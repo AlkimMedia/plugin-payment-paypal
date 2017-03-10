@@ -1,5 +1,3 @@
-<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-
 <div class="wrapper paypal-installment-specific-promotion" id="paypal-installment-specific-promotion_{{ id }}">
     {% if amount < 99 or amount > 5000 %}
         <h4 style="text-align: center">Finanzierung verfügbar ab 99€ bis 5.000€<br>Warenwert mit</h4>
@@ -48,42 +46,8 @@
     {% if amount < 99.99 or amount > 5000 %}
     {% else %}
         <div style="text-align: center">
-            <a href="#" data-toggle="modal" data-target="#installmentSpecificPromotionModal">Informationen zu möglichen Raten</a>
+            <a id="installmentSpecificPromotionModalLink_{{ id }}" onClick="loadSpecificUpstreamPresentment({{ amount }})" href="#" data-toggle="modal" data-target="#installmentSpecificPromotionModal">Informationen zu möglichen Raten</a>
         </div>
-
-
-        <script type="text/javascript">
-            $(function () {
-                $('#installmentSpecificPromotionModal').on('show.bs.modal', function () {
-                    $.get("/payment/payPalInstallment/financingOptions/{{ amount }}", function(data)
-                    {
-                        $('#installmentSpecificPromotionModal .modal-content').html(data);
-                    });
-                });
-                $('#installmentSpecificPromotionModal').on('hidden.bs.modal', function () {
-                    $('#installmentSpecificPromotionModal .modal-content').html('<div class="modal-body">Loading ...</div>');
-                });
-
-                if ($("#installmentSpecificPromotionModal").data("modal-loaded") == true)
-                {
-                    // Modal is already loaded
-                }
-                else
-                {
-                    $("body").append(" " +
-                        "<div class=\"modal fade in\" id=\"installmentSpecificPromotionModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"specificPromotionModalLabel\" aria-hidden=\"true\"> " +
-                            "<div class=\"modal-dialog modal-lg\">" +
-                                "<div class=\"modal-content\" style=\"border: 2px solid #009CDE; border-radius: 10px; padding-top: 30px; padding-bottom: 30px;\"> " +
-                                    "<div class=\"modal-body\">Loading ...</div>" +
-                                "</div>" +
-                            "</div>" +
-                        "</div>");
-
-                    $("#installmentSpecificPromotionModal").data("modal-loaded", true);
-                }
-            });
-
-        </script>
     {% endif %}
 
     <style>
