@@ -4,16 +4,20 @@ namespace PayPal\Providers\DataProvider;
 
 use PayPal\Services\PaymentService;
 use PayPal\Services\PayPalPlusService;
+use Plenty\Plugin\Templates\Twig;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 
 class PayPalPlusPaymentWallDataProvider
 {
     /**
+     * @param Twig $twig
      * @param BasketRepositoryContract $basketRepositoryContract
      * @param PayPalPlusService $paypalPlusService
+     * @param PaymentService $paymentService
      * @return string
      */
-    public function call(   BasketRepositoryContract    $basketRepositoryContract,
+    public function call(   Twig                        $twig,
+                            BasketRepositoryContract    $basketRepositoryContract,
                             PayPalPlusService           $paypalPlusService,
                             PaymentService              $paymentService)
     {
@@ -25,6 +29,6 @@ class PayPalPlusPaymentWallDataProvider
             $content = $paypalPlusService->getPaymentWallContent($basketRepositoryContract->load());
         }
 
-        return $content;
+        return $twig->render('PayPal::PayPalExpress.PayPalExpressButton', ['content'=>$content]);
     }
 }
