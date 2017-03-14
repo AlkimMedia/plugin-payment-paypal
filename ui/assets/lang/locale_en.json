@@ -8,7 +8,7 @@
   "shippingCountries": "Countries of delivery",
   "logo": "Logo",
   "logoUrl": "Logo URL",
-  "displayName": "Display name",
+  "displayName": "Installments Powered by PayPal",
   "infoPage": "Info page",
   "account": "Account",
   "accounts": "Accounts",
@@ -62,5 +62,6 @@
   "languageSettings": "Language Setting",
   "payPalInstallment": "Activate calculation",
   "payPalModeLabel": "payPalModeLabel",
-  "general": "General"
+  "general": "General",
+  "activate": "Activate"
 }

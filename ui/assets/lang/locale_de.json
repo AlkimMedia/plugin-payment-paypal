@@ -8,7 +8,7 @@
   "shippingCountries": "Lieferländer",
   "logo": "Logo",
   "logoUrl": "Logo-URL",
-  "displayName": "Anzeigename",
+  "displayName": "Ratenzahlung Powered by PayPal",
   "infoPage": "Infoseite",
   "account": "Konto",
   "accounts": "Konten",
@@ -62,5 +62,6 @@
   "languageSettings": "Spracheinstellungen",
   "payPalInstallment": "Berechnung aktivieren",
   "payPalModeLabel": "Spezifische Bewerbung",
-  "general": "Allgemein"
+  "general": "Allgemein",
+  "activate": "Aktivieren"
 }
