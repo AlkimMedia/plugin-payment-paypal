@@ -15,7 +15,7 @@
       "entryPoint": "index.html?action=settings_paypal"
     },
     {
-      "label": "Ratenzahlung Powerd by PayPal",
+      "label": "Ratenzahlung Powered by PayPal",
       "menu": "settings/orders/paypal",
       "urlKey": "settings-paypal-installment",
       "entryPoint": "index.html?action=settings_paypal_installment"
