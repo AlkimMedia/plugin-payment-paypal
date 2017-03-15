@@ -285,6 +285,22 @@ class PaymentService
     }
 
     /**
+     * request the paypal sale for the given saleId
+     *
+     * @param $saleId
+     * @return array
+     */
+    public function getSaleDetails($saleId)
+    {
+        $params = $this->getApiContextParams();
+        $params['saleId'] = $saleId;
+
+        $saleDetailsResult = $this->libCall->call('PayPal::getSaleDetails', $params);
+
+        return $saleDetailsResult;
+    }
+
+    /**
      * @param Basket $basket
      * @return string
      */
@@ -363,28 +379,6 @@ class PaymentService
 //        $settingsService->setSettingsValue(SettingsService::WEB_PROFILE, $webProfileResult);
 
         return $webProfileResult;
-    }
-
-    /**
-     * request the paypal sale for the given saleId
-     *
-     * @param $saleId
-     * @return array
-     * @throws \Exception
-     */
-    public function getSaleDetails($saleId)
-    {
-        $params = $this->getApiContextParams();
-        $params['saleId'] = $saleId;
-
-        $saleDetailsResult = $this->libCall->call('PayPal::getSaleDetails', $params);
-
-        if(is_array($saleDetailsResult) && $saleDetailsResult['error'])
-        {
-            throw new \Exception($saleDetailsResult['error_msg']);
-        }
-
-        return $saleDetailsResult;
     }
 
     /**
