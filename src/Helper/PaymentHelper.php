@@ -218,10 +218,28 @@ class PaymentHelper
         /**
          * Add payment property with type account of the receiver
          */
-        $paymentProperty[] = $this->getPaymentProperty(PaymentProperty::TYPE_ACCOUNT_OF_RECEIVER, $paypalPaymentData['id']); //TODO IBAN BIC empfänger property
+        $paymentProperty[] = $this->getPaymentProperty(PaymentProperty::TYPE_ACCOUNT_OF_RECEIVER, $paypalPaymentData['id']);
+
+        if(!empty($paypalPaymentData[SessionStorageService::PAYPAL_INSTALLMENT_COSTS])
+        && is_array($paypalPaymentData[SessionStorageService::PAYPAL_INSTALLMENT_COSTS]))
+        {
+            $creditFinancing = $paypalPaymentData[SessionStorageService::PAYPAL_INSTALLMENT_COSTS];
+
+            $paymentText = [];
+            $paymentText['financingCosts'] = $creditFinancing['total_interest']['value'];
+            $paymentText['totalCostsIncludeFinancing'] = $creditFinancing['total_cost']['value'];
+            $paymentText['currency'] = $creditFinancing['total_cost']['currency'];
+
+            /**
+             * Add payment property with type payment text
+             */
+            $paymentProperty[] = $this->getPaymentProperty(PaymentProperty::TYPE_PAYMENT_TEXT, json_encode($paymentText));
+        }
 
         /**
          * TODO Add the following properties
+         *
+         * IBAN BIC empfänger
          *
          * // Gebühr
          *  $paypalPaymentData['transactions'][0]['related_resources'][0]['sale']['transaction_fee']['value']
@@ -337,6 +355,33 @@ class PaymentHelper
         }
 
         return (int)$this->statusMap[$status];
+    }
+
+    /**
+     * @param Payment $payment
+     * @param int $propertyType
+     * @return null|string
+     */
+    public function getPaymentPropertyValue($payment, $propertyType)
+    {
+        $properties = $payment->property;
+
+        if(is_array($properties))
+        {
+            /** @var PaymentProperty $property */
+            foreach($properties as $property)
+            {
+                if($property instanceof PaymentProperty)
+                {
+                    if($property->typeId == $propertyType)
+                    {
+                        return $property->value;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
 }

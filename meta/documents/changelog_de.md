@@ -1,3 +1,13 @@
+# Veröffentlichung 1.0.0
+
+#### FEATURE
+1. Ratenzahlung Powered by PayPal hinzugefügt.
+
+#### UPDATE
+1. PayPal Plus Wall berücksichtigt andere Container
+2. Ereignisaktion für Ratenzahlung Powerded by PayPal und PayPal PLUS berücksichtigen.
+
+
 # Veröffentlichung 0.7.2
 
 #### FIX

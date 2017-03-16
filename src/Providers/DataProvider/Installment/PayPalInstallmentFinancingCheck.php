@@ -2,8 +2,6 @@
 
 namespace PayPal\Providers\DataProvider\Installment;
 
-
-use PayPal\Helper\PaymentHelper;
 use PayPal\Services\SessionStorageService;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
@@ -11,9 +9,14 @@ use Plenty\Plugin\Templates\Twig;
 
 class PayPalInstallmentFinancingCheck
 {
+    /**
+     * @param Twig $twig
+     * @param BasketRepositoryContract $basketRepositoryContract
+     * @param SessionStorageService $sessionStorageService
+     * @return string
+     */
     public function call(   Twig $twig,
                             BasketRepositoryContract $basketRepositoryContract,
-                            PaymentHelper $paymentHelper,
                             SessionStorageService $sessionStorageService
     )
     {

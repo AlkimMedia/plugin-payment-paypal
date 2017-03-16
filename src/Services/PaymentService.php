@@ -202,7 +202,7 @@ class PaymentService
      *
      * @return array
      */
-    public function executePayment($mode=PaymentHelper::MODE_PAYPAL)
+    public function executePayment($mode = PaymentHelper::MODE_PAYPAL)
     {
         // Load the mandatory PayPal data from session
         $ppPayId    = $this->sessionStorage->getSessionValue(SessionStorageService::PAYPAL_PAY_ID);
@@ -222,6 +222,17 @@ class PaymentService
         {
             $this->returnType = 'errorCode';
             return $executeResponse['error'].': '.$executeResponse['error_msg'];
+        }
+
+        if($mode == PaymentHelper::MODE_PAYPAL_INSTALLMENT)
+        {
+            $financingCosts = $this->sessionStorage->getSessionValue(SessionStorageService::PAYPAL_INSTALLMENT_COSTS);
+
+            if(is_array($financingCosts) && !empty($financingCosts))
+            {
+                $executeResponse[SessionStorageService::PAYPAL_INSTALLMENT_COSTS] = $financingCosts;
+                $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_INSTALLMENT_COSTS, null);
+            }
         }
 
         // Clear the session parameters
@@ -274,6 +285,22 @@ class PaymentService
     }
 
     /**
+     * request the paypal sale for the given saleId
+     *
+     * @param $saleId
+     * @return array
+     */
+    public function getSaleDetails($saleId)
+    {
+        $params = $this->getApiContextParams();
+        $params['saleId'] = $saleId;
+
+        $saleDetailsResult = $this->libCall->call('PayPal::getSaleDetails', $params);
+
+        return $saleDetailsResult;
+    }
+
+    /**
      * @param Basket $basket
      * @return string
      */
@@ -294,6 +321,7 @@ class PaymentService
     }
 
     /**
+     * @param int $saleId
      * @param array $paymentData
      * @return array
      */
@@ -351,28 +379,6 @@ class PaymentService
 //        $settingsService->setSettingsValue(SettingsService::WEB_PROFILE, $webProfileResult);
 
         return $webProfileResult;
-    }
-
-    /**
-     * request the paypal sale for the given saleId
-     *
-     * @param $saleId
-     * @return array
-     * @throws \Exception
-     */
-    public function getSaleDetails($saleId)
-    {
-        $params = $this->getApiContextParams();
-        $params['saleId'] = $saleId;
-
-        $saleDetailsResult = $this->libCall->call('PayPal::getSaleDetails', $params);
-
-        if(is_array($saleDetailsResult) && $saleDetailsResult['error'])
-        {
-            throw new \Exception($saleDetailsResult['error_msg']);
-        }
-
-        return $saleDetailsResult;
     }
 
     /**

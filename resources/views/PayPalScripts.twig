@@ -1,0 +1,45 @@
+<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+<script type="text/javascript">
+    $(function () {
+        if ($("#installmentSpecificPromotionModal").data("modal-loaded") == true)
+        {
+            // Modal is already loaded
+        }
+        else
+        {
+            $("body").append(" " +
+                "<div class=\"modal fade in\" id=\"installmentSpecificPromotionModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"specificPromotionModalLabel\" aria-hidden=\"true\"> " +
+                    "<div class=\"modal-dialog modal-lg\">" +
+                        "<div class=\"modal-content\" style=\"border: 2px solid #009CDE; border-radius: 10px; padding-top: 30px; padding-bottom: 30px;\"> " +
+                            "<div class=\"modal-body\">Loading ...</div>" +
+                        "</div>" +
+                    "</div>" +
+                "</div>");
+
+            $("#installmentSpecificPromotionModal").data("modal-loaded", true);
+        }
+    });
+
+    //Load the modal content
+    function loadSpecificUpstreamPresentment(amount)
+    {
+        $("#installmentSpecificPromotionModal .modal-content").html("<div class=\"modal-body\">Loading ...</div>");
+        $.get("/payment/payPalInstallment/financingOptions/"+amount, function(data)
+        {
+            $('#installmentSpecificPromotionModal .modal-content').html(data);
+        });
+    }
+
+    document.addEventListener("afterPaymentMethodChanged", function(e)
+    {
+        console.log("afterPaymentMethodChanged:", e.detail);
+        if(e.detail == {{ installmentPaymentMethodId }} )
+        {
+            $("#checkoutButtonPayPalInstallment").text("{{ trans("PayPal::PayPal.installmentButton") }}");
+        }
+        else
+        {
+            $("#checkoutButtonPayPalInstallment").text("{{ trans("Ceres::Template.orderBuyNow") }}");
+        }
+    });
+</script>

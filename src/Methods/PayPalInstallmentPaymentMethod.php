@@ -152,7 +152,10 @@ class PayPalInstallmentPaymentMethod extends PaymentMethodService
     public function getDescription()
     {
         $desc = $this->configRepo->get('PayPal.description');
-
+        if(strlen($desc) <= 0)
+        {
+            $desc = '';
+        }
         return $desc;
     }
 }
