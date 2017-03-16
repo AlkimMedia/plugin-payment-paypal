@@ -1,3 +1,12 @@
+# Release 1.0.0
+
+#### FEATURE
+1. Add Installment Powered by PayPal.
+
+#### UPDATE
+1. PayPal Plus Wall used other layout container.
+2. Use the Event procedure also for PayPal Installment and PayPal PLUS
+
 # Release 0.7.2
 
 #### FIX
