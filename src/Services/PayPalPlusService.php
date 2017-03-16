@@ -13,7 +13,9 @@ use PayPal\Helper\PaymentHelper;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Basket\Models\BasketItem;
+use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
+use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 use Plenty\Modules\Payment\Method\Models\PaymentMethod;
 use Plenty\Modules\Plugin\Libs\Contracts\LibraryCallContract;
 
@@ -83,15 +85,25 @@ class PayPalPlusService
      * @param Basket $basket
      * @return string
      */
-    public function getPaymentWallContent(Basket $basket)
+    public function getPaymentWallContent(Basket $basket, Checkout $checkout, CountryRepositoryContract $countryRepositoryContract)
     {
-        /**
-         * TODO Params to replace with configs
-         */
-        $language = 'de_DE';
         $country = 'DE';
 
-        $account = $this->paymentService->loadCurrentAccountSettings('installment');
+        $shippingCountryId = $checkout->getShippingCountryId();
+        if($shippingCountryId > 0)
+        {
+            $country = $countryRepositoryContract->findIsoCode($shippingCountryId, 'isoCode2');
+        }
+        if($country == 'DE')
+        {
+            $language = 'de_DE';
+        }
+        else
+        {
+            $language = 'en_GB';
+        }
+
+        $account = $this->paymentService->loadCurrentAccountSettings('paypal');
         $mode = 'sandbox';
 
         if(array_key_exists('environment', $account) && $account['environment'] == 0)
