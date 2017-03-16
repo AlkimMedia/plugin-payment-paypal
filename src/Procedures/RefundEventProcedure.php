@@ -32,76 +32,103 @@ class RefundEventProcedure
         $order = $eventTriggered->getOrder();
 
         // only sales orders and credit notes are allowed order types to refund
-        if($order->typeId == 1   //sales order
-        OR $order->typeId == 4)  //credit note
+        switch($order->typeId)
         {
-            /** @var Payment[] $payment */
-            $payments = $paymentContract->getPaymentsByOrderId($order->id);
+            case 1: //sales order
+                $orderId = $order->id;
+                break;
+            case 4: //credit note
+                $parentOrder = $order->parentOrder;
 
-            /** @var Payment $payment */
-            foreach($payments as $payment)
-            {
-                if($payment->mopId == $paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPAL)
-                OR $payment->mopId == $paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALEXPRESS)
-                OR $payment->mopId == $paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALPLUS)
-                OR $payment->mopId == $paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALINSTALLMENT))
+                if($parentOrder instanceof Order && $parentOrder->typeId == 1)
                 {
-                    $saleId = (int)$paymentHelper->getPaymentPropertyValue($payment, PaymentProperty::TYPE_TRANSACTION_ID);
-
-                    if($saleId > 0)
+                    if($parentOrder->typeId == 1)
                     {
-                        // refund the payment
-                        $refundResult = $paymentService->refundPayment($saleId);
-
-                        if($refundResult['error'])
-                        {
-                            throw new \Exception($refundResult['error_msg']);
-                        }
-
-                        if($refundResult['state'] == 'failed')
-                        {
-                            //TODO log the reason_code
-                        }
-                        else
-                        {
-                            $paymentData = [];
-                            $paymentData['parentId'] = $payment->id;
-                            $paymentData['type'] = 'debit';
-
-                            // if the refund is pending, set the payment unaccountable
-                            if($refundResult['state'] == 'pending')
-                            {
-                                $paymentData['unaccountable'] = 1;  //1 true 0 false
-                            }
-
-                            // get the sale details of the refunded payment
-                            $saleDetails = $paymentService->getSaleDetails($saleId);
-
-                            if(!isset($saleDetails['error']))
-                            {
-                                // create the new debit payment
-                                /** @var Payment $debitPayment */
-                                $debitPayment = $paymentHelper->createPlentyPayment($saleDetails, $paymentData);
-
-                                // read the payment status of the refunded payment
-                                $payment->status = $paymentHelper->mapStatus($saleDetails['state']);
-
-                                // update the refunded payment
-                                $paymentContract->updatePayment($payment);
-                            }
-
-                            if(isset($debitPayment) && $debitPayment instanceof Payment)
-                            {
-                                if($refundResult['state'] == 'completed')
-                                {
-                                    // assign the new debit payment to the order
-                                    $paymentHelper->assignPlentyPaymentToPlentyOrder($debitPayment, $order->id);
-                                }
-                            }
-                        }
-
-                        unset($saleId);
+                        $orderId = $parentOrder->id;
                     }
+                    else
+                    {
+                        $parentParentOrder = $parentOrder->parentOrder;
+                        if($parentParentOrder instanceof Order)
+                        {
+                            $orderId = $parentParentOrder->id;
+                        }
+                    }
+                }
+                break;
+        }
+
+        if(empty($orderId))
+        {
+            throw new \Exception('Refund PayPal payment failed! The given order is invalid!');
+        }
+
+        /** @var Payment[] $payment */
+        $payments = $paymentContract->getPaymentsByOrderId($orderId);
+
+        /** @var Payment $payment */
+        foreach($payments as $payment)
+        {
+            if($payment->mopId == $paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPAL)
+            OR $payment->mopId == $paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALEXPRESS)
+            OR $payment->mopId == $paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALPLUS)
+            OR $payment->mopId == $paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALINSTALLMENT))
+            {
+                $saleId = (int)$paymentHelper->getPaymentPropertyValue($payment, PaymentProperty::TYPE_TRANSACTION_ID);
+
+                if($saleId > 0)
+                {
+                    // refund the payment
+                    $refundResult = $paymentService->refundPayment($saleId);
+
+                    if($refundResult['error'])
+                    {
+                        throw new \Exception($refundResult['error_msg']);
+                    }
+
+                    if($refundResult['state'] == 'failed')
+                    {
+                        //TODO log the reason_code
+                    }
+                    else
+                    {
+                        $paymentData = [];
+                        $paymentData['parentId'] = $payment->id;
+                        $paymentData['type'] = 'debit';
+
+                        // if the refund is pending, set the payment unaccountable
+                        if($refundResult['state'] == 'pending')
+                        {
+                            $paymentData['unaccountable'] = 1;  //1 true 0 false
+                        }
+
+                        // get the sale details of the refunded payment
+                        $saleDetails = $paymentService->getSaleDetails($saleId);
+
+                        if(!isset($saleDetails['error']))
+                        {
+                            // create the new debit payment
+                            /** @var Payment $debitPayment */
+                            $debitPayment = $paymentHelper->createPlentyPayment($saleDetails, $paymentData);
+
+                            // read the payment status of the refunded payment
+                            $payment->status = $paymentHelper->mapStatus($saleDetails['state']);
+
+                            // update the refunded payment
+                            $paymentContract->updatePayment($payment);
+                        }
+
+                        if(isset($debitPayment) && $debitPayment instanceof Payment)
+                        {
+                            if($refundResult['state'] == 'completed')
+                            {
+                                // assign the new debit payment to the order
+                                $paymentHelper->assignPlentyPaymentToPlentyOrder($debitPayment, $order->id);
+                            }
+                        }
+                    }
+
+                    unset($saleId);
                 }
             }
         }
