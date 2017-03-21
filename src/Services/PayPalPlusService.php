@@ -1,14 +1,7 @@
 <?php
-/**
- * Created by IntelliJ IDEA.
- * User: jkonopka
- * Date: 05.01.17
- * Time: 14:28
- */
 
 namespace PayPal\Services;
 
-use PayPal\Api\Payment;
 use PayPal\Helper\PaymentHelper;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
@@ -17,7 +10,6 @@ use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 use Plenty\Modules\Payment\Method\Models\PaymentMethod;
-use Plenty\Modules\Plugin\Libs\Contracts\LibraryCallContract;
 
 class PayPalPlusService
 {
@@ -32,9 +24,9 @@ class PayPalPlusService
     private $paymentService;
 
     /**
-     * @var LibraryCallContract
+     * @var LibService
      */
-    private $libraryCallContract;
+    private $libService;
 
     /**
      * @var SessionStorageService
@@ -59,14 +51,14 @@ class PayPalPlusService
     /**
      * PayPalPlusService constructor.
      * @param PaymentService $paymentService
-     * @param LibraryCallContract $libraryCallContract
+     * @param LibService $libService
      * @param SessionStorageService $sessionStorage
      * @param AddressRepositoryContract $addressRepo
      * @param FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepositoryContract
      * @param PaymentHelper $paymentHelper
      */
     public function __construct(    PaymentService $paymentService,
-                                    LibraryCallContract $libraryCallContract,
+                                    LibService $libService,
                                     SessionStorageService $sessionStorage,
                                     AddressRepositoryContract $addressRepo,
                                     FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepositoryContract,
@@ -74,7 +66,7 @@ class PayPalPlusService
     )
     {
         $this->paymentService = $paymentService;
-        $this->libraryCallContract = $libraryCallContract;
+        $this->libService = $libService;
         $this->sessionStorage = $sessionStorage;
         $this->addressRepo = $addressRepo;
         $this->frontendPaymentMethodRepositoryContract = $frontendPaymentMethodRepositoryContract;
@@ -228,7 +220,6 @@ class PayPalPlusService
             $payPalRequestParams['basketItems'][] = $basketItem;
         }
 
-
         // Read the shipping address ID from the session
         $shippingAddressId = $basket->customerShippingAddressId;
 
@@ -262,7 +253,7 @@ class PayPalPlusService
         $country['isoCode2'] = $countryRepo->findIsoCode($basket->shippingCountryId, 'iso_code_2');
         $payPalRequestParams['country'] = $country;
 
-        $updatePaymentResult = $this->libraryCallContract->call('PayPal::updatePayment', $payPalRequestParams);
+        $updatePaymentResult = $this->libService->libUpdatePayment($payPalRequestParams);
 
         if($updatePaymentResult)
         {

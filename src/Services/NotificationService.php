@@ -4,8 +4,6 @@ namespace PayPal\Services;
 
 use PayPal\Constants\NotificationEvents;
 use PayPal\Helper\PaymentHelper;
-use PayPal\Services\PaymentService;
-use Plenty\Modules\Plugin\Libs\Contracts\LibraryCallContract;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -32,29 +30,31 @@ class NotificationService
     private $notificationEvents;
 
     /**
-     * @var LibraryCallContract
+     * @var LibService
      */
-    private $libCall;
+    private $libService;
 
     /**
      * NotificationService constructor.
      * @param PaymentHelper $paymentHelper
      * @param PaymentService $paymentService
      * @param NotificationEvents $notificationEvents
-     * @param LibraryCallContract $libraryCallContract
+     * @param LibService $libService
      */
     public function __construct(PaymentHelper $paymentHelper,
                                 PaymentService $paymentService,
                                 NotificationEvents $notificationEvents,
-                                LibraryCallContract $libraryCallContract)
+                                LibService $libService)
     {
         $this->paymentHelper = $paymentHelper;
         $this->paymentService = $paymentService;
         $this->notificationEvents = $notificationEvents;
-        $this->libCall = $libraryCallContract;
+        $this->libService = $libService;
     }
 
     /**
+     * Create the webhooks for the account
+     *
      * @return string
      */
     public function createWebhook()
@@ -74,7 +74,7 @@ class NotificationService
         $params['webhookEvents'][] = NotificationEvents::INVOICING_INVOICE_REFUNDED;
         $params['webhookEvents'][] = NotificationEvents::INVOICING_INVOICE_CANCELLED;
 
-        $response = $this->libCall->call('PayPal::createWebhook', $params);
+        $response = $this->libService->libCreateWebhook($params);
 
         if(is_array($response) && !empty($response['id']))
         {
@@ -84,7 +84,7 @@ class NotificationService
         {
             $this->deleteWebhooks();
 
-            $response = $this->libCall->call('PayPal::createWebhook', $params);
+            $response = $this->libService->libCreateWebhook($params);
 
             if(is_array($response) && !empty($response['id']))
             {
@@ -98,12 +98,17 @@ class NotificationService
         return false;
     }
 
+    /**
+     * Delete all webhooks
+     */
     public function deleteWebhooks()
     {
-        $this->libCall->call('PayPal::deleteWebhook', $this->paymentService->getApiContextParams());
+        $this->libService->libDeleteWebhook($this->paymentService->getApiContextParams());
     }
 
     /**
+     * Validate a given webhook
+     *
      * @param $headers
      * @param $body
      * @param $webhookId
@@ -117,7 +122,7 @@ class NotificationService
         $params['body'] = $body;
         $params['webhookId'] = $webhookId;
 
-        $response = $this->libCall->call('PayPal::validateNotification', $params);
+        $response = $this->libService->libValidateNotification($params);
 
         if(is_array($response) && !empty($response['verification_status']))
         {
@@ -136,11 +141,12 @@ class NotificationService
     }
 
     /**
+     * List all available webhooks
+     *
      * @return array
      */
     public function listWebhooks()
     {
-        return $this->libCall->call('PayPal::listAvailableWebhooks', $this->paymentService->getApiContextParams());
+        return $this->libService->libListAvailableWebhooks($this->paymentService->getApiContextParams());
     }
-
 }
