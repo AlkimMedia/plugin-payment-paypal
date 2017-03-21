@@ -98,7 +98,7 @@ class PaymentService
      * @param SessionStorageService $sessionStorage
      * @param SystemService $systemService
      * @param SettingsService $settingsService
-     * @param LibSerice $libService
+     * @param LibService $libService
      */
     public function __construct(  PaymentMethodRepositoryContract $paymentMethodRepository,
                                   PaymentRepositoryContract $paymentRepository,
