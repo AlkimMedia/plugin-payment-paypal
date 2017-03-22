@@ -3,6 +3,7 @@
 namespace PayPal\Services;
 
 use PayPal\Services\Database\AccountService;
+use Plenty\Log\Traits\Loggable;
 use Plenty\Modules\Basket\Models\BasketItem;
 use Plenty\Modules\Frontend\Services\SystemService;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
@@ -22,6 +23,8 @@ use PayPal\Services\ContactService;
  */
 class PaymentService
 {
+    use Loggable;
+
     /**
      * @var string
      */
@@ -158,6 +161,7 @@ class PaymentService
 
         // Prepare the PayPal payment
         $preparePaymentResult = $this->libService->libPreparePayment($payPalRequestParams);
+        $this->getLogger('PayPal_PaymentService')->debug('preparePayment', $preparePaymentResult);
 
         // Check for errors
         if(is_array($preparePaymentResult) && $preparePaymentResult['error'])
@@ -218,6 +222,7 @@ class PaymentService
 
         // Execute the PayPal payment
         $executeResponse = $this->libService->libExecutePayment($executeParams);
+        $this->getLogger('PayPal_PaymentService')->debug('executePayment', $executeParams);
 
         // Check for errors
         if(is_array($executeResponse) && $executeResponse['error'])
@@ -268,6 +273,7 @@ class PaymentService
         $requestParams['paymentId'] = $paymentId;
 
         $response = $this->libService->libGetPaymentDetails($requestParams);
+        $this->getLogger('PayPal_PaymentService')->debug('getPaymentDetails', $response);
 
         return $response;
     }
@@ -284,6 +290,7 @@ class PaymentService
         $params['saleId'] = $saleId;
 
         $saleDetailsResult = $this->libService->libGetSaleDetails($params);
+        $this->getLogger('PayPal_PaymentService')->debug('getSaleDetails', $saleDetailsResult);
 
         return $saleDetailsResult;
     }
