@@ -8,7 +8,6 @@ use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentOrderRelationRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
-use Plenty\Modules\Payment\Method\Models\PaymentMethod;
 use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Modules\Order\Models\Order;
 
@@ -62,6 +61,11 @@ class PaymentHelper
     private $orderRepo;
 
     /**
+     * @var PaymentService
+     */
+    private $paymentService;
+
+    /**
      * @var array
      */
     private $statusMap = array();
@@ -75,6 +79,7 @@ class PaymentHelper
      * @param ConfigRepository $config
      * @param SessionStorageService $sessionService
      * @param OrderRepositoryContract $orderRepo
+     * @param PaymentService $paymentService
      */
     public function __construct(PaymentMethodRepositoryContract $paymentMethodRepository,
                                 PaymentRepositoryContract $paymentRepo,
@@ -122,22 +127,7 @@ class PaymentHelper
      */
     public function getRestReturnUrls($mode)
     {
-        /** @var \Plenty\Modules\Helper\Services\WebstoreHelper $webstoreHelper */
-        $webstoreHelper = pluginApp(\Plenty\Modules\Helper\Services\WebstoreHelper::class);
-
-        /** @var \Plenty\Modules\System\Models\WebstoreConfiguration $webstoreConfig */
-        $webstoreConfig = $webstoreHelper->getCurrentWebstoreConfiguration();
-
-        if(is_null($webstoreConfig))
-        {
-            return 'error';
-        }
-
-        $domain = $webstoreConfig->domainSsl;
-        if($domain == 'http://dbmaster.plenty-showcase.de' OR $domain == 'http://dbmaster-beta7.plentymarkets.eu')
-        {
-            $domain = 'http://master.plentymarkets.com';
-        }
+        $domain = $this->getDomain();
 
         $urls = [];
 
@@ -162,6 +152,26 @@ class PaymentHelper
         }
 
         return $urls;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDomain()
+    {
+        /** @var \Plenty\Modules\Helper\Services\WebstoreHelper $webstoreHelper */
+        $webstoreHelper = pluginApp(\Plenty\Modules\Helper\Services\WebstoreHelper::class);
+
+        /** @var \Plenty\Modules\System\Models\WebstoreConfiguration $webstoreConfig */
+        $webstoreConfig = $webstoreHelper->getCurrentWebstoreConfiguration();
+
+        $domain = $webstoreConfig->domainSsl;
+        if($domain == 'http://dbmaster.plenty-showcase.de' OR $domain == 'http://dbmaster-beta7.plentymarkets.eu')
+        {
+            $domain = 'http://master.plentymarkets.com';
+        }
+
+        return $domain;
     }
 
     /**
@@ -283,21 +293,38 @@ class PaymentHelper
         /** @var array $payments */
         $payments = $this->paymentRepository->getPaymentsByPropertyTypeAndValue(PaymentProperty::TYPE_TRANSACTION_ID, $saleId);
 
-        $state = $this->mapStatus((STRING)$state);
-
-        /** @var Payment $payment */
-        foreach($payments as $payment)
+        // update the payment
+        if(!empty($payments))
         {
-            if($payment->status != $state)
+            $state = $this->mapStatus((STRING)$state);
+
+            /** @var Payment $payment */
+            foreach($payments as $payment)
             {
-                $payment->status = $state;
-
-                if($state == Payment::STATUS_APPROVED || $state == Payment::STATUS_CAPTURED)
+                if($payment->status != $state)
                 {
-                    $payment->unaccountable = 0;
-                }
+                    $payment->status = $state;
 
-                $this->paymentRepository->updatePayment($payment);
+                    if($state == Payment::STATUS_APPROVED || $state == Payment::STATUS_CAPTURED)
+                    {
+                        $payment->unaccountable = 0;
+                    }
+
+                    $this->paymentRepository->updatePayment($payment);
+                }
+            }
+        }
+        // create a new payment
+        else
+        {
+            /** @var \PayPal\Services\PaymentService $paymentService */
+            $paymentService = pluginApp(\PayPal\Services\PaymentService::class);
+
+            $sale = $paymentService->getSaleDetails($saleId);
+
+            if(empty($sale['error']))
+            {
+                $this->createPlentyPayment($sale);
             }
         }
     }

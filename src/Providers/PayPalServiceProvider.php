@@ -248,6 +248,22 @@ class PayPalServiceProvider extends ServiceProvider
 
                             case $paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALPLUS):
 
+                                /** @var \Plenty\Modules\Payment\Models\Payment $payment */
+                                $payment = $payments[0];
+
+                                $bankData = json_decode($paymentHelper->getPaymentPropertyValue($payment, PaymentProperty::TYPE_PAYMENT_TEXT), true);
+
+                                if(!empty($bankData) && is_array($bankData))
+                                {
+                                    /** @var \Plenty\Modules\Order\Pdf\Models\OrderPdfGeneration $orderPdfGenerationModel */
+                                    $orderPdfGenerationModel = pluginApp(\Plenty\Modules\Order\Pdf\Models\OrderPdfGeneration::class);
+
+                                    $orderPdfGenerationModel->language = 'de';
+                                    $orderPdfGenerationModel->advice = (string)$bankData;
+
+                                    $event->addOrderPdfGeneration($orderPdfGenerationModel);
+                                }
+
                                 break;
                         }
                     }
