@@ -3,7 +3,7 @@
 namespace PayPal\Services;
 
 use PayPal\Services\Database\AccountService;
-use Plenty\Log\Traits\Loggable;
+use Plenty\Plugin\Log\Loggable;
 use Plenty\Modules\Basket\Models\BasketItem;
 use Plenty\Modules\Frontend\Services\SystemService;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
@@ -139,11 +139,19 @@ class PaymentService
     }
 
     /**
+     * @param string $returnType
+     */
+    public function setReturnType(string $returnType)
+    {
+        $this->returnType = $returnType;
+    }
+
+    /**
      * Get the PayPal payment content
      *
      * @param Basket $basket
      * @param string $mode
-     * @return string|array
+     * @return string|array|null
      */
     public function getPaymentContent(Basket $basket, $mode = PaymentHelper::MODE_PAYPAL, $additionalRequestParams=[]):string
     {
@@ -167,7 +175,7 @@ class PaymentService
         if(is_array($preparePaymentResult) && $preparePaymentResult['error'])
         {
             $this->returnType = 'errorCode';
-            return $preparePaymentResult['error_msg'];
+            return $preparePaymentResult['error_msg']?$preparePaymentResult['error_msg']:$preparePaymentResult['error_description'];
         }
 
         // Store the PayPal Pay ID in the session
@@ -523,4 +531,46 @@ class PaymentService
 
         return $account;
     }
+
+    /**
+     * @return LibService
+     */
+    public function getLibService(): LibService
+    {
+        return $this->libService;
+    }
+
+    /**
+     * @param LibService $libService
+     */
+    public function setLibService(LibService $libService)
+    {
+        $this->libService = $libService;
+    }
+
+    /**
+     * @return PaymentHelper
+     */
+    public function getPaymentHelper(): PaymentHelper
+    {
+        return $this->paymentHelper;
+    }
+
+    /**
+     * @return \PayPal\Services\SessionStorageService
+     */
+    public function getSessionStorage(): \PayPal\Services\SessionStorageService
+    {
+        return $this->sessionStorage;
+    }
+
+    /**
+     * @return AddressRepositoryContract
+     */
+    public function getAddressRepository(): AddressRepositoryContract
+    {
+        return $this->addressRepo;
+    }
+
+
 }

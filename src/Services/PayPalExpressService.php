@@ -5,27 +5,17 @@ namespace PayPal\Services;
 use PayPal\Helper\PaymentHelper;
 use Plenty\Modules\Basket\Models\Basket;
 
-class PayPalExpressService
+class PayPalExpressService extends PaymentService
 {
-    /**
-     * @var PaymentService
-     */
-    private $paymentService;
-
-    public function __construct(PaymentService  $paymentService)
-    {
-        $this->paymentService   = $paymentService;
-    }
-
     /**
      * @param Basket $basket
      * @return string
      */
     public function preparePayPalExpressPayment(Basket $basket)
     {
-        $paymentContent = $this->paymentService->getPaymentContent($basket, PaymentHelper::MODE_PAYPALEXPRESS);
+        $paymentContent = $this->getPaymentContent($basket, PaymentHelper::MODE_PAYPALEXPRESS);
 
-        $preparePaymentResult = $this->paymentService->getReturnType();
+        $preparePaymentResult = $this->getReturnType();
 
         if($preparePaymentResult == 'errorCode')
         {

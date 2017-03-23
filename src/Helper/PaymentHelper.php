@@ -166,7 +166,7 @@ class PaymentHelper
         $webstoreConfig = $webstoreHelper->getCurrentWebstoreConfiguration();
 
         $domain = $webstoreConfig->domainSsl;
-        if($domain == 'http://dbmaster.plenty-showcase.de' OR $domain == 'http://dbmaster-beta7.plentymarkets.eu')
+        if($domain == 'http://dbmaster.plenty-showcase.de' || $domain == 'http://dbmaster-beta7.plentymarkets.eu' || $domain == 'http://dbmaster-stable7.plentymarkets.eu')
         {
             $domain = 'http://master.plentymarkets.com';
         }

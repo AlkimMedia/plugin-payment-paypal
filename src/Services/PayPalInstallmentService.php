@@ -6,60 +6,15 @@ use PayPal\Helper\PaymentHelper;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Plugin\Templates\Twig;
 
-class PayPalInstallmentService
+class PayPalInstallmentService extends PaymentService
 {
-    /**
-     * @var string
-     */
-    private $returnType = '';
-
-    /**
-     * @var PaymentService
-     */
-    private $paymentService;
-
-    /**
-     * @var LibService
-     */
-    private $libService;
-
-    /**
-     * PayPalPlusService constructor.
-     *
-     * @param PaymentService $paymentService
-     * @param LibService $libService
-     */
-    public function __construct(    PaymentService  $paymentService,
-                                    LibService      $libService
-                                )
-    {
-        $this->paymentService = $paymentService;
-        $this->libService = $libService;
-    }
-
     /**
      * @param Basket $basket
      * @return string
      */
-    public function getPaymentContent(Basket $basket)
+    public function getInstallmentContent(Basket $basket): string
     {
-        return $this->paymentService->getPaymentContent($basket, PaymentHelper::MODE_PAYPAL_INSTALLMENT, ['fundingInstrumentType'=>'CREDIT']);
-    }
-
-    /**
-     * @return string
-     */
-    public function getReturnType(): string
-    {
-        return $this->returnType;
-    }
-
-    /**
-     * @param string $returnType
-     */
-    public function setReturnType(string $returnType)
-    {
-        $this->returnType = $returnType;
+        return $this->getPaymentContent($basket, PaymentHelper::MODE_PAYPAL_INSTALLMENT, ['fundingInstrumentType'=>'CREDIT']);
     }
 
     public function calculateFinancingCosts(Twig $twig, $amount=0)
@@ -120,7 +75,7 @@ class PayPalInstallmentService
      */
     public function getFinancingOptions($amount=0)
     {
-        $account = $this->paymentService->loadCurrentAccountSettings('paypal_installment');
+        $account = $this->loadCurrentAccountSettings('paypal_installment');
 
         $financingOptions = [];
         $financingOptions['clientSecret'] = $account['clientSecret'];
@@ -137,7 +92,7 @@ class PayPalInstallmentService
         $financingOptions['amount'] = $amount;
         $financingOptions['currency'] = 'EUR';
 
-        return $this->libService->libCalculateFinancingOptions($financingOptions);
+        return $this->getLibService()->libCalculateFinancingOptions($financingOptions);
     }
 
     /**
@@ -149,7 +104,7 @@ class PayPalInstallmentService
      */
     public function getFinancingCosts($paymentId, $mode=PaymentHelper::MODE_PAYPAL_INSTALLMENT)
     {
-        $response = $this->paymentService->getPaymentDetails($paymentId, $mode);
+        $response = $this->getPaymentDetails($paymentId, $mode);
 
         if(is_array($response) && array_key_exists('credit_financing_offered', $response))
         {

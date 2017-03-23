@@ -146,7 +146,7 @@ class PayPalServiceProvider extends ServiceProvider
                 elseif ($event->getMop() == $paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALINSTALLMENT))
                 {
                     $basket = $basket->load();
-                    $event->setValue($payPalInstallmentService->getPaymentContent($basket));
+                    $event->setValue($payPalInstallmentService->getInstallmentContent($basket));
                     $event->setType($payPalInstallmentService->getReturnType());
 
                 }
