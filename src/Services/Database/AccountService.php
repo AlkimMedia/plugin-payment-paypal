@@ -29,7 +29,8 @@ class AccountService extends DatabaseBaseService
             {
                 if($account instanceof Account)
                 {
-                    $accounts[] = $account->value;
+                    $accounts[$account->id] = $account->value;
+                    $accounts[$account->id]['id'] = $account->id;
                 }
             }
         }
