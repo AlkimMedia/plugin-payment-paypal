@@ -1,165 +1,81 @@
 <?php
-/**
- * Created by IntelliJ IDEA.
- * User: jkonopka
- * Date: 05.01.17
- * Time: 14:28
- */
 
 namespace PayPal\Services;
 
-
-use PayPal\Api\Payment;
 use PayPal\Helper\PaymentHelper;
-use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
-use Plenty\Modules\Basket\Models\BasketItem;
-use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
-use Plenty\Modules\Payment\Method\Models\PaymentMethod;
-use Plenty\Modules\Plugin\Libs\Contracts\LibraryCallContract;
-use Plenty\Plugin\ConfigRepository;
+use Plenty\Plugin\Templates\Twig;
 
-class PayPalInstallmentService
+class PayPalInstallmentService extends PaymentService
 {
-    /**
-     * @var string
-     */
-    private $returnType = '';
-
-    /**
-     * @var PaymentService
-     */
-    private $paymentService;
-
-    /**
-     * @var LibraryCallContract
-     */
-    private $libraryCallContract;
-
-    /**
-     * @var SessionStorageService
-     */
-    private $sessionStorage;
-
-    /**
-     * @var AddressRepositoryContract
-     */
-    private $addressRepo;
-
-    /**
-     * @var FrontendPaymentMethodRepositoryContract
-     */
-    private $frontendPaymentMethodRepositoryContract;
-
-    /**
-     * @var PaymentHelper
-     */
-    private $paymentHelper;
-
-    /**
-     * @var ConfigRepository
-     */
-    private $configRepository;
-
-    /**
-     * PayPalPlusService constructor.
-     * @param PaymentService $paymentService
-     * @param LibraryCallContract $libraryCallContract
-     * @param SessionStorageService $sessionStorage
-     * @param AddressRepositoryContract $addressRepo
-     * @param FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepositoryContract
-     */
-    public function __construct(    PaymentService $paymentService,
-                                    LibraryCallContract $libraryCallContract,
-                                    SessionStorageService $sessionStorage,
-                                    AddressRepositoryContract $addressRepo,
-                                    FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepositoryContract,
-                                    PaymentHelper $paymentHelper,
-                                    ConfigRepository $configRepository
-                                )
-    {
-        $this->paymentService = $paymentService;
-        $this->libraryCallContract = $libraryCallContract;
-        $this->sessionStorage = $sessionStorage;
-        $this->addressRepo = $addressRepo;
-        $this->frontendPaymentMethodRepositoryContract = $frontendPaymentMethodRepositoryContract;
-        $this->paymentHelper = $paymentHelper;
-        $this->configRepository = $configRepository;
-    }
-
     /**
      * @param Basket $basket
      * @return string
      */
-    public function getPaymentContent(Basket $basket)
+    public function getInstallmentContent(Basket $basket): string
     {
-        $payPalRequestParams = $this->paymentService->getPaypalParams($basket, PaymentHelper::MODE_PAYPAL_INSTALLMENT);
+        return $this->getPaymentContent($basket, PaymentHelper::MODE_PAYPAL_INSTALLMENT, ['fundingInstrumentType'=>'CREDIT']);
+    }
 
-        $payPalRequestParams['mode'] = PaymentHelper::MODE_PAYPAL_INSTALLMENT;
-        $payPalRequestParams['fundingInstrumentType'] = 'CREDIT';
-
-        // Prepare the PayPal payment
-        $preparePaymentResult = $this->libraryCallContract->call('PayPal::preparePayment', $payPalRequestParams);
-
-        // Check for errors
-        if(is_array($preparePaymentResult) && $preparePaymentResult['error'])
+    public function calculateFinancingCosts(Twig $twig, $amount=0)
+    {
+        if($amount > 98.99 && $amount < 5000)
         {
-            $this->returnType = 'errorCode';
-            return $preparePaymentResult['error_msg'];
-        }
+            $qualifyingFinancingOptions = [];
+            $financingOptions = $this->getFinancingOptions($amount);
 
-        // Store the PayPal Pay ID in the session
-        if(isset($preparePaymentResult['id']) && strlen($preparePaymentResult['id']))
-        {
-            $this->sessionStorage->setSessionValue(SessionStorageService::PAYPAL_PAY_ID, $preparePaymentResult['id']);
-        }
-
-        // Get the content of the PayPal container
-        $links = $preparePaymentResult['links'];
-        $paymentContent = null;
-
-        if(is_array($links))
-        {
-            foreach($links as $link)
+            if(is_array($financingOptions) && array_key_exists('financing_options', $financingOptions))
             {
-                // Get the redirect URLs for the content
-                if($link['method'] == 'REDIRECT')
+                if(is_array($financingOptions['financing_options'][0]) && is_array(($financingOptions['financing_options'][0]['qualifying_financing_options'])))
                 {
-                    $paymentContent = $link['href'];
-                    $this->returnType = 'redirectUrl';
+                    $starExample = [];
+                    /**
+                     * Sort the financing options
+                     * lowest APR and than lowest rate
+                     */
+                    foreach ($financingOptions['financing_options'][0]['qualifying_financing_options'] as $financingOption)
+                    {
+                        $starExample[$financingOption['monthly_payment']['value']] = str_pad($financingOption['credit_financing']['term'],2,'0', STR_PAD_LEFT).'-'.$financingOption['credit_financing']['apr'];
+                        $qualifyingFinancingOptions[str_pad($financingOption['credit_financing']['term'],2,'0', STR_PAD_LEFT).'-'.$financingOption['credit_financing']['apr'].'-'.$financingOption['monthly_payment']['value']] = $financingOption;
+                    }
+
+                    ksort($starExample);
+                    $highestApr = 0;
+                    $lowestRate = 99999999;
+                    $usedTerm = 0;
+                    foreach ($starExample as $montlyRate => $termApr)
+                    {
+                        $termApr = explode('-', $termApr);
+                        $term = $termApr[0];
+                        $apr = $termApr[1];
+                        if($apr >= $highestApr && $montlyRate < $lowestRate)
+                        {
+                            $highestApr = $apr;
+                            $lowestRate = $montlyRate;
+                            $usedTerm = $term;
+                        }
+                    }
+                    $qualifyingFinancingOptions[$usedTerm.'-'.$highestApr.'-'.$lowestRate]['star'] = true;
+
+                    ksort($qualifyingFinancingOptions);
                 }
             }
+
+            return $twig->render('PayPal::PayPalInstallment.InstallmentOverlay', ['basketAmount'=>$amount, 'financingOptions'=>$qualifyingFinancingOptions, 'merchantName'=>'Testfirma', 'merchantAddress'=>'Teststraße 1, 34117 Kassel']);
         }
 
-        // Check whether the content is set. Else, return an error code.
-        if(is_null($paymentContent) OR !strlen($paymentContent))
-        {
-            $this->returnType = 'errorCode';
-            return 'An unknown error occured, please try again.';
-        }
-
-        return $paymentContent;
+        return '';
     }
 
     /**
-     * @return string
+     * Get the financing options for the given amount
+     *
+     * @param int $amount
+     * @return array
      */
-    public function getReturnType(): string
-    {
-        return $this->returnType;
-    }
-
-    /**
-     * @param string $returnType
-     */
-    public function setReturnType(string $returnType)
-    {
-        $this->returnType = $returnType;
-    }
-
     public function getFinancingOptions($amount=0)
     {
-        $account = $this->paymentService->loadCurrentAccountSettings('paypal_installment');
+        $account = $this->loadCurrentAccountSettings('paypal_installment');
 
         $financingOptions = [];
         $financingOptions['clientSecret'] = $account['clientSecret'];
@@ -176,6 +92,24 @@ class PayPalInstallmentService
         $financingOptions['amount'] = $amount;
         $financingOptions['currency'] = 'EUR';
 
-        return $this->libraryCallContract->call('PayPal::calculatedFinancingOptions', $financingOptions);
+        return $this->getLibService()->libCalculateFinancingOptions($financingOptions);
+    }
+
+    /**
+     * Load the financing costs from the PayPal payment details
+     *
+     * @param $paymentId
+     * @param string $mode
+     * @return mixed|null
+     */
+    public function getFinancingCosts($paymentId, $mode=PaymentHelper::MODE_PAYPAL_INSTALLMENT)
+    {
+        $response = $this->getPaymentDetails($paymentId, $mode);
+
+        if(is_array($response) && array_key_exists('credit_financing_offered', $response))
+        {
+            return $response['credit_financing_offered'];
+        }
+        return null;
     }
 }

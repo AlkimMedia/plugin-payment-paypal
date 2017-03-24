@@ -1,86 +1,17 @@
 <?php
-/**
- * Created by IntelliJ IDEA.
- * User: jkonopka
- * Date: 05.01.17
- * Time: 14:28
- */
 
 namespace PayPal\Services;
 
-use PayPal\Api\Payment;
 use PayPal\Helper\PaymentHelper;
-use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Basket\Models\BasketItem;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Frontend\PaymentMethod\Contracts\FrontendPaymentMethodRepositoryContract;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 use Plenty\Modules\Payment\Method\Models\PaymentMethod;
-use Plenty\Modules\Plugin\Libs\Contracts\LibraryCallContract;
 
-class PayPalPlusService
+class PayPalPlusService extends PaymentService
 {
-    /**
-     * @var string
-     */
-    private $returnType = '';
-
-    /**
-     * @var PaymentService
-     */
-    private $paymentService;
-
-    /**
-     * @var LibraryCallContract
-     */
-    private $libraryCallContract;
-
-    /**
-     * @var SessionStorageService
-     */
-    private $sessionStorage;
-
-    /**
-     * @var AddressRepositoryContract
-     */
-    private $addressRepo;
-
-    /**
-     * @var FrontendPaymentMethodRepositoryContract
-     */
-    private $frontendPaymentMethodRepositoryContract;
-
-    /**
-     * @var PaymentHelper
-     */
-    private $paymentHelper;
-
-    /**
-     * PayPalPlusService constructor.
-     * @param PaymentService $paymentService
-     * @param LibraryCallContract $libraryCallContract
-     * @param SessionStorageService $sessionStorage
-     * @param AddressRepositoryContract $addressRepo
-     * @param FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepositoryContract
-     * @param PaymentHelper $paymentHelper
-     */
-    public function __construct(    PaymentService $paymentService,
-                                    LibraryCallContract $libraryCallContract,
-                                    SessionStorageService $sessionStorage,
-                                    AddressRepositoryContract $addressRepo,
-                                    FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepositoryContract,
-                                    PaymentHelper $paymentHelper
-    )
-    {
-        $this->paymentService = $paymentService;
-        $this->libraryCallContract = $libraryCallContract;
-        $this->sessionStorage = $sessionStorage;
-        $this->addressRepo = $addressRepo;
-        $this->frontendPaymentMethodRepositoryContract = $frontendPaymentMethodRepositoryContract;
-        $this->paymentHelper = $paymentHelper;
-    }
-
     /**
      * @param Basket $basket
      * @return string
@@ -103,7 +34,7 @@ class PayPalPlusService
             $language = 'en_GB';
         }
 
-        $account = $this->paymentService->loadCurrentAccountSettings('paypal');
+        $account = $this->loadCurrentAccountSettings('paypal');
         $mode = 'sandbox';
 
         if(array_key_exists('environment', $account) && $account['environment'] == 0)
@@ -112,13 +43,15 @@ class PayPalPlusService
         }
 
         $content = '';
-        $approvalUrl = $this->paymentService->getPaymentContent($basket, PaymentHelper::MODE_PAYPAL_PLUS);
-        if($this->paymentService->getReturnType() == 'redirectUrl')
+        $approvalUrl = $this->getPaymentContent($basket, PaymentHelper::MODE_PAYPAL_PLUS);
+        if($this->getReturnType() == 'redirectUrl')
         {
             /**
              * Load third party payment methods
              */
-            $currentPaymentMethods = $this->frontendPaymentMethodRepositoryContract->getCurrentPaymentMethodsList();
+            /** @var FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepositoryContract */
+            $frontendPaymentMethodRepositoryContract = pluginApp(FrontendPaymentMethodRepositoryContract::class);
+            $currentPaymentMethods = $frontendPaymentMethodRepositoryContract->getCurrentPaymentMethodsList();
             $thirdPartyPaymentMethods = [];
             $changeCase = [];
             if(is_array($currentPaymentMethods) && count($currentPaymentMethods) > 0)
@@ -132,12 +65,12 @@ class PayPalPlusService
                 /** @var PaymentMethod $paymentMethod */
                 foreach ($currentPaymentMethods as $paymentMethod)
                 {
-                    if($paymentMethod->id == $this->paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALPLUS))
+                    if($paymentMethod->id == $this->getPaymentHelper()->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALPLUS))
                     {
                         continue;
                     }
 
-                    if($paymentMethod->id == $this->paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALINSTALLMENT))
+                    if($paymentMethod->id == $this->getPaymentHelper()->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALINSTALLMENT))
                     {
                         $thirdPartyPaymentMethods[] = [
                             'redirectUrl'   => $domain.'/checkout/',
@@ -181,8 +114,8 @@ class PayPalPlusService
                                             {
                                                 '.implode("\n",$changeCase).'
                                                 default:
-                                                    $.post("/payment/payPalPlus/changePaymentMethod/", { "paymentMethod" : "'.$this->paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALPLUS).'" } );
-                                                    document.dispatchEvent(new CustomEvent("afterPaymentMethodChanged", {detail: '.$this->paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALPLUS).'}));
+                                                    $.post("/payment/payPalPlus/changePaymentMethod/", { "paymentMethod" : "'.$this->getPaymentHelper()->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALPLUS).'" } );
+                                                    document.dispatchEvent(new CustomEvent("afterPaymentMethodChanged", {detail: '.$this->getPaymentHelper()->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALPLUS).'}));
                                                     break;
                                             }
                                         },';
@@ -196,12 +129,18 @@ class PayPalPlusService
         return $content;
     }
 
+    /**
+     * update the paypal payment with the item data and the address
+     *
+     * @param Basket $basket
+     * @return string
+     */
     public function updatePayment(Basket $basket)
     {
-        $payPalRequestParams = $this->paymentService->getApiContextParams();
+        $payPalRequestParams = $this->getApiContextParams();
 
         /** Payment Id to from the created payment */
-        $payPalRequestParams['paymentId'] = $this->sessionStorage->getSessionValue(SessionStorageService::PAYPAL_PAY_ID);
+        $payPalRequestParams['paymentId'] = $this->getSessionStorage()->getSessionValue(SessionStorageService::PAYPAL_PAY_ID);
 
         /** @var Basket $basket */
         $payPalRequestParams['basket'] = $basket;
@@ -228,7 +167,6 @@ class PayPalPlusService
             $payPalRequestParams['basketItems'][] = $basketItem;
         }
 
-
         // Read the shipping address ID from the session
         $shippingAddressId = $basket->customerShippingAddressId;
 
@@ -241,7 +179,7 @@ class PayPalPlusService
 
             if(!is_null($shippingAddressId))
             {
-                $shippingAddress = $this->addressRepo->findAddressById($shippingAddressId);
+                $shippingAddress = $this->getAddressRepository()->findAddressById($shippingAddressId);
 
                 /** declarce the variable as array */
                 $payPalRequestParams['shippingAddress'] = [];
@@ -262,7 +200,7 @@ class PayPalPlusService
         $country['isoCode2'] = $countryRepo->findIsoCode($basket->shippingCountryId, 'iso_code_2');
         $payPalRequestParams['country'] = $country;
 
-        $updatePaymentResult = $this->libraryCallContract->call('PayPal::updatePayment', $payPalRequestParams);
+        $updatePaymentResult = $this->getLibService()->libUpdatePayment($payPalRequestParams);
 
         if($updatePaymentResult)
         {
@@ -278,21 +216,5 @@ class PayPalPlusService
         }
 
         return $content;
-    }
-
-    /**
-     * @return string
-     */
-    public function getReturnType(): string
-    {
-        return $this->returnType;
-    }
-
-    /**
-     * @param string $returnType
-     */
-    public function setReturnType(string $returnType)
-    {
-        $this->returnType = $returnType;
     }
 }

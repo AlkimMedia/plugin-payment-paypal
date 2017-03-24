@@ -3,13 +3,13 @@
 namespace PayPal\Services;
 
 use PayPal\Services\Database\AccountService;
+use Plenty\Plugin\Log\Loggable;
 use Plenty\Modules\Basket\Models\BasketItem;
 use Plenty\Modules\Frontend\Services\SystemService;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Modules\Basket\Models\Basket;
-use Plenty\Modules\Plugin\Libs\Contracts\LibraryCallContract;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 
@@ -23,6 +23,8 @@ use PayPal\Services\ContactService;
  */
 class PaymentService
 {
+    use Loggable;
+
     /**
      * @var string
      */
@@ -42,11 +44,6 @@ class PaymentService
      * @var PaymentHelper
      */
     private $paymentHelper;
-
-    /**
-     * @var LibraryCallContract
-     */
-    private $libCall;
 
     /**
      * @var AddressRepositoryContract
@@ -89,34 +86,38 @@ class PaymentService
     public $settings = [];
 
     /**
+     * @var LibService
+     */
+    private $libService;
+
+    /**
      * PaymentService constructor.
      *
      * @param PaymentMethodRepositoryContract $paymentMethodRepository
      * @param PaymentRepositoryContract $paymentRepository
      * @param ConfigRepository $config
      * @param PaymentHelper $paymentHelper
-     * @param LibraryCallContract $libCall
      * @param AddressRepositoryContract $addressRepo
      * @param SessionStorageService $sessionStorage
      * @param SystemService $systemService
      * @param SettingsService $settingsService
+     * @param LibService $libService
      */
     public function __construct(  PaymentMethodRepositoryContract $paymentMethodRepository,
                                   PaymentRepositoryContract $paymentRepository,
                                   ConfigRepository $config,
                                   PaymentHelper $paymentHelper,
-                                  LibraryCallContract $libCall,
                                   AddressRepositoryContract $addressRepo,
                                   SessionStorageService $sessionStorage,
                                   ContactService $contactService,
                                   SystemService $systemService,
                                   SettingsService $settingsService,
-                                  AccountService  $accountService)
+                                  AccountService  $accountService,
+                                  LibService $libService)
     {
         $this->paymentMethodRepository    = $paymentMethodRepository;
         $this->paymentRepository          = $paymentRepository;
         $this->paymentHelper              = $paymentHelper;
-        $this->libCall                    = $libCall;
         $this->addressRepo                = $addressRepo;
         $this->config                     = $config;
         $this->sessionStorage             = $sessionStorage;
@@ -124,6 +125,7 @@ class PaymentService
         $this->systemService              = $systemService;
         $this->settingsService            = $settingsService;
         $this->accountService             = $accountService;
+        $this->libService                 = $libService;
     }
 
     /**
@@ -137,13 +139,21 @@ class PaymentService
     }
 
     /**
+     * @param string $returnType
+     */
+    public function setReturnType(string $returnType)
+    {
+        $this->returnType = $returnType;
+    }
+
+    /**
      * Get the PayPal payment content
      *
      * @param Basket $basket
      * @param string $mode
-     * @return string|array
+     * @return string|array|null
      */
-    public function getPaymentContent(Basket $basket, $mode = ''):string
+    public function getPaymentContent(Basket $basket, $mode = PaymentHelper::MODE_PAYPAL, $additionalRequestParams=[]):string
     {
         if(!strlen($mode))
         {
@@ -152,16 +162,20 @@ class PaymentService
 
         $payPalRequestParams = $this->getPaypalParams($basket, $mode);
 
+        // Add Additional request params
+        $payPalRequestParams = array_merge($payPalRequestParams, $additionalRequestParams);
+
         $payPalRequestParams['mode'] = $mode;
 
         // Prepare the PayPal payment
-        $preparePaymentResult = $this->libCall->call('PayPal::preparePayment', $payPalRequestParams);
+        $preparePaymentResult = $this->libService->libPreparePayment($payPalRequestParams);
+        $this->getLogger('PayPal_PaymentService')->debug('preparePayment', $preparePaymentResult);
 
         // Check for errors
         if(is_array($preparePaymentResult) && $preparePaymentResult['error'])
         {
             $this->returnType = 'errorCode';
-            return $preparePaymentResult['error_msg'];
+            return $preparePaymentResult['error_msg']?$preparePaymentResult['error_msg']:$preparePaymentResult['error_description'];
         }
 
         // Store the PayPal Pay ID in the session
@@ -200,7 +214,7 @@ class PaymentService
     /**
      * Execute the PayPal payment
      *
-     * @return array
+     * @return array|string
      */
     public function executePayment($mode = PaymentHelper::MODE_PAYPAL)
     {
@@ -215,7 +229,8 @@ class PaymentService
         $executeParams['payerId']   = $ppPayerId;
 
         // Execute the PayPal payment
-        $executeResponse = $this->libCall->call('PayPal::executePayment', $executeParams);
+        $executeResponse = $this->libService->libExecutePayment($executeParams);
+        $this->getLogger('PayPal_PaymentService')->debug('executePayment', $executeParams);
 
         // Check for errors
         if(is_array($executeResponse) && $executeResponse['error'])
@@ -253,33 +268,20 @@ class PaymentService
         $this->contactService->handlePayPalContact($response['payer']);
     }
 
-    /**
-     * @param $paymentId
-     * @param string $mode
-     * @return mixed|null
-     */
-    public function getFinancingCosts($paymentId, $mode=PaymentHelper::MODE_PAYPAL_INSTALLMENT)
-    {
-        $response = $this->getPaymentDetails($paymentId, $mode);
 
-        if(is_array($response) && array_key_exists('credit_financing_offered', $response))
-        {
-            return $response['credit_financing_offered'];
-        }
-        return null;
-    }
 
     /**
      * @param $paymentId
      * @param string $mode
      * @return array
      */
-    private function getPaymentDetails($paymentId, $mode=PaymentHelper::MODE_PAYPAL)
+    public function getPaymentDetails($paymentId, $mode=PaymentHelper::MODE_PAYPAL)
     {
         $requestParams = $this->getApiContextParams($mode);
         $requestParams['paymentId'] = $paymentId;
 
-        $response = $this->libCall->call('PayPal::getPaymentDetails', $requestParams);
+        $response = $this->libService->libGetPaymentDetails($requestParams);
+        $this->getLogger('PayPal_PaymentService')->debug('getPaymentDetails', $response);
 
         return $response;
     }
@@ -295,37 +297,20 @@ class PaymentService
         $params = $this->getApiContextParams();
         $params['saleId'] = $saleId;
 
-        $saleDetailsResult = $this->libCall->call('PayPal::getSaleDetails', $params);
+        $saleDetailsResult = $this->libService->libGetSaleDetails($params);
+        $this->getLogger('PayPal_PaymentService')->debug('getSaleDetails', $saleDetailsResult);
 
         return $saleDetailsResult;
     }
 
     /**
-     * @param Basket $basket
-     * @return string
-     */
-    public function preparePayPalExpressPayment(Basket $basket)
-    {
-        $paymentContent = $this->getPaymentContent($basket, PaymentHelper::MODE_PAYPALEXPRESS);
-
-        $preparePaymentResult = $this->getReturnType();
-
-        if($preparePaymentResult == 'errorCode')
-        {
-            return '/basket';
-        }
-        elseif($preparePaymentResult == 'redirectUrl')
-        {
-            return $paymentContent;
-        }
-    }
-
-    /**
+     * Refund the given payment
+     *
      * @param int $saleId
      * @param array $paymentData
      * @return array
      */
-    public function refundPayment($saleId, $paymentData = array())
+    public function refundPayment($saleId, $paymentData = [])
     {
         $requestParams = $this->getApiContextParams();
         $requestParams['saleId'] = $saleId;
@@ -335,7 +320,7 @@ class PaymentService
             $requestParams['payment'] = $paymentData;
         }
 
-        $response = $this->libCall->call('PayPal::refundPayment', $requestParams);
+        $response = $this->libService->libRefundPayment($requestParams);
 
         return $response;
     }
@@ -349,12 +334,14 @@ class PaymentService
     {
         $requestParams = $this->getApiContextParams();
 
-        $response = $this->libCall->call('PayPal::listAvailableWebhooks', $requestParams);
+        $response = $this->libService->libListAvailableWebhooks($requestParams);
 
         return $response;
     }
 
     /**
+     * Create a web profile for the given account
+     *
      * @return mixed
      * @throws \Exception
      */
@@ -368,7 +355,7 @@ class PaymentService
         $webProfileParams['brandName']          = 'shopDerShops GmbH';
         $webProfileParams['shopName']           = 'SuperDuperShop';
 
-        $webProfileResult = $this->libCall->call('PayPal::createWebProfile', $webProfileParams);
+        $webProfileResult = $this->libService->libCreateWebProfile($webProfileParams);
 
         if(is_array($webProfileResult) && $webProfileResult['error'])
         {
@@ -382,7 +369,7 @@ class PaymentService
     }
 
     /**
-     * Fill and return the Paypal parameters
+     * Fill and return the PayPal parameters
      *
      * @param Basket $basket
      * @param String $mode
@@ -402,9 +389,6 @@ class PaymentService
         /** @var Basket $basket */
         $payPalRequestParams['basket'] = $basket;
 
-        /** @var \Plenty\Modules\Item\Item\Contracts\ItemRepositoryContract $itemContract */
-        $itemContract = pluginApp(\Plenty\Modules\Item\Item\Contracts\ItemRepositoryContract::class);
-
         /** declarce the variable as array */
         $payPalRequestParams['basketItems'] = [];
 
@@ -414,6 +398,9 @@ class PaymentService
             $payPalBasketItem['itemId'] = $basketItem->itemId;
             $payPalBasketItem['quantity'] = $basketItem->quantity;
             $payPalBasketItem['price'] = $basketItem->price;
+
+            /** @var \Plenty\Modules\Item\Item\Contracts\ItemRepositoryContract $itemContract */
+            $itemContract = pluginApp(\Plenty\Modules\Item\Item\Contracts\ItemRepositoryContract::class);
 
             /** @var \Plenty\Modules\Item\Item\Models\Item $item */
             $item = $itemContract->show($basketItem->itemId);
@@ -473,6 +460,9 @@ class PaymentService
     }
 
     /**
+     * Return the api params for the authentication
+     *
+     * @param string $mode
      * @return array
      */
     public function getApiContextParams($mode=PaymentHelper::MODE_PAYPAL)
@@ -499,6 +489,8 @@ class PaymentService
     }
 
     /**
+     * Load the settings from the datebase for the given settings type
+     *
      * @param $settingsType
      * @return array|null
      */
@@ -511,6 +503,12 @@ class PaymentService
         }
     }
 
+    /**
+     * Load the account settings from the database for the given settings type
+     *
+     * @param string $settingsType
+     * @return array
+     */
     public function loadCurrentAccountSettings($settingsType='paypal')
     {
         $account = [];
@@ -533,4 +531,46 @@ class PaymentService
 
         return $account;
     }
+
+    /**
+     * @return LibService
+     */
+    public function getLibService(): LibService
+    {
+        return $this->libService;
+    }
+
+    /**
+     * @param LibService $libService
+     */
+    public function setLibService(LibService $libService)
+    {
+        $this->libService = $libService;
+    }
+
+    /**
+     * @return PaymentHelper
+     */
+    public function getPaymentHelper(): PaymentHelper
+    {
+        return $this->paymentHelper;
+    }
+
+    /**
+     * @return \PayPal\Services\SessionStorageService
+     */
+    public function getSessionStorage(): \PayPal\Services\SessionStorageService
+    {
+        return $this->sessionStorage;
+    }
+
+    /**
+     * @return AddressRepositoryContract
+     */
+    public function getAddressRepository(): AddressRepositoryContract
+    {
+        return $this->addressRepo;
+    }
+
+
 }

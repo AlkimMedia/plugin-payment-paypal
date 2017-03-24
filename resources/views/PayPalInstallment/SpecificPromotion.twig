@@ -1,6 +1,6 @@
 <div class="wrapper paypal-installment-specific-promotion" id="paypal-installment-specific-promotion_{{ id }}">
     {% if amount < 99 or amount > 5000 %}
-        <h4 style="text-align: center">Finanzierung verfügbar ab 99€ bis 5.000€<br>Warenwert mit</h4>
+        <h4 style="text-align: center">Finanzierung verfügbar ab 99€ bis 5.000€<br>Warenkorbwert mit</h4>
         <img class="img-fluid" src="{{ plugin_path('PayPal') }}/images/buttons/installment/HorizontalLockup/FullColor/pp_credit-german_h_rgb.png" />
     {% else %}
         {% if financingOptions is not empty %}
