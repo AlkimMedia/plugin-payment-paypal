@@ -13,20 +13,6 @@ use Plenty\Modules\Payment\Method\Models\PaymentMethod;
 class PayPalPlusService extends PaymentService
 {
     /**
-     * @var FrontendPaymentMethodRepositoryContract
-     */
-    private $frontendPaymentMethodRepositoryContract;
-
-    /**
-     * PayPalPlusService constructor.
-     * @param FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepositoryContract
-     */
-    public function __construct(FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepositoryContract)
-    {
-        $this->frontendPaymentMethodRepositoryContract = $frontendPaymentMethodRepositoryContract;
-    }
-
-    /**
      * @param Basket $basket
      * @return string
      */
@@ -63,7 +49,9 @@ class PayPalPlusService extends PaymentService
             /**
              * Load third party payment methods
              */
-            $currentPaymentMethods = $this->frontendPaymentMethodRepositoryContract->getCurrentPaymentMethodsList();
+            /** @var FrontendPaymentMethodRepositoryContract $frontendPaymentMethodRepositoryContract */
+            $frontendPaymentMethodRepositoryContract = pluginApp(FrontendPaymentMethodRepositoryContract::class);
+            $currentPaymentMethods = $frontendPaymentMethodRepositoryContract->getCurrentPaymentMethodsList();
             $thirdPartyPaymentMethods = [];
             $changeCase = [];
             if(is_array($currentPaymentMethods) && count($currentPaymentMethods) > 0)
