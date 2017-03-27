@@ -1,3 +1,10 @@
+# Veröffentlichung 1.0.1
+
+#### FIX
+1. Setze die Rechnungsdaten von PayPal PLUS Rechnungskauf auf die Rechnung
+2. Zeige korrekte Firmendaten im Overlay von Ratenzahlung an
+3. Speichern der Kontoeinstellungen
+
 # Veröffentlichung 1.0.0
 
 #### FEATURE

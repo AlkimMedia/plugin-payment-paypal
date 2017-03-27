@@ -1,3 +1,10 @@
+# Release 1.0.1
+
+#### FIX
+1. Use the Invoice data from PayPal PLUS for the invoice
+2. Use correct company data for the installment overlay
+3. Fix saving account settings
+
 # Release 1.0.0
 
 #### FEATURE
