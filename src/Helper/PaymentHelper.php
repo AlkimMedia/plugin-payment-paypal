@@ -246,6 +246,25 @@ class PaymentHelper
             $paymentProperty[] = $this->getPaymentProperty(PaymentProperty::TYPE_PAYMENT_TEXT, json_encode($paymentText));
         }
 
+        if(!empty($paypalPaymentData['payment_instruction']) && is_array($paypalPaymentData['payment_instruction']))
+        {
+            if(is_array($paypalPaymentData['payment_instruction']['recipient_banking_instruction']))
+            {
+                $paymentText = [];
+                $paymentText['bankName'] = $paypalPaymentData['payment_instruction']['recipient_banking_instruction']['bank_name'];
+                $paymentText['accountHolder'] = $paypalPaymentData['payment_instruction']['recipient_banking_instruction']['account_holder_name'];
+                $paymentText['iban'] = $paypalPaymentData['payment_instruction']['recipient_banking_instruction']['international_bank_account_number'];
+                $paymentText['bic'] = $paypalPaymentData['payment_instruction']['recipient_banking_instruction']['bank_identifier_code'];
+                $paymentText['referenceNumber'] = $paypalPaymentData['payment_instruction']['reference_number'];
+                $paymentText['paymentDue'] = $paypalPaymentData['payment_instruction']['payment_due_date'];
+
+                /**
+                 * Add payment property with type payment text
+                 */
+                $paymentProperty[] = $this->getPaymentProperty(PaymentProperty::TYPE_PAYMENT_TEXT, json_encode($paymentText));
+            }
+        }
+
         /**
          * TODO Add the following properties
          *

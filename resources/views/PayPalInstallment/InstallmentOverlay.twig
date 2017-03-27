@@ -1,3 +1,4 @@
+{% set company = config("system.company") %}
 <div class="modal-body text-md-center">
     <div class="container-fluid">
         <div class="offset-md-4 col-md-4">
@@ -50,7 +51,7 @@
         <div class="offset-md-3 col-md-6">
             <p>
                 * Zugleich repräsentatives Beispiel gem. § 6a PAngV<br>
-                Darlehensgeber: {{ merchantName }}, {{ merchantAddress }}
+                Darlehensgeber: {{ company["name"] }}, {{ company["street"] }}, {{ company["zip"] }} {{ company["city"] }}, {{ company["country"] }}
             </p>
         </div>
     </div>

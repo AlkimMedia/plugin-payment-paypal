@@ -100,7 +100,7 @@ class PayPalInstallmentSpecificPromotion
             }
         }
 
-        return $twig->render('PayPal::PayPalInstallment.SpecificPromotion', ['amount'=>$amount, 'financingOptions'=>$qualifyingFinancingOptions, 'item'=>$item, 'id'=>$id, 'merchantName'=>'Testfirma', 'merchantAddress'=>'Teststraße 1, 34117 Kassel']);
+        return $twig->render('PayPal::PayPalInstallment.SpecificPromotion', ['amount'=>$amount, 'financingOptions'=>$qualifyingFinancingOptions, 'item'=>$item, 'id'=>$id]);
     }
 
 }
