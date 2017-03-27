@@ -1,3 +1,4 @@
+{% set company = config("system.company") %}
 <div class="wrapper paypal-installment-specific-promotion" id="paypal-installment-specific-promotion_{{ id }}">
     {% if amount < 99 or amount > 5000 %}
         <h4 style="text-align: center">Finanzierung verfügbar ab 99€ bis 5.000€<br>Warenkorbwert mit</h4>
@@ -34,7 +35,7 @@
                         </tr>
                     </table>
                 </div>
-                <span>Darlehnsgeber: {{ merchantName }}, {{ merchantAddress }}</span><br>
+                <span>Darlehensgeber: {{ company["name"] }}, {{ company["street"] }}, {{ company["zip"] }} {{ company["city"] }}, {{ company["country"] }}</span><br>
             {% endif %}
         {% else %}
             <h4 style="text-align: center;">Sie können diesen {% if item is not null %}Artikel{% else %}Warenkorb{% endif %} auch finanzieren mit</h4>

@@ -23,6 +23,7 @@ use Plenty\Modules\Basket\Events\BasketItem\AfterBasketItemAdd;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketCreate;
 use Plenty\Modules\Document\Models\Document;
 
+use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Events\Dispatcher;
 use Plenty\Plugin\ServiceProvider;
 
@@ -70,7 +71,7 @@ class PayPalServiceProvider extends ServiceProvider
                             EventProceduresService $eventProceduresService)
     {
         // Register the PayPal Express payment method in the payment method container
-        $payContainer->register('plentyPayPal::PAYPALEXPRESS', PayPalExpressPaymentMethod::class,
+        $payContainer->register('plentyPayPal::'.PaymentHelper::PAYMENTKEY_PAYPALEXPRESS, PayPalExpressPaymentMethod::class,
             [
                 AfterBasketChanged::class,
                 AfterBasketItemAdd::class,
@@ -80,7 +81,7 @@ class PayPalServiceProvider extends ServiceProvider
             ]);
 
         // Register the PayPal payment method in the payment method container
-        $payContainer->register('plentyPayPal::PAYPAL', PayPalPaymentMethod::class,
+        $payContainer->register('plentyPayPal::'.PaymentHelper::PAYMENTKEY_PAYPAL, PayPalPaymentMethod::class,
             [   AfterBasketChanged::class,
                 AfterBasketItemAdd::class,
                 AfterBasketCreate::class,
@@ -258,8 +259,22 @@ class PayPalServiceProvider extends ServiceProvider
                                     /** @var \Plenty\Modules\Order\Pdf\Models\OrderPdfGeneration $orderPdfGenerationModel */
                                     $orderPdfGenerationModel = pluginApp(\Plenty\Modules\Order\Pdf\Models\OrderPdfGeneration::class);
 
+                                    /** @var ConfigRepository $configRepository */
+                                    $configRepository = pluginApp(ConfigRepository::class);
+                                    $company = $configRepository->get("system.company");
+                                    $advice = $company['name']." hat die Forderung gegen Sie im Rahmen eines laufenden
+                                                Factoringvertrages an die PayPal (Europe) S.àr.l. et Cie, S.C.A. abgetreten. Zahlungen
+                                                mit schuldbefreiender Wirkung können nur an die PayPal (Europe) S.àr.l. et Cie, S.C.A.
+                                                geleistet werden.\n\n";
+                                    $advice .=   "Kontoinhaber: ".$bankData['accountHolder']."\n".
+                                                "Kreditinstitut".$bankData['bankName']."\n".
+                                                "IBAN: ".$bankData['iban']."\n".
+                                                "BIC: ".$bankData['bic']."\n".
+                                                "Verwendungszweck: ".$bankData['referenceNumber']."\n".
+                                                "Zahlbar bis: ".$bankData['paymentDue'];
+
                                     $orderPdfGenerationModel->language = 'de';
-                                    $orderPdfGenerationModel->advice = (string)$bankData;
+                                    $orderPdfGenerationModel->advice = (string)$advice;
 
                                     $event->addOrderPdfGeneration($orderPdfGenerationModel);
                                 }
