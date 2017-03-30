@@ -55,11 +55,14 @@ class NotificationService
     /**
      * Create the webhooks for the account
      *
-     * @return string
+     * @param $clientId
+     * @param $clientSecret
+     * @return bool|string
      */
-    public function createWebhook()
+    public function createWebhook($clientId, $clientSecret)
     {
-        $params = $this->paymentService->getApiContextParams();
+        $params['clientId'] = $clientId;
+        $params['clientSecret'] = $clientSecret;
 
         $url = $this->paymentHelper->getRestReturnUrls(PaymentHelper::MODE_PAYPAL_NOTIFICATION);
         $params['notificationUrl'] = $url[PaymentHelper::MODE_PAYPAL_NOTIFICATION];
@@ -78,17 +81,17 @@ class NotificationService
 
         if(is_array($response) && !empty($response['id']))
         {
-            return (string)$response['id'].'_'.(string)$response['url'];
+            return (string)$response['id'];
         }
         else
         {
-            $this->deleteWebhooks();
+            $this->deleteWebhooks($clientId, $clientSecret);
 
             $response = $this->libService->libCreateWebhook($params);
 
             if(is_array($response) && !empty($response['id']))
             {
-                return (string)$response['id'].'_'.(string)$response['url'];
+                return (string)$response['id'];
             }
         }
 
@@ -100,10 +103,16 @@ class NotificationService
 
     /**
      * Delete all webhooks
+     *
+     * @param $clientId
+     * @param $clientSecret
      */
-    public function deleteWebhooks()
+    public function deleteWebhooks($clientId, $clientSecret)
     {
-        $this->libService->libDeleteWebhook($this->paymentService->getApiContextParams());
+        $params['clientId'] = $clientId;
+        $params['clientSecret'] = $clientSecret;
+
+        $this->libService->libDeleteWebhook($params);
     }
 
     /**
