@@ -95,6 +95,12 @@ class AccountService extends DatabaseBaseService
 
                     if($account instanceof Account)
                     {
+                        // do not overwrite webhookId
+                        if(array_key_exists('webhookId', $account->value))
+                        {
+                            $accountData['webhookId'] = $account->value['webhookId'];
+                        }
+
                         $account->value = $accountData;
                         $account->updatedAt = date('Y-m-d H:i:s');
                         $this->setValue($account);
