@@ -82,11 +82,11 @@ class PayPalPlusService extends PaymentService
                     {
                         $thirdPartyPaymentMethods[] = [
                             'redirectUrl'   => $domain.'/checkout/',
-                            'methodName'    => substr($this->frontendPaymentMethodRepositoryContract->getPaymentMethodName($paymentMethod, 'de'),0,25),
-                            'imageUrl'      => $domain.'/'.$this->frontendPaymentMethodRepositoryContract->getPaymentMethodIcon($paymentMethod, 'de'),
-                            'description'   => (string)($this->frontendPaymentMethodRepositoryContract->getPaymentMethodName($paymentMethod, 'de').' '.$this->frontendPaymentMethodRepositoryContract->getPaymentMethodDescription($paymentMethod, 'de'))
+                            'methodName'    => substr($frontendPaymentMethodRepositoryContract->getPaymentMethodName($paymentMethod, 'de'),0,25),
+                            'imageUrl'      => $domain.'/'.$frontendPaymentMethodRepositoryContract->getPaymentMethodIcon($paymentMethod, 'de'),
+                            'description'   => (string)($frontendPaymentMethodRepositoryContract->getPaymentMethodName($paymentMethod, 'de').' '.$frontendPaymentMethodRepositoryContract->getPaymentMethodDescription($paymentMethod, 'de'))
                         ];
-                        $changeCase[] = 'case "'.substr($this->frontendPaymentMethodRepositoryContract->getPaymentMethodName($paymentMethod, 'de'), 0, 25).'": $.post("/payment/payPalPlus/changePaymentMethod/", { "paymentMethod" : "'.$paymentMethod->id.'" } ); document.dispatchEvent(new CustomEvent("afterPaymentMethodChanged", {detail: '.$paymentMethod->id.'})); break;';
+                        $changeCase[] = 'case "'.substr($frontendPaymentMethodRepositoryContract->getPaymentMethodName($paymentMethod, 'de'), 0, 25).'": $.post("/payment/payPalPlus/changePaymentMethod/", { "paymentMethod" : "'.$paymentMethod->id.'" } ); document.dispatchEvent(new CustomEvent("afterPaymentMethodChanged", {detail: '.$paymentMethod->id.'})); break;';
                     }
                 }
             }

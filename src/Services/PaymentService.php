@@ -392,15 +392,15 @@ class PaymentService
         /** declarce the variable as array */
         $payPalRequestParams['basketItems'] = [];
 
+        /** @var \Plenty\Modules\Item\Item\Contracts\ItemRepositoryContract $itemContract */
+        $itemContract = pluginApp(\Plenty\Modules\Item\Item\Contracts\ItemRepositoryContract::class);
+
         /** @var BasketItem $basketItem */
         foreach($basket->basketItems as $basketItem)
         {
             $payPalBasketItem['itemId'] = $basketItem->itemId;
             $payPalBasketItem['quantity'] = $basketItem->quantity;
             $payPalBasketItem['price'] = $basketItem->price;
-
-            /** @var \Plenty\Modules\Item\Item\Contracts\ItemRepositoryContract $itemContract */
-            $itemContract = pluginApp(\Plenty\Modules\Item\Item\Contracts\ItemRepositoryContract::class);
 
             /** @var \Plenty\Modules\Item\Item\Models\Item $item */
             $item = $itemContract->show($basketItem->itemId);

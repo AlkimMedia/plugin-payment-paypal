@@ -9,6 +9,10 @@ class AccountService extends DatabaseBaseService
 {
     protected $tableName = 'settings';
 
+    /**
+     * AccountService constructor.
+     * @param DataBase $dataBase
+     */
     public function __construct(DataBase $dataBase)
     {
         parent::__construct($dataBase);
@@ -29,9 +33,7 @@ class AccountService extends DatabaseBaseService
             {
                 if($account instanceof Account)
                 {
-                    $accountData = $account->value;
-                    $accountData['id'] = $account->id;
-                    $accounts[] = $accountData;
+                    $accounts[$account->id] = $account->value;
                 }
             }
         }
@@ -58,29 +60,39 @@ class AccountService extends DatabaseBaseService
         return null;
     }
 
+    /**
+     * @param $newAccount
+     * @return bool|null
+     */
     public function createAccount($newAccount)
     {
         if($newAccount)
         {
-            $accounts = array();
             /** @var Account $accountModel */
             $accountModel = pluginApp(Account::class);
             $accountModel->name = $newAccount['email'];
             $accountModel->value = $newAccount;
+            $accountModel->createdAt = date('Y-m-d H:i:s');
             return $this->setValue($accountModel);
         }
         return null;
     }
 
+    /**
+     * @param $updatedAccount
+     * @return int|null
+     */
     public function updateAccount($updatedAccount)
     {
         if(is_array($updatedAccount) && count($updatedAccount) > 0)
         {
-            foreach ($updatedAccount as $accountData)
+            foreach ($updatedAccount as $accountId => $accountData)
             {
-                if(array_key_exists('id', $accountData))
+                if($accountId > 0 && is_numeric($accountId))
                 {
-                    $account = $this->getValue(Account::class, $accountData['id']);
+                    // load the account
+                    $account = $this->getValue(Account::class, $accountId);
+
                     if($account instanceof Account)
                     {
                         $account->value = $accountData;
@@ -94,6 +106,10 @@ class AccountService extends DatabaseBaseService
         return null;
     }
 
+    /**
+     * @param $accountId
+     * @return bool|null
+     */
     public function deleteAccount($accountId)
     {
         if($accountId && $accountId > 0)

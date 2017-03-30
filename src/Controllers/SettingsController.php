@@ -53,15 +53,15 @@ class SettingsController extends Controller
     {
         $newAccount = $request->get('account');
 
-        $webhook = $this->notificationService->createWebhook();
+        $webhookId = $this->notificationService->createWebhook($newAccount['clientId'], $newAccount['clientSecret']);
 
-        $newAccount['webhook'] = $webhook;
+        $newAccount['webhookId'] = $webhookId;
 
         if($newAccount)
         {
             if($this->accountService->createAccount($newAccount))
             {
-                $this->loadAccounts();
+                return $this->loadAccounts();
             }
         }
     }
@@ -102,7 +102,7 @@ class SettingsController extends Controller
         {
             if($this->accountService->deleteAccount($accountId))
             {
-                $this->loadAccounts();
+                return $this->loadAccounts();
             }
         }
     }
