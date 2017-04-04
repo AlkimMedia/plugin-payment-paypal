@@ -59,15 +59,11 @@ class PaymentNotificationController extends Controller
 
         $body = $this->request->getContent();
 
-        $this   ->getLogger('PaymentNotificationController_handleNotification')
-                ->setReferenceType('Notification')
-                ->setReferenceValue('header')
-                ->info(json_encode($headers));
+        $this   ->getLogger(__METHOD__)
+                ->info('headers', json_encode($headers));
 
-        $this   ->getLogger('PaymentNotificationController_handleNotification')
-                ->setReferenceType('Notification')
-                ->setReferenceValue('body')
-                ->info($body);
+        $this   ->getLogger(__METHOD__)
+                ->info('body', $body);
 
         $validity = $this->notificationService->validateNotification($headers, $body, $this->request->get('id'));
 

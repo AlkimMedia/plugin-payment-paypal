@@ -95,8 +95,8 @@ class NotificationService
             }
         }
 
-        $this   ->getLogger('NotificationService_createWebhook')
-                ->error(json_encode($response));
+        $this   ->getLogger(__METHOD__)
+                ->error('webhook creation failed!', json_encode($response));
 
         return false;
     }
@@ -141,10 +141,8 @@ class NotificationService
             }
         }
 
-        $this   ->getLogger('NotificationService_validateNotification')
-                ->setReferenceType('webhookId')
-                ->setReferenceValue($webhookId)
-                ->error(json_encode($response));
+        $this   ->getLogger(__METHOD__)
+                ->error('webhook validation failed!', json_encode($response));
 
         return false;
     }
