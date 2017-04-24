@@ -323,6 +323,7 @@ class PaymentHelper
                 if($payment->status != $state)
                 {
                     $payment->status = $state;
+                    $payment->updateOrderPaymentStatus = true;
 
                     if($state == Payment::STATUS_APPROVED || $state == Payment::STATUS_CAPTURED)
                     {
