@@ -214,7 +214,11 @@ Das Menü zur Ratenzahlung entspricht dem zu PayPal PLUS; der einzige Unterschie
 3. Nehmen Sie die Einstellungen vor. Beachten Sie dazu die Erläuterungen in Tabelle 3.
 4. **Speichern** Sie die Einstellungen.
 
-<strong><i>Wichtig:</strong></i> Um diese Zahlungsart in vollem Umfang und gemäß aller rechtlichen Vorgaben zu nutzen, müssen zwingend die Container <b>PayPal Installment Prepare Button</b>, <b>PayPal Installment Financing Check</b> und <b>PayPal Installment Financing Costs</b> <a href="#10."><strong>verknüpft</strong></a> sein.
+<div class="alert alert-warning" role="alert">
+    <strong><i>Wichtig:</strong></i> Um diese Zahlungsart in vollem Umfang und gemäß aller rechtlichen Vorgaben zu nutzen, müssen zwingend die Container <b>PayPal Installment Prepare Button</b>, <b>PayPal Installment Financing Check</b> und <b>PayPal Installment Financing Costs</b> <a href="#10."><strong>verknüpft</strong></a> sein.<br /> <br />
+Des Weiteren ist Ratenzahlung Powered by PayPal erst nach erfolgreicher Beantragung für deutsche Online-Shops ausgewählter PayPal-Händler verfügbar. 
+Beantragen Sie <a href="https://www.paypal.com/de/webapps/mpp/installments"><strong>hier</strong></a>  die Nutzung von Ratenzahlung Powered by PayPal.
+</div>
 
 <table>
 <caption>Tab. 3: Ratenzahlungseinstellungen vornehmen</caption>

@@ -202,7 +202,9 @@ This menu is equal to the one for PayPal PLUS, with the exception of the descrip
 3. Carry out the settings. Pay attention to the information given in table 3. 
 4. **Save** the settings.
 
-<strong><i>Important:</i></strong> To use this payment method to its full extent and in accordance with legal requirements, you have to <a href="#10."><strong>link</strong></a> the containers <b>PayPal Installment Prepare Button</b>, <b>PayPal Installment Financing Check</b> and <b>PayPal Installment Financing Costs</b>.
+<div class="alert alert-warning" role="alert">
+    <strong><i>Important:</i></strong> To use this payment method to its full extent and in accordance with legal requirements, you have to <a href="#10."><strong>link</strong></a> the containers <b>PayPal Installment Prepare Button</b>, <b>PayPal Installment Financing Check</b> and <b>PayPal Installment Financing Costs</b>.<br /><br />In addition, Installments Powered by PayPal is only available for German online stores of selected PayPal Sellers after successful application. Apply <a href="https://www.paypal.com/de/webapps/mpp/installments"><strong>here</strong></a> for Installments Powered by PayPal.
+</div>
 
 <table>
 <caption>Table 3: Carrying out settings for Installments Powered by PayPal</caption>
