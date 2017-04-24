@@ -410,7 +410,7 @@ class PaymentHelper
      */
     public function getPaymentPropertyValue($payment, $propertyType)
     {
-        $properties = $payment->property;
+        $properties = $payment->properties;
 
         if(is_array($properties))
         {
