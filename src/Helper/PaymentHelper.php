@@ -279,6 +279,7 @@ class PaymentHelper
          */
 
         $payment->properties = $paymentProperty;
+        $payment->regenerateHash = true;
 
         $payment = $this->paymentRepository->createPayment($payment);
 
@@ -330,6 +331,7 @@ class PaymentHelper
                         $payment->unaccountable = 0;
                     }
 
+                    $payment->regenerateHash = true;
                     $this->paymentRepository->updatePayment($payment);
                 }
             }
