@@ -8,6 +8,23 @@ $apiContext = PayPalHelper::getApiContext(  SdkRestApi::getParam('clientId', tru
                                             SdkRestApi::getParam('clientSecret', true),
                                             SdkRestApi::getParam('sandbox', true));
 
+$mode = SdkRestApi::getParam('mode', 'paypal');
+
+switch ($mode)
+{
+    case 'installment':
+        $apiContext->addRequestHeader('PayPal-Partner-Attribution-Id', 'Plenty_Cart_Inst');
+        break;
+    case 'plus':
+        $apiContext->addRequestHeader('PayPal-Partner-Attribution-Id', 'Plenty_Cart_Plus_2');
+        break;
+    case 'paypal':
+    case 'paypalexpress':
+    default:
+        $apiContext->addRequestHeader('PayPal-Partner-Attribution-Id', 'Plenty_Cart_EC_2');
+        break;
+}
+
 $saleId = SdkRestApi::getParam('saleId');
 
 try
