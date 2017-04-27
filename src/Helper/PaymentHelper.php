@@ -200,7 +200,7 @@ class PaymentHelper
 
         if(!empty($paymentData['parentId']))
         {
-            $payment->parent = $paymentData['parentId'];
+            $payment->parentId = $paymentData['parentId'];
         }
 
         if(!empty($paymentData['unaccountable']))
