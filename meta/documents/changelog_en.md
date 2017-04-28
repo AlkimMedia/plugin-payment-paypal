@@ -1,3 +1,10 @@
+# Release 1.0.2
+
+#### FIX
+1. Use the correct path for the PayPal logo.
+2. Correctly create the hash for the unique identity of the payment.
+3. Refund uses the correct order as basis.
+
 # Release 1.0.1
 
 #### FIX

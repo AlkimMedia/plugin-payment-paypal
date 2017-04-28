@@ -1,3 +1,10 @@
+# Veröffentlichung 1.0.2
+
+#### FIX
+1. PayPal Logo wird nun aus dem korrekten Pfad geladen.
+2. Der Hash für die Eindeutigkeit der Zahlung wird nun korrekt berechnet.
+3. Rückerstattung nutzt nun den korrekten Auftrag als Basis.
+
 # Veröffentlichung 1.0.1
 
 #### FIX

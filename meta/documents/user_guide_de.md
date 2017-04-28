@@ -1,3 +1,7 @@
+<div class="alert alert-warning" role="alert">
+   <strong><i>Hinweis:</strong></i> Das PayPal-Plugin ist für die Nutzung mit dem Webshop Ceres entwickelt und funktioniert nur mit dessen Logikstruktur oder anderen Template-Plugins. 
+</div>
+
 # PayPal – Bargeldloses Bezahlen in plentymarkets Online-Shops
 
 Mit dem plentymarkets PayPal Plugin binden Sie **PayPal**, **PayPal PLUS** und **Ratenzahlung Powered by PayPal** in Ihren Webshop ein.
