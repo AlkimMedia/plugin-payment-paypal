@@ -38,20 +38,28 @@ class RefundEventProcedure
                 $orderId = $order->id;
                 break;
             case 4: //credit note
-                $parentOrder = $order->parentOrder;
-
-                if($parentOrder instanceof Order && $parentOrder->typeId == 1)
+                $originOrders = $order->originOrders;
+                if(!$originOrders->isEmpty() && $originOrders->count() > 0)
                 {
-                    if($parentOrder->typeId == 1)
+                    $originOrder = $originOrders->first();
+
+                    if($originOrder instanceof Order)
                     {
-                        $orderId = $parentOrder->id;
-                    }
-                    else
-                    {
-                        $parentParentOrder = $parentOrder->parentOrder;
-                        if($parentParentOrder instanceof Order)
+                        if($originOrder->typeId == 1)
                         {
-                            $orderId = $parentParentOrder->id;
+                            $orderId = $originOrder->id;
+                        }
+                        else
+                        {
+                            $originOriginOrders = $originOrder->originOrders;
+                            if(is_array($originOriginOrders) && count($originOriginOrders) > 0)
+                            {
+                                $originOriginOrder = $originOriginOrders->first();
+                                if($originOriginOrder instanceof Order)
+                                {
+                                    $orderId = $originOriginOrder->id;
+                                }
+                            }
                         }
                     }
                 }

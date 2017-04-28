@@ -8,12 +8,12 @@
 
 namespace PayPal\Methods;
 
-
 use PayPal\Services\PaymentService;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodService;
 use Plenty\Plugin\ConfigRepository;
+use Plenty\Plugin\Application;
 
 class PayPalInstallmentPaymentMethod extends PaymentMethodService
 {
@@ -139,7 +139,9 @@ class PayPalInstallmentPaymentMethod extends PaymentMethodService
                     break;
             }
         }
-        $icon = 'layout/plugins/production/paypal/images/logos/de-pp-logo.png';
+        /** @var Application $app */
+        $app = pluginApp(Application::class);
+        $icon = $app->getUrlPath('paypal').'/images/logos/de-pp-logo.png';
 
         return $icon;
     }

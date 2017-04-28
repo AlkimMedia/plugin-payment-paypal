@@ -1,4 +1,8 @@
-# PayPal&nbsp;– Cashless payment in plentymarkets online stores
+<div class="alert alert-warning" role="alert">
+   <strong><i>Important:</strong></i> The PayPal plugin has been developed for use with the online store Ceres and only works with its structure or other template plugins.
+</div>
+
+# PayPal – Cashless payment in plentymarkets online stores
 
 With the plentymarkets PayPal plugin, incorporate **PayPal**, **PayPal PLUS** and **Installments Powered by PayPal** in your online store.
 

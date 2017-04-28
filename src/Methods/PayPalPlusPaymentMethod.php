@@ -12,6 +12,7 @@ use PayPal\Services\PaymentService;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodService;
+use Plenty\Plugin\Application;
 use Plenty\Plugin\ConfigRepository;
 
 class PayPalPlusPaymentMethod extends PaymentMethodService
@@ -141,7 +142,9 @@ class PayPalPlusPaymentMethod extends PaymentMethodService
                     break;
             }
         }
-        $icon = 'layout/plugins/production/paypal/images/logos/de-pp-logo.png';
+        /** @var Application $app */
+        $app = pluginApp(Application::class);
+        $icon = $app->getUrlPath('paypal').'/images/logos/de-pp-logo.png';
 
         return $icon;
     }

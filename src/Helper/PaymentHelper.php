@@ -189,7 +189,7 @@ class PaymentHelper
         $payment->mopId             = (int)$this->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPAL);
         $payment->transactionType   = Payment::TRANSACTION_TYPE_BOOKED_POSTING;
         $payment->status            = $this->mapStatus((STRING)$paypalPaymentData['state']);
-        $payment->currency          = $paypalPaymentData['transactions'][0]['amount']['currency'];
+        $payment->currency          = $paypalPaymentData['transactions'][0]['amount']['currency']?$paypalPaymentData['transactions'][0]['amount']['currency']:'EUR';
         $payment->amount            = $paypalPaymentData['transactions'][0]['amount']['total'];
         $payment->receivedAt        = $paypalPaymentData['create_time'];
 
@@ -200,7 +200,7 @@ class PaymentHelper
 
         if(!empty($paymentData['parentId']))
         {
-            $payment->parent = $paymentData['parentId'];
+            $payment->parentId = $paymentData['parentId'];
         }
 
         if(!empty($paymentData['unaccountable']))
@@ -279,6 +279,7 @@ class PaymentHelper
          */
 
         $payment->properties = $paymentProperty;
+        $payment->regenerateHash = true;
 
         $payment = $this->paymentRepository->createPayment($payment);
 
@@ -330,6 +331,7 @@ class PaymentHelper
                         $payment->unaccountable = 0;
                     }
 
+                    $payment->regenerateHash = true;
                     $this->paymentRepository->updatePayment($payment);
                 }
             }
@@ -401,7 +403,7 @@ class PaymentHelper
             }
         }
 
-        return (int)$this->statusMap[$status];
+        return strlen($status)?(int)$this->statusMap[$status]:2;
     }
 
     /**
@@ -413,7 +415,7 @@ class PaymentHelper
     {
         $properties = $payment->properties;
 
-        if(is_array($properties))
+        if(($properties->count() > 0) || (is_array($properties ) && count($properties ) > 0))
         {
             /** @var PaymentProperty $property */
             foreach($properties as $property)

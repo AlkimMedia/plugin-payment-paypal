@@ -224,6 +224,7 @@ class PaymentService
 
         // Set the execute parameters for the PayPal payment
         $executeParams = $this->getApiContextParams($mode);
+        $executeParams['mode'] = $mode;
 
         $executeParams['payId']     = $ppPayId;
         $executeParams['payerId']   = $ppPayerId;
@@ -268,8 +269,6 @@ class PaymentService
         $this->contactService->handlePayPalContact($response['payer']);
     }
 
-
-
     /**
      * @param $paymentId
      * @param string $mode
@@ -279,6 +278,7 @@ class PaymentService
     {
         $requestParams = $this->getApiContextParams($mode);
         $requestParams['paymentId'] = $paymentId;
+        $requestParams['mode'] = $mode;
 
         $response = $this->libService->libGetPaymentDetails($requestParams);
         $this->getLogger('PayPal_PaymentService')->debug('getPaymentDetails', $response);
@@ -485,6 +485,7 @@ class PaymentService
             $apiContextParams['sandbox'] = false;
         }
 
+        $apiContextParams['mode'] = $mode;
         return $apiContextParams;
     }
 
