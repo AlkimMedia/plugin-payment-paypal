@@ -113,7 +113,7 @@ class PayPalServiceProvider extends ServiceProvider
             ProcedureEntry::PROCEDURE_GROUP_ORDER,
             [   'de' => 'Rückzahlung der PayPal-Zahlung',
                 'en' => 'Refund the PayPal-Payment'],
-            '\PayPal\Procedures\RefundEventProcedure@run');
+            'PayPal\Procedures\RefundEventProcedure@run');
 
         // Listen for the basket changed event
         $eventDispatcher->listen(AfterBasketChanged::class,
