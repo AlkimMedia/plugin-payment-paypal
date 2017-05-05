@@ -1,3 +1,8 @@
+# Veröffentlichung 1.0.3
+
+#### FIX
+1. Speichern und löschen von Konten.
+
 # Veröffentlichung 1.0.2
 
 #### FIX
