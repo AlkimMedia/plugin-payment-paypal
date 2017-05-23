@@ -319,6 +319,12 @@ You have multiple options to integrate PayPal PLUS, Installments Powered by PayP
 		<td class="th" align=CENTER colspan="2">General</td>
 		</tr>
 		<tr>
+            <td>
+                <b>PayPal Scripts</b>
+            </td>
+            <td>The container Script loader: Register/load JS has to be linked to activate scripts.</td>
+                		</tr>
+		<tr>
 			<td>
 				<b>PayPal Express Checkout button</b>
 			</td>
@@ -344,7 +350,7 @@ You have multiple options to integrate PayPal PLUS, Installments Powered by PayP
 		</td>
 		</tr>
 		<tr>
-		<td>
+    	<td>
 			<b>PayPal Installment Prepare Button</b>
 		</td>
 			<td>
