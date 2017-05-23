@@ -156,14 +156,6 @@ After installing the PayPal plugin and connecting your account, PayPal is automa
 		</tr>
 		<tr>
 			<td>
-				<b>Display name</b>
-			</td>
-			<td>
-				The description for the PayPal payment method in the checkout.
-			</td>
-		</tr>
-		<tr>
-			<td>
 				<b>Logo</b>
 			</td>
 			<td>
@@ -263,14 +255,6 @@ This menu is equal to the one for PayPal PLUS, with the exception of the descrip
 			</td>
 			<td>
 				Select a category page of the type <strong>content</strong> or enter the URL of a website to provide <a href="https://www.plentymarkets.eu/handbuch/payment/bankdaten-verwalten/#2-2"><strong>information about the payment method</strong></a>.
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<b>Display name</b>
-			</td>
-			<td>
-				The description for the PayPal payment method in the checkout.
 			</td>
 		</tr>
 		<tr>

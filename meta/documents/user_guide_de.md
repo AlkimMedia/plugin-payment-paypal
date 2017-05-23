@@ -164,14 +164,6 @@ Nachdem Sie das PayPal-Plugin installiert und Ihr Konto eingerichtet haben, ist 
 		</tr>
 		<tr>
 			<td>
-				<b>Anzeigename</b>
-			</td>
-			<td>
-				Die Bezeichnung, die in der Übersicht der Zahlungsarten in der Kaufabwicklung für die Zahlung mit PayPal angezeigt wird.
-			</td>
-		</tr>
-		<tr>
-			<td>
 				<b>Logo</b>
 			</td>
 			<td>
@@ -277,14 +269,6 @@ Beantragen Sie <a href="https://www.paypal.com/de/webapps/mpp/installments"><str
 			</td>
 			<td>
 				Als <a href="https://www.plentymarkets.eu/handbuch/payment/bankdaten-verwalten/#2-2"><strong>Information zur Zahlungsart</strong></a> eine Kategorieseite vom Typ <strong>Content</strong> anlegen oder die URL einer Webseite eingeben.
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<b>Anzeigename</b>
-			</td>
-			<td>
-				Die Bezeichnung, die in der Übersicht der Zahlungsarten in der Kaufabwicklung für die Zahlung mit PayPal angezeigt wird.
 			</td>
 		</tr>
 		<tr>
