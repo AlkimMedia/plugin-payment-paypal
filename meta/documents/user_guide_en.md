@@ -325,7 +325,6 @@ You have multiple options to integrate PayPal PLUS, Installments Powered by PayP
             <td>The container Script loader: Register/load JS has to be linked to activate scripts.</td>
                 		</tr>
 		<tr>
-		<tr>
 			<td>
 				<b>PayPal Express Checkout button</b>
 			</td>
