@@ -335,6 +335,13 @@ You have multiple options to integrate PayPal PLUS, Installments Powered by PayP
 		<td class="th" align=CENTER colspan="2">General</td>
 		</tr>
 		<tr>
+            <td>
+                <b>PayPal Scripts</b>
+            </td>
+            <td>The container Script loader: Register/load JS has to be linked to activate scripts.</td>
+                		</tr>
+		<tr>
+		<tr>
 			<td>
 				<b>PayPal Express Checkout button</b>
 			</td>
@@ -359,8 +366,7 @@ You have multiple options to integrate PayPal PLUS, Installments Powered by PayP
 		<td class="th" align=CENTER colspan="2"><strong><i>Important:</i></strong> To use this payment method to its full extent and in accordance with legal requirements, you have to link the containers <b>PayPal Installment Prepare Button</b>, <b>PayPal Installment Financing Check</b> and <b>PayPal Installment Financing Costs</b>.
 		</td>
 		</tr>
-		<tr>
-		<td>
+    	<td>
 			<b>PayPal Installment Prepare Button</b>
 		</td>
 			<td>

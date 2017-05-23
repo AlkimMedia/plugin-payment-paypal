@@ -355,6 +355,12 @@ Hierfür sind in den Templates in plentymarkets an relevanten Stellen Container 
 		<td class="th" align=CENTER colspan="2">Allgemein</td>
 		</tr>
 		<tr>
+        	<td>
+        		<b>PayPal Scripts</b>
+        	</td>
+        	<td>Der Container Script loader: Register/load JS muss verknüpft sein, um Scripts zu aktivieren.</td>
+        		</tr>
+		<tr>
 			<td>
 				<b>PayPal Express Button</b>
 			</td>
