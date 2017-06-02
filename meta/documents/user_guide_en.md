@@ -1,8 +1,8 @@
 <div class="alert alert-warning" role="alert">
-   <strong><i>Important:</strong></i> The PayPal plugin has been developed for use with the online store Ceres and only works with its structure or other template plugins.
+   <strong><i>Note:</i></strong> The PayPal plugin has been developed for use with the online store Ceres and only works with its structure or other template plugins. 
 </div>
 
-# PayPal – Cashless payment in plentymarkets online stores
+# PayPal&nbsp;– Cashless payment in plentymarkets online stores
 
 With the plentymarkets PayPal plugin, incorporate **PayPal**, **PayPal PLUS** and **Installments Powered by PayPal** in your online store.
 
@@ -10,25 +10,29 @@ With the plentymarkets PayPal plugin, incorporate **PayPal**, **PayPal PLUS** an
 
 You need to [open a business account with PayPal](https://www.paypal.com/de/webapps/mpp/merchant) before you can set up the payment method in plentymarkets. You will then receive information and access data, which you will need for setting up the function in plentymarkets.
 
+## Receiving access data from PayPal
+
+To use the PayPal plugin, create an app for your online store with the [PayPal Developer Interface](https://developer.paypal.com). In the app, you find access data for the live and sandbox environment which you <a href="#30."><strong>enter</strong></a> in the plentymarkets back end.
+
+In **My Apps &amp; Credentials** in the dashboard, you find an overview of the interfaces. If there already is an app of the REST type&nbsp;– i.e. the online store&nbsp;–, it will be displayed here. With **Create App**, you can create a new target.
+
+![View of the PayPal dashboard](https://github.com/plentymarkets/plugin-payment-paypal/blob/master/meta/images/sandbox_tutorial_1?raw=true)
+
+Select the app (in this case **PayPalPlugin**) to open an overview of the interface data. Make sure to <a href="#30."><strong>enter</strong></a> the live mode data for live access. Use the switch in the upper right corner to change between live and sandbox mode. Alternatively, you can use the sandbox data to test a normal checkout.
+
+![View of the PayPal dashboard](https://github.com/plentymarkets/plugin-payment-paypal/blob/master/meta/images/sandbox_tutorial_2.png?raw=true)
+
 ## Setting up PayPal in plentymarkets
 
 Before using the full functionality of the plugin, you first have to connect your PayPal account with your plentymarkets system.
 
 ##### Adding a PayPal account:   
-1. Go to **Settings&nbsp;» Orders&nbsp;» PayPal&nbsp;» Account settings**. 
-2. Click on **Add PayPal account**. 
-3. Enter an email address.<br />→ This address also serves as the name of the account. 
-4. Enter the client ID. 
-5. Enter the client secret. 
-6. Click on **Add**.<br /> → The PayPal account will be added and displayed in the list.
+1. Go to **Settings&nbsp;» Orders&nbsp;» PayPal&nbsp;» Account settings**. 2. Click on **Add PayPal account**. 3. Enter an email address.<br />→ This address also serves as the name of the account. 4. Enter the client ID. 5. Enter the client secret. 6. Click on **Add**.<br /> → The PayPal account will be added and displayed in the list.
 
 Carry out further settings for the account.
 
 ##### Managing your PayPal account:  
-1. Go to **Settings&nbsp;» Orders&nbsp;» PayPal&nbsp;» Account settings**. 
-2. Click on the PayPal account you want to configure.<br /> → The PayPal account will open. 
-3. Carry out the settings. Pay attention to the information given in table 1. 
-4. **Save** the settings.
+1. Go to **Settings&nbsp;» Orders&nbsp;» PayPal&nbsp;» Account settings**. 2. Click on the PayPal account you want to configure.<br /> → The PayPal account will open. 3. Carry out the settings. Pay attention to the information given in table 1. 4. **Save** the settings.
 
 <table>
 <caption>Table 1: Carrying out the PayPal account settings</caption>
@@ -45,7 +49,7 @@ Carry out further settings for the account.
 			<td>
 				<b>Client settings</b>
 			</td>
-			<td><b>Account</b> The email address serving as the account name.<br /> <b>Client ID:</b> Your PayPal ID.<br /><b>Client secret:</b> Your PayPal secret.<br /><strong><i>Note:</i></strong> This information cannot be changed.
+			<td><a id="30." name="30."></a><b>Account</b> The email address serving as the account name.<br /> <b>Client ID:</b> Your PayPal ID.<br /><b>Client secret:</b> Your PayPal secret.<br /><strong><i>Note:</i></strong> This information cannot be changed.
 			</td>
 		</tr>
 		<tr>
@@ -61,7 +65,7 @@ Choose between <b>Test environment</b> and <b>Live environment</b>.<br /> <stron
 				<b>Logo URL</b>
 			</td>
 			<td>
-			A HTTPS URL that leads to the logo. Valid file formats are .gif, .jpg or .png. The image may not exceed a maximum size of 190 pixels in width and 60 pixels in height. PayPal cuts off images that are larger. PayPal places thelogo at the very top of the shopping cart overview.
+			A HTTPS URL that leads to the logo. Valid file formats are .gif, .jpg or .png. The image may not exceed a maximum size of 190 pixels in width and 60 pixels in height. PayPal cuts off images that are larger. PayPal places the logo at the very top of the shopping cart overview.
 			</td>
 		</tr>
 		<tr>
@@ -93,10 +97,7 @@ After installing the PayPal plugin and connecting your account, PayPal is automa
 
 ##### Activating PayPal PLUS:
 
-1. Go to **Settings&nbsp;» Orders&nbsp;» PayPal&nbsp;» PayPal PLUS**. 
-2. Select a Client (store). 
-3. Carry out the settings. Pay attention to the information given in table 2. 
-4. **Save** the settings.
+1. Go to **Settings&nbsp;» Orders&nbsp;» PayPal&nbsp;» PayPal PLUS**. 2. Select a Client (store). 3. Carry out the settings. Pay attention to the information given in table 2. 4. **Save** the settings.
 
 <table>
 <caption>Table 2: Configuring PayPal PLUS</caption>
@@ -151,7 +152,7 @@ After installing the PayPal plugin and connecting your account, PayPal is automa
 				<b>Info page</b>
 			</td>
 			<td>
-				Select a category page of the type <strong>content</strong> or enter the URL of a website to provide <a href="https://www.plentymarkets.eu/handbuch/payment/bankdaten-verwalten/#2-2"><strong>information about the payment method</strong></a>.
+				Select a category page of the type <strong>content</strong> or enter the URL of a website to provide <strong><a href="https://www.plentymarkets.co.uk/manual/payment/managing-bank-details/#2-2">information about the payment method</a></strong>.
 			</td>
 		</tr>
 		<tr>
@@ -159,7 +160,7 @@ After installing the PayPal plugin and connecting your account, PayPal is automa
 				<b>Logo</b>
 			</td>
 			<td>
-			A HTTPS URL that leads to the logo. Valid file formats are .gif, .jpg or .png. The image may not exceed a maximum size of 190 pixels in width and 60 pixels in height. PayPal cuts off images that are larger. PayPal places thelogo at the very top of the shopping cart overview.
+			A HTTPS URL that leads to the logo. Valid file formats are .gif, .jpg or .png. The image may not exceed a maximum size of 190 pixels in width and 60 pixels in height. PayPal cuts off images that are larger. PayPal places the logo at the very top of the shopping cart overview.
 			</td>
 		</tr>
 		<tr>
@@ -178,9 +179,9 @@ After installing the PayPal plugin and connecting your account, PayPal is automa
 				<b>Surcharges</b>
 			</td>
 			<td>
-If the payment with PayPal results in additional costs, enter the percentage value or flat rate value. The choice depends on the conditions of your contract.<br /><strong>Domestic (surcharge):</strong> Enter a flat rate. The value that is entered will be taken into consideration for those orders that correspond to the system country. Once the customer has selected the payment method, these costs will be added to the particular order in the order process. The amount will be added to the total in the order and will not be displayed individually.<br />
+If the payment with PayPal results in additional costs, enter the percentage value or flat rate value. The choice depends on the conditions of your contract.<strong>Domestic (surcharge):</strong> Enter a flat rate. The value that is entered will be taken into consideration for those orders that correspond to the system country. Once the customer has selected the payment method, these costs will be added to the particular order in the order process. The amount will be added to the total in the order and will not be displayed individually.<br />
 
-Percentage <strong>Domestic (surcharge):</strong> Enter a percentage value. The value that is entered will be taken into consideration for those orders that correspond to the system country.<br /><strong>Foreign countries (surcharge):</strong> Enter a flat rate. The value that is entered will be taken into consideration for those orders that correspond to a foreign country. Once the customer has selected the payment method, these costs will be added to the particular order in the order process. The amount will be added to the total in the order and will not be displayed individually.<br />
+Percentage <strong>Domestic (surcharge):</strong> Enter a percentage value. The value that is entered will be taken into consideration for those orders that correspond to the system country.<strong>Foreign countries (surcharge):</strong> Enter a flat rate. The value that is entered will be taken into consideration for those orders that correspond to a foreign country. Once the customer has selected the payment method, these costs will be added to the particular order in the order process. The amount will be added to the total in the order and will not be displayed individually.<br />
 
 Percentage <strong>Foreign countries (surcharge)</strong>: Enter a percentage value. The value that is entered will be taken into consideration for those orders that correspond to a foreign country.<br />
 
@@ -193,10 +194,7 @@ Percentage <strong>Foreign countries (surcharge)</strong>: Enter a percentage va
 
 This menu is equal to the one for PayPal PLUS, with the exception of the description of the activation button. If you already have carried out settings in the menu **PayPal / PayPal PLUS**, you can apply these here as well.
 
-1. Go to **Settings&nbsp;» Orders&nbsp;» PayPal&nbsp;» Installments Powered by PayPal**. 
-2. Select a Client (store). 
-3. Carry out the settings. Pay attention to the information given in table 3. 
-4. **Save** the settings.
+1. Go to **Settings&nbsp;» Orders&nbsp;» PayPal&nbsp;» Installments Powered by PayPal**. 2. Select a Client (store). 3. Carry out the settings. Pay attention to the information given in table 3. 4. **Save** the settings.
 
 <div class="alert alert-warning" role="alert">
     <strong><i>Important:</i></strong> To use this payment method to its full extent and in accordance with legal requirements, you have to <a href="#10."><strong>link</strong></a> the containers <b>PayPal Installment Prepare Button</b>, <b>PayPal Installment Financing Check</b> and <b>PayPal Installment Financing Costs</b>.<br /><br />In addition, Installments Powered by PayPal is only available for German online stores of selected PayPal Sellers after successful application. Apply <a href="https://www.paypal.com/de/webapps/mpp/installments"><strong>here</strong></a> for Installments Powered by PayPal.
@@ -254,7 +252,7 @@ This menu is equal to the one for PayPal PLUS, with the exception of the descrip
 				<b>Info page</b>
 			</td>
 			<td>
-				Select a category page of the type <strong>content</strong> or enter the URL of a website to provide <a href="https://www.plentymarkets.eu/handbuch/payment/bankdaten-verwalten/#2-2"><strong>information about the payment method</strong></a>.
+				Select a category page of the type <strong>content</strong> or enter the URL of a website to provide <strong><a href="https://www.plentymarkets.co.uk/manual/payment/managing-bank-details/#2-2">information about the payment method</a></strong>.
 			</td>
 		</tr>
 		<tr>
@@ -262,7 +260,7 @@ This menu is equal to the one for PayPal PLUS, with the exception of the descrip
 				<b>Logo</b>
 			</td>
 			<td>
-				A HTTPS URL that leads to the logo. Valid file formats are .gif, .jpg or .png. The image may not exceed a maximum size of 190 pixels in width and 60 pixels in height. PayPal cuts off images that are larger. PayPal places thelogo at the very top of the shopping cart overview.
+				A HTTPS URL that leads to the logo. Valid file formats are .gif, .jpg or .png. The image may not exceed a maximum size of 190 pixels in width and 60 pixels in height. PayPal cuts off images that are larger. PayPal places the logo at the very top of the shopping cart overview.
 			</td>
 		</tr>
 		<tr>
@@ -281,9 +279,9 @@ This menu is equal to the one for PayPal PLUS, with the exception of the descrip
 				<b>Surcharges</b>
 			</td>
 			<td>
-If the payment with PayPal results in additional costs, enter the percentage value or flat rate value. The choice depends on the conditions of your contract.<br /><strong>Domestic (surcharge):</strong> Enter a flat rate. The value that is entered will be taken into consideration for those orders that correspond to the system country. Once the customer has selected the payment method, these costs will be added to the particular order in the order process. The amount will be added to the total in the order and will not be displayed individually.<br />
+If the payment with PayPal results in additional costs, enter the percentage value or flat rate value. The choice depends on the conditions of your contract.<strong>Domestic (surcharge):</strong> Enter a flat rate. The value that is entered will be taken into consideration for those orders that correspond to the system country. Once the customer has selected the payment method, these costs will be added to the particular order in the order process. The amount will be added to the total in the order and will not be displayed individually.<br />
 
-Percentage <strong>Domestic (surcharge):</strong> Enter a percentage value. The value that is entered will be taken into consideration for those orders that correspond to the system country.<br /><strong>Foreign countries (surcharge):</strong> Enter a flat rate. The value that is entered will be taken into consideration for those orders that correspond to a foreign country. Once the customer has selected the payment method, these costs will be added to the particular order in the order process. The amount will be added to the total in the order and will not be displayed individually.<br />
+Percentage <strong>Domestic (surcharge):</strong> Enter a percentage value. The value that is entered will be taken into consideration for those orders that correspond to the system country.<strong>Foreign countries (surcharge):</strong> Enter a flat rate. The value that is entered will be taken into consideration for those orders that correspond to a foreign country. Once the customer has selected the payment method, these costs will be added to the particular order in the order process. The amount will be added to the total in the order and will not be displayed individually.<br />
 
 Percentage <strong>Foreign countries (surcharge)</strong>: Enter a percentage value. The value that is entered will be taken into consideration for those orders that correspond to a foreign country.<br />
 
@@ -299,10 +297,7 @@ You have multiple options to integrate PayPal PLUS, Installments Powered by PayP
 
 ##### Linking the PayPal PLUS Wall:
 
-1. Click on **Start&nbsp;» Plugins**. 
-2. Click on the **Content** tab. 
-3. Select the area PayPal PLUS Wall. 
-4. Select one, several or all containers which shall use the PayPal PLUS Wall. Pay attention to the information given in table 4.<br />→ The content is linked with the container.
+1. Click on **Start&nbsp;» Plugins**. 2. Click on the **Content** tab. 3. Select the area PayPal PLUS Wall. 4. Select one, several or all containers which shall use the PayPal PLUS Wall. Pay attention to the information given in table 4.<br />→ The content is linked with the container.
 
 <table>
 <caption>Table 4: Linking containers</caption>
@@ -319,11 +314,11 @@ You have multiple options to integrate PayPal PLUS, Installments Powered by PayP
 		<td class="th" align=CENTER colspan="2">General</td>
 		</tr>
 		<tr>
-            <td>
-                <b>PayPal Scripts</b>
-            </td>
-            <td>The container Script loader: Register/load JS has to be linked to activate scripts.</td>
-                		</tr>
+        	<td>
+        		<b>PayPal scripts</b>
+        	</td>
+        	<td>The container Script loader: Register/load JS has to be linked to activate scripts.</td>
+        		</tr>
 		<tr>
 			<td>
 				<b>PayPal Express Checkout button</b>
@@ -339,7 +334,7 @@ You have multiple options to integrate PayPal PLUS, Installments Powered by PayP
 				<b>PayPal PLUS Wall</b>
 			</td>
 			<td>
-				A link with the container <strong>Checkout: Override payment method</strong> replaces all previous payment methods with the PayPal PLUS Wall. Any payment methods offered in addition to those inside the Wall&nbsp;– PayPal, Debit, Credit card and pay upon invoice&nbsp;– will be displayed below these four inside the wall in order of their priority. <a id="10." name="10."></a>
+				A link with the container <strong>Checkout: Override payment method replaces all previous payment methods with the PayPal PLUS Wall. A link with the container Checkout: Override payment method</strong> replaces all previous payment methods with the PayPal PLUS Wall. Any payment methods offered in addition to those inside the Wall&nbsp;– PayPal, Debit, Credit card and pay upon invoice&nbsp;– will be displayed below these four inside the wall in order of their priority. <a id="10." name="10."></a>
 			</td>
 		</tr>
 		<tr>
@@ -350,11 +345,11 @@ You have multiple options to integrate PayPal PLUS, Installments Powered by PayP
 		</td>
 		</tr>
 		<tr>
-    	<td>
+		<td>
 			<b>PayPal Installment Prepare Button</b>
 		</td>
 			<td>
-				A link with the container <strong>Checkout: Override "Order now" button</strong> replaces the <strong>Order now</strong> button with <strong>Apply for installments</strong> when a customer selects the payment method Installments Powered by PayPal.
+				Klarna Checkout A link with the container Checkout: Override "Order now" button</strong> replaces the <strong>Order now</strong> button with <strong>Apply for installments</strong> when a customer selects the payment method Installments Powered by PayPal.
 			</td>
 			</tr>
 			<tr>
@@ -370,7 +365,7 @@ After a click on <strong>Apply for installments</strong>, the customer is redire
 				<b>PayPal Installment Financing Check</b>
 			</td>
 			<td>
-				According to legal requirements, all financing costs have to be displayed at the time of purchase. Ideal is a link with <strong>Order confirmation: Add content after totals</strong>, since the financing costs have to be displayed below the gross amount. In addition, the financing costs are displayed on the customer invoice.
+				According to legal requirements, all financing costs have to be displayed at the time of purchase. Ideal is a link with <strong>Order confirmation: Add content after totals, since the financing costs have to be displayed below the gross amount. Ideal is a link with Order confirmation: Add content after totals</strong>, since the financing costs have to be displayed below the gross amount. In addition, the financing costs are displayed on the customer invoice.
 			</td>
 			</tr>
 			<tr>
@@ -398,14 +393,7 @@ Set up an event procedure to automatically refund a PayPal payment.
 
 ##### Setting up an event procedure:
 
-1. Go to **Settings » Orders » Event procedures**. 
-2. Click on **Add event procedure**. → The **Create new event procedure** window will open. 
-3. Enter the name. 
-4. Select the event listed in table 4. 
-5. **Save** the settings. 
-6. Pay attention to the explanations given in table 4 and carry out the settings as desired. 
-7. Place a check mark next to the option **Active**. 
-8. **Save** the settings.
+1. Go to **Settings » Orders » Event procedures**. 2. Click on **Add event procedure**. → The **Create new event procedure** window will open. 3. Enter the name. 4. Select the event listed in table 4. 5. **Save** the settings. 6. Pay attention to the explanations given in table 4 and carry out the settings as desired. 7. Place a check mark next to the option **Active**. 8. **Save** the settings.
 
 <table>
 	<thead>
@@ -442,5 +430,4 @@ Set up an event procedure to automatically refund a PayPal payment.
 </table>
 
 
-## License 
-This project is licensed under the GNU AFFERO GENERAL PUBLIC LICENSE. – find further information in the [LICENSE.md](https://github.com/plentymarkets/plugin-payment-paypal/blob/master/LICENSE.md).
+## This project is licensed under the GNU AFFERO GENERAL PUBLIC LICENSE. – find further information in the [LICENSE.md](https://github.com/plentymarkets/plugin-payment-paypal/blob/master/LICENSE.md).
