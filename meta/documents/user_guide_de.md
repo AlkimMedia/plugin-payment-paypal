@@ -10,6 +10,19 @@ Mit dem plentymarkets PayPal Plugin binden Sie **PayPal**, **PayPal PLUS** und *
 
 Bevor Sie die Zahlungsarten in plentymarkets einrichten können, ist die [Eröffnung eines Geschäftskontos bei PayPal](https://www.paypal.com/de/webapps/mpp/merchant) erforderlich. Sie erhalten dann Informationen sowie Zugangsdaten, die Sie für die Einrichtung in plentymarkets benötigen.
 
+## Zugangsdaten von PayPal erhalten
+
+Um das PayPal-Plugin zu nutzen, müssen Sie für Ihren Webshop im [PayPal Developer Interface](https://developer.paypal.com) eine App einrichten.
+In der App finden Sie sowohl Live- als auch Sandbox-Zugangsdaten, die Sie im plentymarkets Backend <a href="#30."><strong>eingeben</strong></a>. Die Client ID bei PayPal entspricht der Mandanten-ID im Plugin, das Secret entspricht dem Mandanten-Geheimwort.
+
+Über das Dashboard gelangt man zur Übersicht der Schnittstellen: **My Apps & Credentials**. Wenn bereits eine App vom Typ REST – also der Webshop – eingerichtet wurde, wird diese dort angezeigt. Über **Create App** richten Sie ein neues Ziel ein.
+
+![Ansicht des PayPal Dashboards](https://github.com/plentymarkets/plugin-payment-paypal/blob/master/meta/images/sandbox_tutorial_1?raw=true)
+
+Wählen Sie diese App (hier **PayPalPlugin**). Eine neue Ansicht mit den Schnittstellendaten wird geöffnet. Achten Sie darauf, dass Sie für den Live-Betrieb die Daten des Live-Modus <a href="#30."><strong>eingeben</strong></a>. Mit dem Umschalter oben rechts wechseln Sie zwischen Live- und Sandbox-Modus. Alternativ können Sie mit den Sandbox-Daten einen normalen Checkout für einen Test durchlaufen.
+
+![Ansicht des PayPal Dashboards](https://github.com/plentymarkets/plugin-payment-paypal/blob/master/meta/images/sandbox_tutorial_2.png?raw=true)
+
 ## PayPal in plentymarkets einrichten
 
 Bevor Sie die Funktionen des PayPal-Plugins nutzen können, müssen Sie zuerst Ihr PayPal-Konto mit Ihrem plentymarkets System verbinden.
@@ -50,7 +63,7 @@ Nach dem Hinzufügen nehmen Sie weitere Einstellungen für das Konto vor.
 			<td>
 				<b>Mandanten-Einstellungen</b>
 			</td>
-			<td><b>Konto:</b> Die eingegebene E-Mail-Adresse, die gleichzeitig als Name des Kontos fungiert.<br /> <b>Mandanten-ID:</b> Ihre PayPal-ID.<br /><b>Mandanten-Geheimwort:</b> Ihr PayPal-Geheimwort.<br /><strong><i>Hinweis:</strong></i> Diese Angaben können nicht mehr geändert werden.
+			<td><a id="30." name="30."></a><b>Konto:</b> Die eingegebene E-Mail-Adresse, die gleichzeitig als Name des Kontos fungiert.<br /> <b>Mandanten-ID:</b> Ihre PayPal-ID.<br /><b>Mandanten-Geheimwort:</b> Ihr PayPal-Geheimwort.<br /><strong><i>Hinweis:</strong></i> Diese Angaben können nicht mehr geändert werden.
 			</td>
 		</tr>
 		<tr>
