@@ -83,7 +83,7 @@ class PayPalInstallmentService extends PaymentService
 
         $financingOptions['sandbox'] = true;
 
-        if(array_key_exists('environment', $account) && $account['environment'] == 0)
+        if(!$account['environment'])
         {
             $financingOptions['sandbox'] = false;
         }

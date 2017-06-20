@@ -37,7 +37,7 @@ class PayPalPlusService extends PaymentService
         $account = $this->loadCurrentAccountSettings('paypal');
         $mode = 'sandbox';
 
-        if(array_key_exists('environment', $account) && $account['environment'] == 0)
+        if(!$account['environment'])
         {
             $mode = 'live';
         }
