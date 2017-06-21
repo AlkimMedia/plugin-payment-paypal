@@ -17,7 +17,7 @@ In der App finden Sie sowohl Live- als auch Sandbox-Zugangsdaten, die Sie im ple
 
 Über das Dashboard gelangt man zur Übersicht der Schnittstellen: **My Apps & Credentials**. Wenn bereits eine App vom Typ REST – also der Webshop – eingerichtet wurde, wird diese dort angezeigt. Über **Create App** richten Sie ein neues Ziel ein.
 
-![Ansicht des PayPal Dashboards](https://github.com/plentymarkets/plugin-payment-paypal/blob/master/meta/images/sandbox_tutorial_1?raw=true)
+![Ansicht des PayPal Dashboards](https://github.com/plentymarkets/plugin-payment-paypal/blob/master/meta/images/sandbox_tutorial_1.png?raw=true)
 
 Wählen Sie diese App (hier **PayPalPlugin**). Eine neue Ansicht mit den Schnittstellendaten wird geöffnet. Achten Sie darauf, dass Sie für den Live-Betrieb die Daten des Live-Modus <a href="#30."><strong>eingeben</strong></a>. Mit dem Umschalter oben rechts wechseln Sie zwischen Live- und Sandbox-Modus. Alternativ können Sie mit den Sandbox-Daten einen normalen Checkout für einen Test durchlaufen.
 
