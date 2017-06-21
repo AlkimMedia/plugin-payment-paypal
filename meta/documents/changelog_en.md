@@ -1,3 +1,11 @@
+# Release 1.0.4
+
+#### FIX
+1. live modus fallback 
+
+#### UPDATE
+1. Documentation: "Receiving access data from PayPal" 
+
 # Release 1.0.3
 
 #### FIX

@@ -1,3 +1,11 @@
+# Veröffentlichung 1.0.4
+
+#### FIX
+1. Fallback auf live Modus 
+
+#### UPDATE
+1. Dokumentation: "Zugangsdaten von PayPal erhalten"
+
 # Veröffentlichung 1.0.3
 
 #### FIX
