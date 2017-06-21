@@ -169,7 +169,7 @@ class PayPalPlusPaymentMethod extends PaymentMethodService
      *
      * @return bool
      */
-    public function switchTo()
+    public function isSwitchableTo()
     {
         return false;
     }
@@ -179,7 +179,7 @@ class PayPalPlusPaymentMethod extends PaymentMethodService
      *
      * @return bool
      */
-    public function switchFrom()
+    public function isSwitchableFrom()
     {
         return true;
     }
