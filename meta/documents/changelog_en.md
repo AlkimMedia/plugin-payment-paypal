@@ -1,3 +1,8 @@
+# Release 1.0.5
+
+#### FIX
+1. Correct PayPal Plus BN Code
+
 # Release 1.0.4
 
 #### FIX

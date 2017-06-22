@@ -1,3 +1,8 @@
+# Veröffentlichung 1.0.5
+
+#### FIX
+1. Falscher BN Code für PayPal Plus
+
 # Veröffentlichung 1.0.4
 
 #### FIX
