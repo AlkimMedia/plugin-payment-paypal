@@ -1,3 +1,16 @@
+# Release Note für Paypal
+
+# 1.0.4 (2017-06-22)
+
+## Hinzugefügt
+
+- Für das Festlegen, ob der Kunde von einer Zahlart auf eine andere wechsel darf wurde eine Methode isSwitchableFrom hinzugefügt
+- Für das Festlegen, ob auf eine Zahlart gewechselt werden darf, wurde eine Methode hinzugefügt: isSwitchableTo
+
+## Bekannte Probleme
+
+- Die Einstellungen für **Aufpreise** haben derzeit noch keine Funktion bei der Preisberechnung in der Kaufabwicklung (Checkout)
+
 # Veröffentlichung 1.0.3
 
 #### FIX
