@@ -164,9 +164,10 @@ class PayPalInstallmentPaymentMethod extends PaymentMethodService
     /**
      * Check if it is allowed to switch to this payment method
      *
+     * @param int $orderId
      * @return bool
      */
-    public function isSwitchableTo()
+    public function isSwitchableTo($orderId)
     {
         return false;
     }
@@ -174,9 +175,10 @@ class PayPalInstallmentPaymentMethod extends PaymentMethodService
     /**
      * Check if it is allowed to switch from this payment method
      *
+     * @param int $orderId
      * @return bool
      */
-    public function isSwitchableFrom()
+    public function isSwitchableFrom($orderId)
     {
         return false;
     }
