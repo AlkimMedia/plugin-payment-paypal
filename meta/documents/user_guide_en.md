@@ -349,7 +349,7 @@ You have multiple options to integrate PayPal PLUS, Installments Powered by PayP
 			<b>PayPal Installment Prepare Button</b>
 		</td>
 			<td>
-				Klarna Checkout A link with the container Checkout: Override "Order now" button</strong> replaces the <strong>Order now</strong> button with <strong>Apply for installments</strong> when a customer selects the payment method Installments Powered by PayPal.
+				A link with the container Checkout: Override "Order now" button</strong> replaces the <strong>Order now</strong> button with <strong>Apply for installments</strong> when a customer selects the payment method Installments Powered by PayPal.
 			</td>
 			</tr>
 			<tr>
