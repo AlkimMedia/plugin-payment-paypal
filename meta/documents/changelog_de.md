@@ -1,15 +1,18 @@
+
 # Release Note für Paypal
 
-# 1.0.4 (2017-06-22)
+# Veröffentlichung 1.0.5
 
-## Hinzugefügt
+#### FIX
+1. Falscher BN Code für PayPal Plus
 
-- Für das Festlegen, ob der Kunde von einer Zahlart auf eine andere wechsel darf wurde eine Methode isSwitchableFrom hinzugefügt
-- Für das Festlegen, ob auf eine Zahlart gewechselt werden darf, wurde eine Methode hinzugefügt: isSwitchableTo
+# Veröffentlichung 1.0.4
 
-## Bekannte Probleme
+#### FIX
+1. Fallback auf live Modus 
 
-- Die Einstellungen für **Aufpreise** haben derzeit noch keine Funktion bei der Preisberechnung in der Kaufabwicklung (Checkout)
+#### UPDATE
+1. Dokumentation: "Zugangsdaten von PayPal erhalten"
 
 # Veröffentlichung 1.0.3
 

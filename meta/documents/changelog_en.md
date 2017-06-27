@@ -1,3 +1,16 @@
+# Release 1.0.5
+
+#### FIX
+1. Correct PayPal Plus BN Code
+
+# Release 1.0.4
+
+#### FIX
+1. live modus fallback 
+
+#### UPDATE
+1. Documentation: "Receiving access data from PayPal" 
+
 # Release 1.0.3
 
 #### FIX

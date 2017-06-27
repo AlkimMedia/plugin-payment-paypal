@@ -37,7 +37,7 @@ class PayPalPlusService extends PaymentService
         $account = $this->loadCurrentAccountSettings('paypal');
         $mode = 'sandbox';
 
-        if(array_key_exists('environment', $account) && $account['environment'] == 0)
+        if(!$account['environment'])
         {
             $mode = 'live';
         }
@@ -137,7 +137,7 @@ class PayPalPlusService extends PaymentService
      */
     public function updatePayment(Basket $basket)
     {
-        $payPalRequestParams = $this->getApiContextParams();
+        $payPalRequestParams = $this->getApiContextParams(PaymentHelper::MODE_PAYPAL_PLUS);
 
         /** Payment Id to from the created payment */
         $payPalRequestParams['paymentId'] = $this->getSessionStorage()->getSessionValue(SessionStorageService::PAYPAL_PAY_ID);
