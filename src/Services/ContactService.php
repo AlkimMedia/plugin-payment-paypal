@@ -69,8 +69,11 @@ class ContactService
             {
                 $createdAddress = $this->addressContract->createAddress($address->toArray());
 
-                // set the customer invoice address ID
-                $this->checkout->setCustomerInvoiceAddressId($createdAddress->id);
+                if(empty($this->checkout->getCustomerInvoiceAddressId()))
+                {
+                    // set the customer invoice address ID
+                    $this->checkout->setCustomerInvoiceAddressId($createdAddress->id);
+                }
             }
 
             // update/set the customer shipping address ID
