@@ -1,8 +1,7 @@
 <div class="col-xs-12 col-md-4" id="PayPalAfterChange-{{order.order.id}}" style="display:none">
 
   <!-- PLUGIN CONTENT -->
-
-  {% if services.Template.isMyAccount() %}
+  {% if services.template.isMyAccount() %}
     <button id="myAccountButtonAfterChange" class="btn btn-primary btn-block" @click="" :disabled="">
       <i class="fa fa-arrow-right" aria-hidden="true"></i>
       {% if installmentSelected == true %}

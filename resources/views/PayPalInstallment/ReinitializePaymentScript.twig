@@ -1,0 +1,14 @@
+<script type="text/javascript">
+
+document.addEventListener('historyPaymentMethodChanged', e => {
+for(let property in e.detail.newOrder.order.properties){
+  if(e.detail.newOrder.order.properties[property].typeId === 3){
+    if (e.detail.newOrder.order.properties[property].value == {{ typeId }}) {
+      document.getElementById("PayPalAfterChange-" + e.detail.oldOrder.order.id).style.display = "block";
+    }
+  }
+}
+
+});
+
+</script>
