@@ -161,7 +161,7 @@ class PayPalPaymentMethod extends PaymentMethodService
         }
         return $desc;
     }
-    
+
     /**
      * Check if it is allowed to switch to this payment method
      *
@@ -170,9 +170,9 @@ class PayPalPaymentMethod extends PaymentMethodService
      */
     public function isSwitchableTo($orderId)
     {
-        return false;
+        return true;
     }
-    
+
     /**
      * Check if it is allowed to switch from this payment method
      *

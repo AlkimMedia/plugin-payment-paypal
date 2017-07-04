@@ -6,10 +6,10 @@ use PayPal\Helper\PaymentHelper;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Plugin\Templates\Twig;
 
-class PayPalInstallmentButtonAfterChange
+class PayPalInstallmentReinitializePayment
 {
     public function call(Twig $twig, $arg):string
     {
-        return $twig->render('PayPal::PayPalInstallment.ButtonAfterChange', ["order" => $arg[0]]);
+        return $twig->render('PayPal::PayPalInstallment.ReinitializePayment', ["order" => $arg[0]]);
     }
 }
