@@ -1,16 +1,16 @@
 <script type="text/javascript">
 
-document.addEventListener('historyPaymentMethodChanged', e => {
-for(let property in e.detail.newOrder.order.properties){
-  if(e.detail.newOrder.order.properties[property].typeId === 3){
-    if (e.detail.newOrder.order.properties[property].value == {{ typeId }}) {
-      document.getElementById("reinitPayPal-" + e.detail.oldOrder.order.id).style.display = "block";
-    }else {
-      document.getElementById("reinitPayPal-" + e.detail.oldOrder.order.id).style.display = "none";
-    }
-  }
-}
+    document.addEventListener('historyPaymentMethodChanged', e => {
+        for(let property in e.detail.newOrder.order.properties){
+            if(e.detail.newOrder.order.properties[property].typeId === 3){
+                if (e.detail.newOrder.order.properties[property].value == {{ typeId }}) {
+                    document.getElementById("reinitPayPal-" + e.detail.oldOrder.order.id).style.display = "block";
+                }else {
+                    document.getElementById("reinitPayPal-" + e.detail.oldOrder.order.id).style.display = "none";
+                }
+            }
+        }
 
-});
+    });
 
 </script>
