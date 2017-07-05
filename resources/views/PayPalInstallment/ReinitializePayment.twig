@@ -1,19 +1,18 @@
 <!-- PLUGIN BUTTON -->
 {% if services.template.isMyAccount() %}
+    {% set properties = order.order.properties %}
 
-  {% set property = order.detail.newOrder.order.properties %}
+    {% for property in properties %}
+        {% if property.typeId == 3 and property.value == paymentMethodId %}
+            <button id="reinitPayPal-{{property.orderId}}" class="btn btn-primary btn-block" @click="" :disabled="" style="margin-top: .5rem">
+                <i class="fa fa-arrow-right" aria-hidden="true"></i>
+                {% if installmentSelected == true %}
+                    {{ trans("PayPal::PayPal.installmentButton") }}
+                {% else %}
+                    {{ trans("Ceres::Template.myAccountReinitPayment") }}
+                {% endif %}
+            </button>
 
-  {% if property.typeId === 3 and if property.value == paymentMethodId %}
-
-    <button id="reinitPayPal-{{order.order.id}}" class="btn btn-primary btn-block" @click="" :disabled="" style="display:none;">
-      <i class="fa fa-arrow-right" aria-hidden="true"></i>
-      {% if installmentSelected == true %}
-        {{ trans("PayPal::PayPal.installmentButton") }}
-      {% else %}
-        {{ trans("Ceres::Template.myAccountReinitPayment") }}
-      {% endif %}
-    </button>
-
-  {% endif %}
-
+        {% endif %}
+    {% endfor %}
 {% endif %}
