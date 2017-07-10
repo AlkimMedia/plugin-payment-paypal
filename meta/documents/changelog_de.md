@@ -1,5 +1,9 @@
-
 # Release Note für Paypal
+
+# Veröffentlichung 1.0.6
+
+#### FIX
+1. Bilderpfad für die PayPal Plus Wall
 
 # Veröffentlichung 1.0.5
 

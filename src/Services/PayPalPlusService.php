@@ -83,7 +83,7 @@ class PayPalPlusService extends PaymentService
                         $thirdPartyPaymentMethods[] = [
                             'redirectUrl'   => $domain.'/checkout/',
                             'methodName'    => substr($frontendPaymentMethodRepositoryContract->getPaymentMethodName($paymentMethod, 'de'),0,25),
-                            'imageUrl'      => $domain.'/'.$frontendPaymentMethodRepositoryContract->getPaymentMethodIcon($paymentMethod, 'de'),
+                            'imageUrl'      => $frontendPaymentMethodRepositoryContract->getPaymentMethodIcon($paymentMethod, 'de'),
                             'description'   => (string)($frontendPaymentMethodRepositoryContract->getPaymentMethodName($paymentMethod, 'de').' '.$frontendPaymentMethodRepositoryContract->getPaymentMethodDescription($paymentMethod, 'de'))
                         ];
                         $changeCase[] = 'case "'.substr($frontendPaymentMethodRepositoryContract->getPaymentMethodName($paymentMethod, 'de'), 0, 25).'": $.post("/payment/payPalPlus/changePaymentMethod/", { "paymentMethod" : "'.$paymentMethod->id.'" } ); document.dispatchEvent(new CustomEvent("afterPaymentMethodChanged", {detail: '.$paymentMethod->id.'})); break;';

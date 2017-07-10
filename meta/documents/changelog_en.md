@@ -1,3 +1,8 @@
+# Release 1.0.6
+
+#### FIX
+1. Correct image path for the paypal plus wall
+
 # Release 1.0.5
 
 #### FIX
