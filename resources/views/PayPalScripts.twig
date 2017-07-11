@@ -18,6 +18,12 @@
 
             $("#installmentSpecificPromotionModal").data("modal-loaded", true);
         }
+
+        $("[id^='reinitPayPal-']").click(function () {
+            var orderId = $(this).attr('id').split('-')[1];
+            alert('Yep, you clicked orderId-' + orderId);
+        });
+
     });
 
     //Load the modal content
