@@ -1,19 +1,31 @@
 <!-- PLUGIN BUTTON -->
+{% set paymentId = 0 %}
+{% set paidStatus = '' %}
+
 {% if services.template.isMyAccount() %}
     {% set properties = order.order.properties %}
 
     {% for property in properties %}
         {% if property.typeId == 3 %}
-            {% set display = property.value == paymentMethodId ? "block" : "none" %}
+            {% set paymentId = property.value %}
+        {% endif %}
 
-            <button id="reinitPayPal-{{order.order.id}}" class="btn btn-primary btn-block" @click="" :disabled="" style="display: {{ display }}; margin-top: 0.5rem">
-                <i class="fa fa-arrow-right" aria-hidden="true"></i>
-                {% if installmentSelected == true %}
-                    {{ trans("PayPal::PayPal.installmentButton") }}
-                {% else %}
-                    {{ trans("Ceres::Template.myAccountReinitPayment") }}
-                {% endif %}
-            </button>
+        {% if property.typeId == 4 %}
+            {% set paidStatus = property.value %}
         {% endif %}
     {% endfor %}
+    {% if (paymentId == paymentMethodId) and (paidStatus != 'fullyPaid') %}
+        {% set display = "block" %}
+    {% else %}
+        {% set display = "none" %}
+    {% endif %}
+
+    <button id="reinitPayPal-{{order.order.id}}" class="btn btn-primary btn-block" @click="" :disabled="" style="display: {{ display }}; margin-top: 0.5rem">
+        <i class="fa fa-arrow-right" aria-hidden="true"></i>
+        {% if installmentSelected == true %}
+            {{ trans("PayPal::PayPal.installmentButton") }}
+        {% else %}
+            {{ trans("Ceres::Template.myAccountReinitPayment") }}
+        {% endif %}
+    </button>
 {% endif %}
