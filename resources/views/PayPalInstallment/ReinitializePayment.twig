@@ -20,12 +20,11 @@
         {% set display = "none" %}
     {% endif %}
 
-    <button id="reinitPayPal-{{order.order.id}}" class="btn btn-primary btn-block" @click="" :disabled="" style="display: {{ display }}; margin-top: 0.5rem">
-        <i class="fa fa-arrow-right" aria-hidden="true"></i>
+    <button id="reinitPayPal-{{order.order.id}}" class="btn btn-primary btn-block" @click="" :disabled="" style="display: {{ display }}; margin-top: 0.5rem">        
         {% if installmentSelected == true %}
             {{ trans("PayPal::PayPal.installmentButton") }}
         {% else %}
-            {{ trans("Ceres::Template.myAccountReinitPayment") }}
+            {{ trans("PayPal::PayPal.myAccountReinitPayment") }}
         {% endif %}
     </button>
 {% endif %}
