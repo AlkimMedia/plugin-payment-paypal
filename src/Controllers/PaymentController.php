@@ -7,6 +7,8 @@ use PayPal\Services\PayPalInstallmentService;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Basket\Models\Basket;
+use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
+use Plenty\Modules\Order\Models\Order;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
@@ -54,6 +56,11 @@ class PaymentController extends Controller
     private $basketContract;
 
     /**
+     * @var OrderRepositoryContract
+     */
+    private $orderContract;
+
+    /**
      * @var SessionStorageService
      */
     private $sessionStorage;
@@ -67,6 +74,7 @@ class PaymentController extends Controller
      * @param PaymentHelper $paymentHelper
      * @param PaymentService $paymentService
      * @param BasketRepositoryContract $basketContract
+     * @param OrderRepositoryContract $orderContract
      * @param SessionStorageService $sessionStorage
      */
     public function __construct(  Request $request,
@@ -75,6 +83,7 @@ class PaymentController extends Controller
                                   PaymentHelper $paymentHelper,
                                   PaymentService $paymentService,
                                   BasketRepositoryContract $basketContract,
+                                  OrderRepositoryContract $orderContract,
                                   SessionStorageService $sessionStorage)
     {
         $this->request          = $request;
@@ -83,6 +92,7 @@ class PaymentController extends Controller
         $this->paymentHelper    = $paymentHelper;
         $this->paymentService   = $paymentService;
         $this->basketContract   = $basketContract;
+        $this->orderContract    = $orderContract;
         $this->sessionStorage   = $sessionStorage;
     }
 
@@ -199,6 +209,23 @@ class PaymentController extends Controller
         $payPalExpressService = pluginApp(\PayPal\Services\PayPalExpressService::class);
         $redirectURL = $payPalExpressService->preparePayPalExpressPayment($basket);
 
+        return $this->response->redirectTo($redirectURL);
+    }
+
+
+    /**
+     * @param $orderId
+     *
+     * Redirect to PayPal Express Checkout
+     */
+    public function expressOrderCheckout($orderId)
+    {
+        /** @var Order $order */
+        $order = $this->orderContract->findOrderById($orderId);
+
+        /** @var PayPalExpressService $payPalExpressService */
+        $payPalExpressService = pluginApp(\PayPal\Services\PayPalExpressService::class);
+        $redirectURL = $payPalExpressService->preparePayPalExpressPaymentByOrder($order);
         return $this->response->redirectTo($redirectURL);
     }
 

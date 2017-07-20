@@ -10,6 +10,7 @@ use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Modules\Basket\Models\Basket;
+use Plenty\Modules\Order\Models\Order;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 
@@ -210,6 +211,46 @@ class PaymentService
 
         return $paymentContent;
     }
+
+
+    /**
+     * Get the PayPal payment content
+     *
+     * @param Order $order
+     * @param string $mode
+     * @return string|array|null
+     */
+    public function getPaymentContentByOrder(Order $order, $mode = PaymentHelper::MODE_PAYPAL, $additionalRequestParams=[]):string
+    {
+        if($order->methodOfPaymentId != 6003)
+        {
+            return 'https://www.plentymarkets.eu/unternehmen/impressum';
+        }
+
+        return '<div class="modal-body text-md-center">
+    <div class="container-fluid">
+        <div class="offset-md-4 col-md-4">
+        </div>
+        <div class="offset-md-1 col-md-10">
+            <h3>Zahlen Sie bequem und einfach PayPalPLUS Wall</h3>
+            <p>
+                Ihre Ratenzahlung und den passenden Finanzierungsplan können Sie im Rahmen des Bestellprozesses auswählen.<br>
+                Ihr Antrag erfolgt komplett online und wird in wenigen Schritten hier im Shop abgeschlossen.
+            </p>
+        </div>
+
+        <div class="offset-md-1 col-md-10">
+        </div>
+        <div class="offset-md-3 col-md-6">
+            <p>
+                * Zugleich repräsentatives Beispiel gem. § 6a PAngV<br>
+            </p>
+        </div>
+    </div>
+</div>';
+
+    }
+
 
     /**
      * Execute the PayPal payment

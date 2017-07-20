@@ -44,6 +44,11 @@ class PayPalRouteServiceProvider extends RouteServiceProvider
         // Get the PayPalExpress checkout
         $router->get('payment/payPal/expressCheckout', 'PayPal\Controllers\PaymentController@expressCheckout');
 
+        // Get the PayPalExpress Order checkout
+        $router->get('payment/payPal/expressOrderCheckout/{orderId}', 'PayPal\Controllers\PaymentController@expressOrderCheckout');
+
+        $router->get('payment/payPalPlus/paymentWall/{orderId}', 'PayPal\Controllers\PaymentController@plusOrderCheckout');
+
         // PayPal Webhook handler
         $router->post('payment/payPal/notification', 'PayPal\Controllers\PaymentNotificationController@handleNotification');
 

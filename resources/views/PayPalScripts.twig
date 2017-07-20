@@ -18,6 +18,11 @@
 
             $("#installmentSpecificPromotionModal").data("modal-loaded", true);
         }
+
+        $("[id^='reinitPayPal-']").click(function () {
+            var orderId = $(this).attr('id').split('-')[1];
+            window.location = "/payment/payPal/expressOrderCheckout/"+orderId;
+        });
     });
 
     //Load the modal content
@@ -42,4 +47,6 @@
             $("#checkoutButtonPayPalInstallment").text("{{ trans("Ceres::Template.orderBuyNow") }}");
         }
     });
+
+
 </script>
