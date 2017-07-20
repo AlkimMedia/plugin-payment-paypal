@@ -33,7 +33,7 @@
         {"key":"PayPal\\Providers\\DataProvider\\Installment\\PayPalInstallmentFinancingCheck", "name":"PayPal Installment Financing Check", "description": "Display the PayPal Installment Financing Check"},
         {"key":"PayPal\\Providers\\DataProvider\\Installment\\PayPalInstallmentFinancingCosts", "name":"PayPal Installment Financing Costs", "description": "Display the PayPal Installment Financing Costs"},
         {"key":"PayPal\\Providers\\DataProvider\\Installment\\PayPalInstallmentPrepareButton", "name":"PayPal Installment Prepare Button", "description": "Display the PayPal Installment Prepare Button"},
-        {"key":"PayPal\\Providers\\DataProvider\\Installment\\PayPalInstallmentReinitializePayment", "name":"PayPal Reinitialize Payment", "description": "Display the PayPal Installment Button after the Payment changed to PayPal"},
-        {"key":"PayPal\\Providers\\DataProvider\\Installment\\PayPalInstallmentReinitializePaymentScript", "name":"PayPal Reinitialize Payment Script", "description": "A Script for displaying the PayPal Installment Button after the Payment changed to PayPal"}
+        {"key":"PayPal\\Providers\\DataProvider\\ReinitializePayment", "name":"PayPal Reinitialize Payment", "description": "Display the PayPal Button after the Payment changed to PayPal"},
+        {"key":"PayPal\\Providers\\DataProvider\\ReinitializePaymentScript", "name":"PayPal Reinitialize Payment Script", "description": "A Script for displaying the PayPal Button after the Payment changed to PayPal"}
     ]
 }
