@@ -11,7 +11,8 @@ class PayPalReinitializePaymentScript
     public function call(Twig $twig):string
     {
       $paymentHelper = pluginApp(PaymentHelper::class);
-      $typeId = $paymentHelper->getPayPalMopIdByPaymentKey('PAYPAL');
-      return $twig->render('PayPal::PayPalReinitializePaymentScript', ['typeId' => $typeId]);
+      $pp = $paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPAL);
+      $ppp = $paymentHelper->getPayPalMopIdByPaymentKey(PaymentHelper::PAYMENTKEY_PAYPALPLUS);
+      return $twig->render('PayPal::PayPalReinitializePaymentScript', ['mopIds' => ['pp' => $pp, 'ppp' => $ppp]]);
     }
 }
